@@ -1,0 +1,627 @@
+@model IEnumerable<Registerhead>
+@{
+    ViewData["Title"] = "จัดการคะแนน";
+    int i=1;
+    var b="";
+    var c="";
+    IList<Registerhead> models=ViewBag.data;
+     IList<uploadfilepdf> uploadfilepdf=ViewBag.fileupload;
+}
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<div class="card">
+ <div class="card-header">
+        <h2 class="card-title">ข้อมูลการจัดการคะแนน</h2>
+    </div>
+ <div>
+    <form asp-controller="Manager" asp-action="frmmanagerscore">
+        <input id="s_id" value="@ViewBag.c_id" hidden>
+        @Html.AntiForgeryToken()
+            <div class="card-body">
+                <!-- Main content -->
+                <section class="content">
+                    <div class="container-fluid">
+                        <!-- SELECT2 EXAMPLE -->
+                        <div class="card card-default">
+                            <div class="card-header">
+                                <h3 class="card-title">เงื่อนไขการค้นหา</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">กลุ่ม</label>
+                                    <div class="col-sm-10">
+                                        @Html.DropDownList("g_id", (IEnumerable<SelectListItem>)TempData["LevelData"], "ทั้งหมด", new { @name = "", @class = "form-control select2", @style = "width: 100%;", @selected = (int)ViewBag.currentTypelevel })
+                                    </div>
+                                </div>
+                            </div>  
+                        </div>
+                    </div>
+                    <!-- /.container-fluid -->
+                </section>
+                <!-- /.content -->
+                <!-- /.card-body -->
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-info">ค้นหา</button>
+                   
+                    <button type="submit" class="btn btn-default float-right">Cancel</button>
+                </div>
+                <!-- /.card-footer -->
+            </div>
+        </form>
+      
+ </div>
+ <div class="card-footer clearfix">
+              <button type="button" id="openAddTeamModal" class="btn btn-primary float-right">
+        <i class="fas fa-plus"></i> เพิ่มทีมแข่งขัน
+    </button>
+              </div>
+  <div class="card-body">
+     <table id="example1" class="table table-bordered table-striped">
+        <thead>
+                <tr>
+                    <th>
+                        #
+                    </th>
+                    <th>
+                        รหัส
+                    </th>
+                    <th>
+                        ชื่อโรงเรียน 
+                    </th>
+                    <th>
+                        กลุ่ม
+                    </th>
+                    <th>กรรมการ</th>
+                    <th>
+                        นักเรียน/ครู
+                    </th>
+                    <th>
+                        คะแนน
+                    </th>
+                    @if(Model.Where(x=>x.status=="2").FirstOrDefault()!=null){
+                        <th>ระดับ</th>
+                        <th>อันดับ</th>
+                    }
+                </tr>
+            </thead>
+             <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr data-widget="expandable-table" aria-expanded="false">
+                        <td align="center">
+                            @i
+                        </td>
+                        <td align="center">
+                            @Html.DisplayFor(modelItem => item.id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.School.Name)
+                            <br>
+                            @if(item.c_id==43){
+                                var dupdf=uploadfilepdf.Where(x=>x.c_id==item.c_id&&x.s_id==item.s_id).FirstOrDefault();
+                                if(dupdf!=null){
+                                    if(dupdf.status=="1"){
+                                        <span class="badge bg-danger showModal" data-cid="@item.c_id" data-sid=@item.s_id  style="cursor: pointer;">รอการตรวจสอบ</span>
+                                    }else if(dupdf.status=="0")
+                                    {
+                                        <span class="badge bg-danger showModal" data-cid="@item.c_id" data-sid=@item.s_id  style="cursor: pointer;">ไม่ผ่านเกณฑ์</span>
+                                    }else
+                                    {
+                                        <span class="badge bg-success showModal" data-cid="@item.c_id" data-sid=@item.s_id  style="cursor: pointer;">ตรวจสอบเรียบร้อย</span>
+                                    }
+                                }
+                            }
+                            <button class="btn btn-sm btn-danger deletePdfBtn" data-id="@item.id" style="margin-top: 5px;">
+                                 ลบ
+                            </button>
+                        </td>
+                        <td align="center">
+                            @Html.DisplayFor(modelItem => item.School.grouplist.Name)
+                        </td>
+                        <td align="center">
+                             <a asp-action="frmRegister_addreferee" asp-controller="Manager" asp-route-id="@item.Competitionlist.c_id"  asp-route-c_id="@item.c_id" asp-route-c_name="@item.Competitionlist.Name" asp-route-type="@item.Competitionlist.type" asp-route-d="@item.Competitionlist.director">
+                             แก้ไขข้อมูลกรรมการ
+                             </a>
+                        </td>
+                        <td align="center">
+                             <a asp-action="frmRegister_add" asp-controller="Member" asp-route-id="@item.id"  asp-route-c_id="@item.c_id" asp-route-c_name="@item.Competitionlist.Name" asp-route-type="@item.Competitionlist.type" asp-route-t="@item.Competitionlist.teacher" asp-route-s="@item.Competitionlist.student" asp-route-s_id="@item.s_id">
+                             แก้ไขข้อมูลนักเรียน/ครู
+                             </a>
+                        </td>
+                        <td> 
+                        <!-- กรอกคะแนน จำกัดค่า -1 ถึง 100 -->
+                        @if(item.status=="1"){
+                        <input id="score_@i" name="Scores[@i].Score" class="form-control score-input" type="number" min="-1" max="100" step="0.01" onchange="saveScore(this, '@item.id')" oninput="validateScore(this)" value="@item.score" onfocus="setTimeout(() => this.select(), 0);" tabindex="@i" onkeydown="submitOnEnter(event, this, '@item.id')" required />
+                       
+                         @Html.ValidationMessageFor(m => models[i].score) <!-- แสดงข้อความข้อผิดพลาด -->
+                        }else if(item.status=="2"){
+                        <input id="score_@i" name="Scores[@i].Score" class="form-control" type="number" min="-1" max="100" step="1" value="@item.score" disabled />
+                        }
+                         
+                        </td>
+                        @if(item.status=="2")
+                        {
+                        <td align="center">@(item.rank.HasValue ? item.rank.ToString() : "-")</td>
+                        <td align="center">@(item.award?? "-")</td>
+                        }
+                    </tr>
+                    i+=1;  
+                }
+            </tbody>
+     </table>
+  </div>
+  <div class="card-footer d-flex justify-content-between">
+    @if(Model.Where(x=>x.status=="2").FirstOrDefault()==null)
+    {
+        <button type="button" id="save" value="Submit" class="btn btn-info" onclick="announceResults()">ยืนยันการประกาศผล</button>
+        <div class="ml-auto">
+        <button type="button" class="btn btn-secondary" onclick="downloadPdf(@Model.FirstOrDefault().c_id)">พิมพ์เอกสารตรวจสอบคะแนน</button>
+    </div>
+    }else{
+        <button type="button" id="save" value="Submit" class="btn btn-danger" onclick="announceResults1()">ยกเลิกการประกาศผล</button>
+        <div class="ml-auto">
+        <button type="button" class="btn btn-secondary" onclick="downloadPdf1(@Model.FirstOrDefault().c_id)">พิมพ์เอกสารผลการแข่งขัน</button>
+    </div>
+    }
+    
+</div>
+</div>
+<!-- Modal สำหรับแสดง PDF และปุ่มยืนยัน -->
+<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">รายละเอียด PDF</h5>
+                
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalContent">
+                <!-- ข้อมูล PDF จะมาแสดงที่นี่ -->
+            </div>
+            <div class="modal-footer">
+                <div class="form-group">
+                    <label for="rejectReason">เหตุผลที่ไม่ผ่านเกณฑ์:</label>
+                    <textarea id="rejectReason" class="form-control" rows="3" placeholder="พิมพ์เหตุผลที่นี่..."></textarea>
+                </div>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-success" id="approveButton">ผ่านเกณฑ์</button>
+                <button type="button" class="btn btn-danger" id="rejectButton">ไม่ผ่านเกณฑ์</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal สำหรับใส่เหตุผล -->
+<div class="modal fade" id="deleteReasonModal" tabindex="-1" aria-labelledby="deleteReasonLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteReasonLabel">ยืนยันการลบ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>กรุณาระบุเหตุผลที่ต้องการลบ:</p>
+                <textarea id="deleteReason" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-danger confirmDeleteBtn">ยืนยันการลบ</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="addTeamModal" tabindex="-1" aria-labelledby="addTeamModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTeamModalLabel">เพิ่มทีมแข่งขัน</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addTeamForm">
+                    <div class="mb-3">
+                        <label for="schoolDropdown" class="form-label">เลือกโรงเรียน</label>
+                        <select id="schoolDropdown" class="form-select select2" name="schoolId" required>
+                            <option value="">-- กรุณาเลือกโรงเรียน --</option>
+                            @foreach (var school in ViewBag.SchoolList as List<SelectListItem>)
+                            {
+                                <option value="@school.Value">@school.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <input type="hidden" id="competitionId" value="123"> <!-- c_id -->
+                    <button type="submit" class="btn btn-primary">บันทึกข้อมูล</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script>$(function () {
+        $('.select2').select2()
+        $("#example1").DataTable({
+            "responsive": true, "lengthChange": false, "autoWidth": false, "ordering": true, "pageLength": 40, "orderMulti":true,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+        });
+       
+    });</script>
+    <script>
+    function validateScore(input) {
+        // ดึงค่าคะแนนจากช่อง input
+       var value = parseFloat(input.value); // ใช้ parseFloat เพื่อรองรับทศนิยม
+        
+        // ตรวจสอบว่าค่าคะแนนไม่อยู่ในช่วงที่กำหนด
+        if (value < -1 || value > 100 || isNaN(value)) {
+            alert("กรุณากรอกคะแนนระหว่าง -1 ถึง 100");
+            input.value = ''; // ล้างค่าที่กรอกถ้าไม่ถูกต้อง
+        }
+    }
+
+    function validateBeforeSubmit() {
+        // ตรวจสอบทุกช่อง input ที่ใช้กรอกคะแนน
+        var scoreInputs = document.querySelectorAll('input.score');
+        var isValid = true;
+
+        scoreInputs.forEach(function(input) {
+            var value = parseFloat(input.value);
+            if (value < -1 || value > 100 || isNaN(value)) {
+                isValid = false;
+                alert("มีคะแนนที่ไม่ถูกต้อง กรุณากรอกคะแนนระหว่าง -1 ถึง 100");
+            }
+        });
+
+        return isValid; // คืนค่า true ถ้าข้อมูลถูกต้องทั้งหมด
+    }
+</script>
+<script>
+    function saveScore(scoreInput, scoreId) {
+        // รับค่า score จาก input
+        var score = scoreInput.value;
+
+        // ตรวจสอบค่าคะแนนว่าต้องอยู่ในช่วง -1 ถึง 100
+        if (score < -1 || score > 100) {
+            alert("กรุณากรอกคะแนนระหว่าง -1 ถึง 100");
+            return;
+        }
+
+        // ส่งค่าไปยังเซิร์ฟเวอร์ด้วย AJAX
+        fetch('/Manager/saveScore', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: scoreId,  // ส่ง ID ของนักเรียน/รายการไปด้วย
+                score: score  // ส่งคะแนนที่กรอก
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log("บันทึกคะแนนสำเร็จ");
+            } else {
+                console.error("เกิดข้อผิดพลาดในการบันทึกคะแนน");
+            }
+        })
+        .catch(error => {
+            console.error("ข้อผิดพลาดจากการเชื่อมต่อ: ", error);
+        });
+    }
+</script>
+<script>
+    function announceResults() {
+        var c_id = document.getElementById("s_id").value; // Get the c_id value
+        if (confirm("คุณแน่ใจหรือไม่ที่จะประกาศผล?")) {
+            $.ajax({
+                type: "POST",
+                url: "/Manager/AnnounceResults?c_id=" + $("#s_id").val()+"&s=2",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+               success: function (response) {
+                if (response.success) {
+                    alert(response.message);
+                    location.reload(); // Reload page if success
+                } else {
+                    alert(response.message); // Show error message
+                }
+            },
+            error: function () {
+                alert("เกิดข้อผิดพลาดในการประกาศผล");
+            }
+            });
+        }
+    }
+    function announceResults1() {
+        var c_id = document.getElementById("s_id").value; // Get the c_id value
+        if (confirm("คุณแน่ใจหรือไม่ที่ยกเลิกการประกาศผล?")) {
+            $.ajax({
+                type: "POST",
+                url: "/Manager/AnnounceResults?c_id=" + $("#s_id").val()+"&s=1",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                if (response.success) {
+                    alert(response.message);
+                    location.reload(); // Reload page if success
+                } else {
+                    alert(response.message); // Show error message
+                }
+            },
+            error: function () {
+                alert("เกิดข้อผิดพลาดในการประกาศผล");
+            }
+            });
+        }
+    }
+    function printScoreDocument() {
+        var h_id = document.getElementById("s_id").value; // Get the c_id value
+        $.ajax({
+        url: '@Url.Action("GenePdfprintScoreDocument", "Pdfmember")',
+        type: 'POST',
+        data: JSON.stringify({ h_id: h_id }),
+        contentType: 'application/json; charset=utf-8',
+        xhrFields: {
+            responseType: 'blob' // กำหนดประเภทการตอบกลับเป็น 'blob'
+        },
+        success: function(response) {
+            // สร้าง URL จาก Blob
+            var url = window.URL.createObjectURL(response);
+            // เปิด URL ในแท็บใหม่
+            window.open(url, '_blank');
+        },
+        error: function(xhr, status, error) {
+            console.error('เกิดข้อผิดพลาด:', error);
+        }
+    });
+    }
+    function downloadPdf(h_id) {
+        // สร้าง URL สำหรับดาวน์โหลดไฟล์
+        var url = '@Url.Action("GenePdfprintScoreDocument", "Pdfmember")' + '?h_id=' + h_id;
+        // เปลี่ยนเส้นทางไปยัง URL เพื่อเริ่มการดาวน์โหลด
+        window.location.href = url;
+    }
+    function downloadPdf1(h_id) {
+        // สร้าง URL สำหรับดาวน์โหลดไฟล์
+        var url = '@Url.Action("GenePdfprintScoreDocument1", "Pdfmember")' + '?h_id=' + h_id;
+        // เปลี่ยนเส้นทางไปยัง URL เพื่อเริ่มการดาวน์โหลด
+        window.location.href = url;
+    }
+
+$(document).on('click', '.showModal', function() {
+    const c_id = this.getAttribute("data-cid");
+    const s_id = this.getAttribute("data-sid");
+
+    // เรียกใช้ AJAX เพื่อดึงข้อมูลจากเซิร์ฟเวอร์
+    fetch(`/Manager/GetPdfDetails?c_id=${c_id}&s_id=${s_id}`)
+        .then(response => response.text())
+        .then(data => {
+            // ใส่ข้อมูล PDF ใน modal
+            document.getElementById("modalContent").innerHTML = data;
+            // แสดง modal
+            $('#detailsModal').modal('show');
+        })
+        .catch(error => console.error('Error fetching PDF details:', error));
+});
+document.getElementById("rejectButton").addEventListener("click", function() {
+    //const c_id = document.querySelector('.showModal[data-cid]').getAttribute('data-cid');
+    //const s_id = document.querySelector('.showModal[data-sid]').getAttribute('data-sid');
+    const c_id=document.getElementById("cc_id").value;
+    const s_id=document.getElementById("ss_id").value;
+    const rejectReason = document.getElementById("rejectReason").value;
+
+    // ส่งข้อมูลไปยังเซิร์ฟเวอร์โดยใช้ fetch
+    fetch(`/Manager/RejectPdf`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            c_id: c_id,
+            s_id: s_id,
+            reason: rejectReason
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("บันทึกเหตุผลไม่ผ่านเกณฑ์เรียบร้อยแล้ว");
+            $('#detailsModal').modal('hide');
+            location.reload(); // รีเฟรชหน้าหลังอัปเดตสถานะ
+        } else {
+            alert("เกิดข้อผิดพลาด: " + data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+document.getElementById("approveButton").addEventListener("click", function() {
+    //const c_id = document.querySelector('.showModal[data-cid]').getAttribute('data-cid');
+   // const s_id = document.querySelector('.showModal[data-sid]').getAttribute('data-sid');
+    const c_id=document.getElementById("cc_id").value;
+    const s_id=document.getElementById("ss_id").value;
+
+    // ส่งข้อมูลไปยังเซิร์ฟเวอร์เพื่ออนุมัติ
+    fetch(`/Manager/ApprovePdf`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            c_id: c_id,
+            s_id: s_id
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("อนุมัติเอกสารเรียบร้อยแล้ว");
+            $('#detailsModal').modal('hide');
+            location.reload(); // รีเฟรชหน้าหลังอัปเดตสถานะ
+        } else {
+            alert("เกิดข้อผิดพลาด: " + data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Get all score input fields
+    const scoreInputs = document.querySelectorAll('.score-input');
+    
+    // Add event listener to each input
+    scoreInputs.forEach((input, index) => {
+        input.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' || event.key === 'Tab') {
+                event.preventDefault(); // Prevent default behavior of Tab or Enter
+                
+                // Move to the next input if it exists
+                const nextInput = scoreInputs[index + 1];
+                if (nextInput) {
+                    nextInput.focus();
+                }
+            }
+        });
+    });
+});
+let deletePdfId = null;
+
+$(document).on("click", ".deletePdfBtn", function () {
+    deletePdfId = $(this).data("id");
+    const fileName = $(this).data("name");
+    $("#deleteReason").val(""); // ล้างค่าใน textarea
+    $("#deleteReasonModal").modal("show"); // เปิด Modal
+});
+
+$(document).on("click", ".confirmDeleteBtn", function () {
+    const reason = $("#deleteReason").val().trim();
+    if (reason === "") {
+        alert("กรุณาระบุเหตุผลที่ต้องการลบ");
+        return;
+    }
+
+    // ส่งคำขอไปยัง Server
+    $.ajax({
+        url: '/Manager/DeletePdfWithReason', // URL ของ Action ใน Controller
+        type: 'POST',
+        data: { id: deletePdfId, reason: reason },
+        success: function (response) {
+            if (response.success) {
+                alert("ลบข้อมูลเรียบร้อยแล้ว");
+                location.reload(); // โหลดหน้าใหม่เพื่ออัปเดตข้อมูล
+            } else {
+                alert("เกิดข้อผิดพลาดในการลบไฟล์");
+            }
+        },
+        error: function () {
+            alert("เกิดข้อผิดพลาดในการส่งคำขอลบ");
+        }
+    });
+
+    $("#deleteReasonModal").modal("hide"); // ปิด Modal
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const openModalButton = document.getElementById('openAddTeamModal');
+    const addTeamModal = new bootstrap.Modal(document.getElementById('addTeamModal'), {
+        keyboard: true,
+        backdrop: 'static'
+    });
+
+    // เปิด Modal เมื่อคลิกปุ่ม
+    if (openModalButton) {
+        openModalButton.addEventListener('click', function () {
+            addTeamModal.show();
+        });
+    }
+
+    // จัดการส่งฟอร์ม
+    const addTeamForm = document.getElementById('addTeamForm');
+    if (addTeamForm) {
+        addTeamForm.addEventListener('submit', function (e) {
+            e.preventDefault(); // ป้องกันการรีโหลดหน้า
+
+            const schoolId = document.getElementById('schoolDropdown').value; // ดึงค่า schoolId
+            const c_id = document.getElementById('s_id').value; // ดึงค่า c_id จาก input หรือ element
+
+            if (!schoolId) {
+                alert("กรุณาเลือกโรงเรียนก่อน");
+                return;
+            }
+
+            fetch('/Manager/SaveTeam', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    schoolId: schoolId, 
+                    c_id: c_id // เพิ่ม c_id ในข้อมูล JSON
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("เพิ่มทีมแข่งขันเรียบร้อยแล้ว!");
+                    location.reload(); // โหลดหน้าใหม่
+                } else {
+                    alert("เกิดข้อผิดพลาด: " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("ไม่สามารถเพิ่มทีมแข่งขันได้");
+            });
+        });
+    }
+});
+</script>
+<script>
+    function submitOnEnter(event, element, id) {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Prevent form submission if in a form
+            saveScore(element, id); // Call the saveScore function with the necessary parameters
+            // Find the next element in the tabindex sequence
+            const currentTabIndex = parseInt(element.getAttribute("tabindex"));
+            const nextElement = document.querySelector(`[tabindex="${currentTabIndex + 1}"]`);
+
+            // If there is a next element, focus on it
+            if (nextElement) {
+                nextElement.focus();
+            }
+        }
+    }
+</script>
+<style>
+    /* จัดข้อความให้อยู่ตรงกลางใน input ทั้งแนวตั้งและแนวนอน */
+    .form-control {
+        text-align: center; /* จัดข้อความตรงกลางแนวนอน */
+        padding: 8px;      /* เพิ่มระยะห่างภายใน */
+        line-height: 1.5;  /* จัดตำแหน่งแนวตั้ง */
+    }
+</style>

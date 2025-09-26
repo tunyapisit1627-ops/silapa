@@ -1,0 +1,179 @@
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@inject UserManager<ApplicationUser> UserManager
+@{
+    var user = await UserManager.GetUserAsync(User);
+}
+<div class="collapse navbar-collapse order-md-3" id="navbarCollapse" >
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item">
+            <a asp-action="Index" asp-controller="Home" class="nav-link">หน้าหลัก</a>
+        </li>
+        <li class="nav-item">
+            <a asp-action="contacts" asp-controller="Home" class="nav-link">Contacts</a>
+        </li>
+        @if (User.Identity.IsAuthenticated)
+        {
+            if (User.IsInRole("Admin"))
+            {
+                <li class="nav-item dropdown">
+                    <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                        class="nav-link dropdown-toggle">จัดการระบบ</a>
+                    <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
+                        <li><a asp-controller="Admin" asp-action="frmsetupsystem" asp-route-id="1"
+                                class="dropdown-item">ตั้งค่าระบบ</a></li>
+                        <li><a asp-controller="Admin" asp-action="frmList" class="dropdown-item">รายการแข่งขัน
+                            </a></li>
+                        <li><a asp-controller="Admin" asp-action="frmfileList" class="dropdown-item">ไฟล์เอกสาร
+                            </a></li>
+                        <li><a asp-controller="Account" asp-action="ListRegister" class="dropdown-item">ข้อมูลผู้ใช้งานระบบ </a>
+                        </li>
+                        <li><a asp-controller="Admin" asp-action="frmschoolList" class="dropdown-item">ข้อมูลโรงเรียน </a></li>
+                        <li><a asp-controller="News" asp-action="frmnewslist" class="dropdown-item">ข่าวประชาสัมพันธ์</a></li>
+                        <li class="dropdown-divider"></li>
+                        <li><a asp-controller="Admin" asp-action="frmcontacts" class="dropdown-item">ข้อมูลผู้ประสานงาน</a></li>
+                        <li class="dropdown-divider"></li>
+                        <li><a asp-controller="Admin" asp-action="frmlistregisterAll"
+                                class="dropdown-item">สรุปทีมที่ลงทะเบียน</a>
+                        </li>
+                        <li class="dropdown-divider"></li>
+                        <li><a asp-controller="Pdf" asp-action="printreferee" class="dropdown-item">ปริ้นคำสั่งกรรมการ</a></li>
+                        <li class="dropdown-divider"></li>
+                        <!-- Level two dropdown-->
+
+                        <!-- End Level two -->
+                    </ul>
+
+                </li>
+            }
+            else if (User.IsInRole("Manager"))
+            {
+                <li class="nav-item dropdown">
+                    <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                        class="nav-link dropdown-toggle">จัดการระบบ</a>
+                    <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
+                        <li><a asp-controller="Manager" asp-action="frmmanagerRegister"
+                                class="dropdown-item">รายการที่ทะเบียนแข่งขัน</a></li>
+                        <li><a asp-controller="Manager" asp-action="frmracedetails"
+                                class="dropdown-item">วันที่และสถานที่จัดการแข่งขัน</a></li>
+                        <li><a asp-controller="Manager" asp-action="frmrefereeprintpic"
+                                class="dropdown-item">จัดการรูปและปริ้นบัตรกรรมการ</a></li>
+                        <li><a asp-controller="Manager" asp-action="frmgroupreferee" class="dropdown-item">คณะดำเนินการ</a></li>
+                        <li><a asp-controller="Manager" asp-action="frmapprovedirector"
+                                class="dropdown-item">รายชื่อที่สมัครเข้ามาเป็นกรรมการ</a></li>
+                        <li><a asp-controller="Manager" asp-action="frmlistreferee"
+                                class="dropdown-item">รายชื่อกรรมการทั้งหมด</a></li>
+                        <li><a asp-controller="Manager" asp-action="frmprintAll" class="dropdown-item">ปริ้นเอกสารการแข่งขัน</a>
+                        </li>
+                        <li><a asp-controller="Manager" asp-action="frmprintresult" class="dropdown-item">ปริ้นผลการแข่งขัน</a>
+                        </li>
+                        <li><a asp-controller="News" asp-action="frmnewslist" class="dropdown-item">ข่าวประชาสัมพันธ์</a></li>
+                        <li><a asp-controller="Manager" asp-action="frmcharts" class="dropdown-item">สรุปการลงทะเบียน</a></li>
+
+                    </ul>
+                </li>
+            }
+            else if (User.IsInRole("Member"))
+            {
+                <li class="nav-item dropdown">
+                    <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                        class="nav-link dropdown-toggle">จัดการระบบ</a>
+                    <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
+                        <li><a asp-controller="Admin" asp-action="frmschoolAdd" asp-route-id="@user.s_id"
+                                class="dropdown-item">ข้อมูลโรงเรียน</a></li>
+                        <li><a asp-controller="Member" asp-action="frmRegister" class="dropdown-item">ลงทะเบียนแข่งขัน</a></li>
+                        <li><a asp-controller="Member" asp-action="frmschoolregister" class="dropdown-item">สรุปการลงทะเบียน
+                            </a>
+                        </li>
+                        <li><a asp-controller="Member" asp-action="frmSummaryresult" class="dropdown-item">สรุปผลการแข่งขัน
+                            </a>
+                        </li>
+                        <li><a asp-controller="Member" asp-action="frmprintregister"
+                                class="dropdown-item">ปริ้นเอกสารการลงทะเบียน
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            }
+
+        }
+
+    </ul>
+    <!-- SEARCH FORM -->
+    <form class="form-inline ml-0 ml-md-3" asp-action="frmsearch"asp-controller="Home">
+        <div class="input-group input-group-sm">
+            <input class="form-control form-control-navbar" name="searchInput" id="searchInput" type="search" placeholder="Search"
+                aria-label="Search">
+            <div class="input-group-append">
+                <button class="btn btn-navbar" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+<!-- Right navbar links -->
+<ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
+    <!-- Messages Dropdown Menu -->
+
+    <li class="nav-item">
+        <ul class="navbar-nav">
+            @if (User.Identity.IsAuthenticated)
+            {
+                <li class="nav-item">
+                    <a class="nav-link"
+                        asp-route-id="@User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier)"
+                        asp-action="RegisterEdit" asp-controller="Account">Hello,
+                        @User.Identity.Name!</a>
+                </li>
+                <li class="nav-item">
+                    <form class="form-inline" asp-controller="Account" asp-action="Logout" method="post">
+                        <button type="submit" class="btn btn-link nav-link" style="text-decoration: none;">Logout</button>
+                    </form>
+                </li>
+            }
+            else
+            {
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                </li>
+            }
+        </ul>
+
+    </li>
+</ul>
+</div>
+
+
+<head>
+
+    <!-- JavaScript 
+    <script>
+        function showSearchModal(event) {
+            event.preventDefault();
+
+            const searchQuery = document.getElementById('searchInput').value; // ดึงค่าที่กรอกในช่องค้นหา
+
+            if (searchQuery.trim() !== "") {
+                // ใช้ AJAX เพื่อดึงข้อมูล
+                $.ajax({
+                    url: '/Home/GetPersonDetails', // เปลี่ยนเป็น Action ที่คุณสร้างใน Controller
+                    type: 'GET',
+                    data: { query: searchQuery },
+                    success: function (data) {
+                        $('#searchResults').html(data);
+                    },
+                    error: function () {
+                        alert('เกิดข้อผิดพลาดในการดึงข้อมูล');
+                    }
+                });
+            } else {
+                alert('กรุณากรอกข้อความสำหรับค้นหา');
+            }
+        }
+    </script>-->
+</head>

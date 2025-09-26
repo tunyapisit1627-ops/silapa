@@ -1,0 +1,77 @@
+@model IEnumerable<filelist>
+@{
+    ViewData["Title"] = "ข้อมูลเอกสารต่างๆ";
+    int i = 1;
+    // IList<RegisterViewModel> models=ViewBag.data;
+}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">ข้อมูลเอกสารต่างๆ</h2>
+    </div>
+    <div class="card-body">
+        <table id="example1" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        #
+                    </th>
+                    <th>
+                        รายละเอียด
+                    </th>
+                    <th>
+                        file
+                    </th>
+                    <th>
+                        <a asp-action="frmfileListAdd" asp-controller="Admin" class="btn btn-outline-success"><i
+                                class="fa fa-plus-square"></i>Create New</a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @i
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.name)
+                        </td>
+                        <td>
+                            <a asp-action="DownloadFilelist" asp-route-id="@item.id" class="btn btn-link">
+                                ดาวน์โหลด <i class="fa fa-download"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <a asp-action="frmfileListAdd" asp-route-id="@item.id"><i class="fa fa-edit fa-lg"></i></a> |
+                            <a asp-action="DeleteFilelist" asp-route-id="@item.id" class="text-danger ml-1"
+                                onclick="return confirm('Are you sure to delete this record?')"><i
+                                    class="fa fa-trash fa-lg"></i></a>
+                        </td>
+                    </tr>
+                    i += 1;
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script>$(function () {
+        $('.select2').select2()
+        $("#example1").DataTable({
+            "responsive": true, "lengthChange": false, "autoWidth": false, "ordering": true, "pageLength": 20, "orderMulti": true,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+        });
+    });</script>

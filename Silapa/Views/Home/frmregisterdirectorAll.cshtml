@@ -1,0 +1,101 @@
+@model IEnumerable<Competitionlist>
+@{
+    ViewData["Title"] = "ข้อมูลรายชื่อที่สมัครเข้ามาเป็นกรรมการ";
+    int i = 1;
+    IList<registerdirector> models = ViewBag.data;
+}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>รายชื่อที่สมัครเข้ามาเป็นกรรมการ</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home"
+                                class="nav-link">Home</a></li>
+                        <li class="breadcrumb-item active"></li>
+                    </ol>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+        <!-- Default box -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">รายชื่อที่สมัครเข้ามาเป็นกรรมการ</h3>
+
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-striped projects">
+                    <thead>
+                        <tr>
+                            <th style="width: 1%">
+                                #
+                            </th>
+                            <th style="width: 20%">
+                                รายการ
+                            </th>
+                            <th style="width: 30%">
+                                รายชื่อครูที่สมัครกรรมการ
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            var sqldata = models.Where(x => x.c_id == item.Id).ToList();
+                            if (sqldata.Count > 0)
+                            {
+                                <tr>
+                                    <td>
+                                        #
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Name)
+                                    </td>
+                                    <td>
+                                        <ul class="list-inline">
+                                            @foreach (var dr in sqldata)
+                                            {
+                                                <li class="list-inline-item">
+                                                    <img alt="Avatar" class="table-avatar" src="@dr.ProfileImageUrl">
+                                                    <div>
+                                                        @if(dr.status=="1"){
+                                                        <small>รอพิจารณา</small>
+                                                        }else{
+                                                        <small>ผ่านการพิจารณา</small>
+                                                        }
+                                                    
+                                                    </div>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+
+    </section>
+    <!-- /.content -->
+</div>

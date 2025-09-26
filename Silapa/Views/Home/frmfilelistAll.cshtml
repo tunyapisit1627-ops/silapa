@@ -1,0 +1,46 @@
+@model IEnumerable<filelist>
+@{
+    ViewData["Title"] = "ข้อมูลเอกสารต่างๆ";
+    int i = 1;
+    int j=1;
+    // IList<Registerhead> models=ViewBag.data;
+    System.Globalization.CultureInfo thaiCulture = new System.Globalization.CultureInfo("th-TH");
+}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">ข้อมูลข้อมูลเอกสารต่างๆ</h2>
+    </div>
+    <div class="card-body">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">คำสั่งและเอกสารต่างๆ</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body p-0">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th style="width: 10px">#</th>
+                            <th>ราลละเอียดไฟล์</th>
+                            <th style="width: 40px">ไฟล์</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var dr in Model)
+                        {
+                            <tr>
+                                <td>@i.</td>
+                                <td>@dr.name</td>
+                                <td><a asp-action="DownloadFilelist" asp-controller="Home" asp-route-id="@dr.id"><span
+                                            class="badge bg-danger">ดาวน์โหลด</span></a></td>
+                            </tr>
+                            i+=1;
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+    </div>
+</div>

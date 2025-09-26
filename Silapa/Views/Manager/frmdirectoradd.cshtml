@@ -1,0 +1,86 @@
+@model referee
+@{
+    ViewData["Title"] = "เพิ่มข้อมูลคณะกรรมการดำเนินงาน";
+}
+
+<body class="hold-transition sidebar-mini">
+    <div class="card">
+        <form asp-action="frmdirectoradd" asp-controller="Manager" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="id" hidden>
+            <div class="card card-info">
+                <div class="card-header">
+                    <h2 class="card-title">เพิ่มข้อมูลคณะกรรมการดำเนินงาน</h2>
+                </div>
+                <div class="card-body">
+                    <!-- Main content -->
+                    <section class="content">
+                        <div class="container-fluid">
+                            <div class="card card-default">
+                                <div class="card-body">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label">หมวดหมู่/สาระ</label>
+                                        <div class="col-sm-10">
+                                            @Html.DropDownList("m_id", ViewBag.categoryData as SelectList,
+                                                 "เลือกหมวดหมู่/สาระ", new
+                                                 {
+                                                     @class = "form-control select2",
+                                                     id = "m_id",
+                                                     @name="m_id"
+                                                 })
+                                        <span asp-validation-for="m_id" class="text-danger"></span>
+                                        </div>             
+                                    </div>
+                                    <div class="form-group row">
+                                        <label asp-for="name" for="inputEmail3" class="col-sm-2 col-form-label"></label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="name" class="form-control" />
+                                            <span asp-validation-for="name" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label asp-for="role" for="inputEmail3" class="col-sm-2 col-form-label"></label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="role" class="form-control" />
+                                            <span asp-validation-for="role" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label asp-for="position" for="inputEmail3"
+                                            class="col-sm-2 col-form-label"></label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="position" class="form-control" />
+                                            <span asp-validation-for="position" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <!-- ฟิลด์อัปโหลดรูปภาพ -->
+                                    <div class="form-group row">
+                                        <label asp-for="ImageUrl" class="col-sm-2 col-form-label">รูปภาพ</label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="ImageUrl" class="form-control-file" type="file"
+                                                accept="image/*" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <div class="card-footer">
+                        <button type="submit" value="Submit" class="btn btn-info">บันทึกข้อมูล</button>
+                        <button asp-action="frmList" asp-controller="Admin"
+                            class="btn btn-default float-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script>$(function () {
+        $('.select2').select2()
+    });
+</script>

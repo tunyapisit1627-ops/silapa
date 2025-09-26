@@ -1,0 +1,11 @@
+@model news
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">ข่าวประชาสัมพันธ์</h2>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            @Html.Raw(Model.details)
+        </div>
+    </div>
+</div>

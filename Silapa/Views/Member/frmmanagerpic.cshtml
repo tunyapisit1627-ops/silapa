@@ -1,0 +1,150 @@
+@model IEnumerable<Registerdetail>
+@{
+    ViewData["Title"] = "ข้อมูลจัดการภาพติดบัตร";
+    int i = 1;
+    var id=Model.ToList();
+
+}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">จัดการรูปภาพติดบัตรรายการ @ViewBag.c_name นักเรียน</h3>
+         
+        <div class="card-tools">
+            <span class="badge badge-danger">@DateTime.Now</span>
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+            <button type="button" class="btn btn-tool" data-card-widget="remove">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body p-0">
+        <ul class="users-list clearfix">
+            @foreach (var dr in Model)
+            {
+                <li>
+                    <img width="128" height="128" src="@dr.ImageUrl" alt="User Image" data-h-id="@dr.h_id" data-no="@dr.no" data-type="@dr.Type"
+                        onclick="openCropModal('@dr.h_id','@dr.no','@dr.Type', '@dr.ImageUrl')">
+                    <a class="users-list-name" href="#">@dr.Prefix @dr.FirstName @dr.LastName</a>
+                    <span class="users-list-date">@dr.Type</span>
+                </li>
+            }
+
+
+        </ul>
+        <!-- /.users-list -->
+    </div>
+    <!-- /.card-body -->
+    <div class="card-footer text-center">
+        <a href="/Pdf/GeneratePdf?id=@id[0].h_id&type=s">ปริ้นบัตร</a>
+    </div>
+    <!-- /.card-footer -->
+</div>
+<!-- Modal for cropping the image -->
+<div class="modal fade" id="imageCropModal" tabindex="-1" aria-labelledby="imageCropModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageCropModalLabel">Edit Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- File input to choose an image -->
+                <div class="form-group">
+                    <label for="imageInput">Choose an image</label>
+                    <input type="file" id="imageInput" class="form-control" accept="image/*"
+                        onchange="loadImage(event)">
+                </div>
+
+                <!-- Image container for cropping -->
+                <div class="img-container mt-3">
+                    <img id="imageToCrop" src="" alt="Image for cropping" style="max-width: 100%; display: none;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="cropImage()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Include Cropper.js CSS and JS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+<script>
+    var cropper;
+
+    // Load and preview the selected image
+    function loadImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const imageElement = document.getElementById('imageToCrop');
+                imageElement.src = e.target.result;
+                imageElement.style.display = 'block'; // Show the image
+
+                // Destroy any existing cropper instance
+                if (cropper) cropper.destroy();
+
+                // Initialize the cropper
+                cropper = new Cropper(imageElement, {
+                    aspectRatio: 1, // Adjust this ratio based on your requirements
+                    viewMode: 1
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // Crop the image and send it to the server
+    function cropImage() {
+        const croppedDataUrl = cropper.getCroppedCanvas().toDataURL('image/jpeg'); // Get cropped image data
+
+        // Send cropped image data to the server using AJAX
+        $.ajax({
+            url: '/Member/UpdateImage', // Adjust with your actual controller path
+            type: 'POST',
+            data: {
+                croppedImage: croppedDataUrl,
+                h_id: selectedHId, // Pass the relevant parameters for the server
+                no: selectedNo,
+                Type: selectedType
+            },
+            success: function (response) {
+                // Handle success - update the image on the page
+                if (response.success) {
+                    // Update the image `src` with a timestamp to prevent caching
+                    const updatedImageUrl = `${response.newImageUrl}?t=${new Date().getTime()}`;
+
+                    // Target the img element using data attributes for `h_id` and `no`
+                    const imgElement = document.querySelector(`img[data-h-id="${selectedHId}"][data-no="${selectedNo}"][data-type="${selectedType}"]`);
+
+                    if (imgElement) {
+                        imgElement.src = updatedImageUrl;
+                    }
+                    // Clear the modal data
+                    $('#imageInput').val(''); // Clear the file input
+                    $('#imageToCrop').attr('src', '').hide(); // Hide the cropped image preview
+                    $('#imageCropModal').modal('hide'); // Close modal
+                    alert("Image updated successfully!");
+                }
+            },
+            error: function () {
+                alert("An error occurred while updating the image.");
+            }
+        });
+    }
+    function openCropModal(h_id, no,type, imageUrl) {
+        // Save these IDs for use when saving
+        selectedHId = h_id;
+        selectedNo = no;
+        selectedType=type;
+        // Set the existing image URL if you want to show the current image
+        document.getElementById('imageToCrop').src = imageUrl;
+        $('#imageCropModal').modal('show'); // Show the modal
+    }
+</script>

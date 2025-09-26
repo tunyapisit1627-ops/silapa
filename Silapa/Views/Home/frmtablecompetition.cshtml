@@ -1,0 +1,18 @@
+@model IEnumerable<Competitionlist>
+@{
+    ViewData["Title"] = "ตารางการแข่งขัน";
+    System.Globalization.CultureInfo thaiCulture = new System.Globalization.CultureInfo("th-TH");
+    int i = 1;
+}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">ข้อมูลตารางการแข่งขัน</h2>
+    </div>
+    <div class="card-body">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">หมวดหมู่รายการแข่งขัน : @ViewBag.c_name</h3>
+            </div>
+        </div>
+    </div>
+</div>

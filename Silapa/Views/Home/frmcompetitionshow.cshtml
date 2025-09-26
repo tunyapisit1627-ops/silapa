@@ -1,0 +1,174 @@
+@model IEnumerable<Registerhead>
+@{
+    ViewData["Title"] = "รายการแข่งขัน";
+    int i = 0;
+    racedetails racedetails = ViewBag.racedetails;
+}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">ข้อมูลรายการแข่ง</h2>
+    </div>
+     <form asp-controller="Home" asp-action="frmcompetitionshow">
+    <div class="card-body">
+        <section class="content">
+            <div class="container-fluid">
+                <!-- SELECT2 EXAMPLE -->
+                <div class="card card-default">
+                    <div class="card-header">
+                        <h3 class="card-title">เงื่อนไขการค้นหา</h3>
+
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="form-group row">
+                            <label for="inputEmail3" class="col-sm-2 col-form-label">หมวดหมู่</label>
+                            <div class="col-sm-10">
+                                @Html.DropDownList("c_id", (IEnumerable<SelectListItem>)ViewBag.levelData, "ทั้งหมด",
+                                         new
+                                         {
+                                             @name = "",
+                                             @class = "form-control select2",
+                                             @style = "width: 100%;",
+                                             @selected =
+                                         (int)ViewBag.currentTypelevel
+                                         })
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="inputEmail3" class="col-sm-2 col-form-label">รายการ</label>
+                            <div class="col-sm-10">
+                               @Html.DropDownList("c_name", new List<SelectListItem>(), "เลือกรายการแข่งขัน",
+            new
+             {
+                 @class = "form-control select2",
+                 @id = "c_name",
+                 @name = "c_name"
+             })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.container-fluid -->
+        </section>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-info">ค้นหา</button>
+            <button type="submit" class="btn btn-default float-right">Cancel</button>
+        </div>
+    </div>
+    </form>
+    <div class="card-body">
+        <table id="example1" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        #
+                    </th>
+                    <th>
+                        รหัส
+                    </th>
+                    <th>
+                        ชื่อ
+                    </th>
+                    <th>
+                        วันที่แข่ง
+                    </th>
+                    <th>
+                        นักเรียน
+                    </th>
+                    <th>
+                        ครู
+                    </th>
+                    
+                    <th>
+                        สถานที่
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+
+                    <tr data-widget="expandable-table" aria-expanded="false">
+                        <td align="center">
+                            @i
+                        </td>
+                        <td align="center">
+                            @Html.DisplayFor(modelItem => item.id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Competitionlist.Name)
+                        </td>
+                        <td align="center">
+                            @Html.DisplayFor(modelItem => item)
+                        </td>
+                        <td align="center">
+                            @foreach (var ds in item.Registerdetail.Where(x => x.Type == "student").OrderBy(x => x.no))
+                            {
+                                <p>@ds.no)@ds.Prefix@ds.FirstName @ds.LastName</p>
+                            }
+                        </td>
+                        <td align="center">
+                            @foreach (var ds in item.Registerdetail.Where(x => x.Type == "teacher").OrderBy(x => x.no))
+                            {
+                                <p>@ds.no)@ds.Prefix@ds.FirstName @ds.LastName</p>
+                            }
+                        </td>
+                        
+                        <td></td>
+                    </tr>
+                    i += 1;
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script>$(function () {
+        $('.select2').select2()
+        $("#example1").DataTable({
+            "responsive": true, "lengthChange": false, "autoWidth": false, "ordering": true, "pageLength": 20, "orderMulti": true,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+        });
+        $('#c_id').change(function () {
+            var c_id = $(this).val();
+
+            $.ajax({
+                url: '@Url.Action("GetCompetitions", "Home")',
+                type: 'GET',
+                data: { c_id: c_id },
+                success: function (data) {
+                    var $c_name = $('#c_name');
+                    $c_name.empty(); // Clear existing options
+                    $c_name.append($('<option>').text('เลือกรายการแข่งขัน').attr('value', '')); // Default option
+
+                    $.each(data, function (index, item) {
+                        $c_name.append($('<option>').text(item.text).attr('value', item.value));
+                    });
+                },
+                error: function (xhr, status, error) {
+                    alert('Error loading competitions.');
+                }
+            });
+        });
+    });</script>

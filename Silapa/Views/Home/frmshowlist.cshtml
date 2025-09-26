@@ -1,0 +1,40 @@
+@model IEnumerable<category>
+@{
+    ViewData["Title"] = "รายการหมวดหมู่การแข่งขัน";
+    int i = 1;
+}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">ข้อมูลรายการหมวดหมู่แข่งขัน</h2>
+    </div>
+    <div class="card-body">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">หมวดหมู่รายการแข่งขัน</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body p-0">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th style="width: 10px">#</th>
+                            <th>หมวดหมู่</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var dr in Model)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td><a asp-action="frmshowlistdata" asp-controller="Home" asp-route-id="@dr.Id" asp-route-c_name="@dr.Name">@dr.Name</a></td>
+                            </tr>
+                            i+=1;
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+    </div>
+</div>

@@ -1,0 +1,172 @@
+@model registerdirector
+@{
+    ViewData["Title"] = "งานศิลปหัตภกรรมนักเรียนครั้งที่ 72 ปีการศึกษา 2567 จังหวัดนครราชสีมา";
+    // IList<news> news=ViewBag.news;
+    int n = 1;
+}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">สมัครกรรมการตัดสิน</h2>
+    </div>
+    <div class="card-body">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <form asp-action="frmregisterdirector" asp-controller="Home" method="post" enctype="multipart/form-data">
+            <section class="content">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title">General</h3>
+                                <input asp-asp-for="id"  name="id" hidden />
+                                <input asp-asp-for="ProfileImageUrl" name="ProfileImageUrl"  hidden />
+                                <input asp-for="lastupdate" value="@DateTime.Now" hidden />
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"
+                                        title="Collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="name">ชื่อ-สกุล</label>
+                                    <input type="text" asp-for="name" name="name" id="name" class="form-control">
+                                    <span asp-validation-for="name" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="position">ตำแหน่ง/โรงเรียน (เช่น ครู โรงเรียนจักราชวิทยา)</label>
+                                    <input type="text" asp-for="position" name="position" id="position" class="form-control">
+                                    <span asp-validation-for="position" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="experience">ประสบการณ์</label>
+                                    <textarea id="experience" name="experience" asp-for="experience" class="form-control"
+                                        rows="4"></textarea>
+                                    <span asp-validation-for="experience" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="tel">เบอร์โทร</label>
+                                    <input type="text" id="tel" name="tel" asp-for="tel" class="form-control">
+                                    <span asp-validation-for="tel" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputStatus">หมวดหมู่/กลุ่มสาระ</label>
+                                    @Html.DropDownList("g_id", (IEnumerable<SelectListItem>)ViewBag.levelData,
+                                             "ทั้งหมด", new
+                                             {
+                                                 @name = "g_id",
+                                                 @id = "g_id",
+                                                 @class = "form-control select2",
+                                                 @style =
+                                             "width: 100%;",
+                                                 @selected = (int)ViewBag.currentTypelevel,
+                                                 @onchange = "loadItemsBasedOnCategory(this.value)"
+                                             })
+                                    <span asp-validation-for="g_id" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="c_id">รายการ</label>
+                                    <select id="c_id" name="c_id" asp-for="c_id" class="form-control select2">
+                                        <option selected disabled>Select one</option>
+                                    </select>
+                                    <span asp-validation-for="c_id" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card card-secondary">
+                            <div class="card-header">
+                                <h3 class="card-title">รูปภาพ</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"
+                                        title="Collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <h3>Upload Profile Picture</h3>
+                                    <input type="file" name="ProfileImage" id="ProfileImage" accept="image/*" onchange="previewImage(event)">
+                                     <span asp-validation-for="ProfileImage" class="text-danger"></span>
+                                    <div class="image-preview">
+                                        <img id="preview" class="preview" alt="Image Preview">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <a href="#" class="btn btn-secondary">Cancel</a>
+                        <input type="submit" value="ส่งข้อมูลเพื่อสมัครกรรมการ" class="btn btn-success float-right">
+                    </div>
+                </div>
+            </section>
+        </form>
+    </div>
+</div>
+<style>
+    .preview {
+        width: 128px;
+        height: 128px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        object-fit: cover;
+        display: none;
+        /* ซ่อนภาพก่อนเลือก */
+    }
+</style>
+<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script>$(function () {
+        $('.select2').select2()
+    });
+</script>
+<script>
+    function previewImage(event) {
+        const preview = document.getElementById('preview');
+        const file = event.target.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block'; // แสดงภาพเมื่อเลือกไฟล์
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.style.display = 'none'; // ซ่อนภาพเมื่อยกเลิกการเลือกไฟล์
+        }
+    }
+</script>
+<script>
+    function loadItemsBasedOnCategory(categoryId) {
+        // ส่ง request ไปยัง server เพื่อดึงข้อมูลรายการที่สัมพันธ์กับหมวดหมู่
+        fetch(`/Home/GetItemsByCategory?categoryId=${categoryId}`)
+            .then(response => response.json())
+            .then(data => {
+                const itemsDropdown = document.getElementById('c_id');
+
+                // ล้างตัวเลือกเก่า
+                itemsDropdown.innerHTML = '<option selected disabled>เลือกรายการแข่งขัน</option>';
+
+                // เพิ่มตัวเลือกใหม่จากข้อมูลที่ได้รับ
+                data.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.value || ""; // ตรวจสอบว่ามีค่าหรือไม่
+                    option.text = item.text || ""; // ตรวจสอบว่ามีค่าหรือไม่
+                    itemsDropdown.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching items:', error));
+    }
+</script>

@@ -1,0 +1,78 @@
+@model IEnumerable<criterion>
+@{
+    ViewData["Title"] = "ข้อมูลเกณฑ์การแข่งขัน";
+    int i = 1;
+    int j=1;
+    // IList<Registerhead> models=ViewBag.data;
+    System.Globalization.CultureInfo thaiCulture = new System.Globalization.CultureInfo("th-TH");
+}
+<div class="card">
+   
+    <div class="card-header">
+        <h2 class="card-title">ข้อมูลเกณฑ์การแข่งขัน</h2>
+    </div>
+    <div class="card-body">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">เกณฑ์การแข่งขันในกลุ่ม Soft Power</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body p-0">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th style="width: 10px">#</th>
+                            <th>กิจกรรมหลักที่สอดคล้องกับ Soft Power</th>
+                            <th style="width: 40px">ไฟล์</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var dr in Model.Where(x => x.g_id == 1))
+                        {
+                            <tr>
+                                <td>@i.</td>
+                                <td>@dr.name</td>
+                                <td><a href="~/pdf/@dr.file" target="_blank"><span
+                                            class="badge bg-danger">ดาวน์โหลด</span></a></td>
+                            </tr>
+                            i+=1;
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+          <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">เกณฑ์การแข่งขันในกลุ่มที่จัดเพิ่มเติม</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body p-0">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th style="width: 10px">#</th>
+                            <th>กลุ่ม/หมวดหมู่</th>
+                            <th style="width: 40px">ไฟล์</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var dr in Model.Where(x => x.g_id == 2))
+                        {
+                            <tr>
+                                <td>@j.</td>
+                                <td>@dr.name</td>
+                                <td><a href="~/pdf/@dr.file" target="_blank"><span
+                                            class="badge bg-danger">ดาวน์โหลด</span></a></td>
+                            </tr>
+                            j+=1;
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+    </div>
+</div>

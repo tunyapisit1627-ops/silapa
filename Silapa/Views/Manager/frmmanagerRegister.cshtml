@@ -1,0 +1,179 @@
+@model IEnumerable<CompetitionViewModel1>
+@{
+    ViewData["Title"] = "ข้อมูลรายการแข่งขันที่ลงทะเบียน";
+    int i=1;
+    //IList<Registerhead> models=ViewBag.data;
+}
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="-1">
+<div class="card">
+ <div class="card-header">
+        <h2 class="card-title">ข้อมูลรายการแข่งขันที่ลงทะเบียน</h2>
+    </div>
+ <div>
+    <form asp-controller="Manager" asp-action="frmmanagerRegister">
+            <div class="card-body">
+                <!-- Main content -->
+                <section class="content">
+                    <div class="container-fluid">
+                        <!-- SELECT2 EXAMPLE -->
+                        <div class="card card-default">
+                            <div class="card-header">
+                                <h3 class="card-title">เงื่อนไขการค้นหา</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">หมวดหมู่</label>
+                                    <div class="col-sm-10">
+                                        @Html.DropDownList("c_id", (IEnumerable<SelectListItem>)TempData["LevelData"], "ทั้งหมด", new { @name = "", @class = "form-control select2", @style = "width: 100%;", @selected = (int)ViewBag.currentTypelevel })
+                                    </div>
+                                </div>
+                            </div>  
+                        </div>
+                    </div>
+                    <!-- /.container-fluid -->
+                </section>
+                <!-- /.content -->
+                <!-- /.card-body -->
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-info">ค้นหา</button>
+                    <button type="submit" class="btn btn-default float-right">Cancel</button>
+                </div>
+                <!-- /.card-footer -->
+            </div>
+        </form>
+ </div>
+  <div class="card-body">
+     <table id="example1" class="table table-bordered table-striped">
+        <thead>
+                <tr>
+                    <th>
+                        #
+                    </th>
+                    <th>
+                        รหัส
+                    </th>
+                    <th>
+                        ชื่อ
+                    </th>
+                    <th>
+                        ประเภท
+                    </th>
+                    <th>
+                        จำนวนทีม
+                    </th>
+                    <th>
+                        จำนวนนักเรียน
+                    </th>
+                    <th>
+                        จำนวนครู
+                    </th>
+                    <th>
+                        สถานะ
+                    </th>
+                </tr>
+            </thead>
+             <tbody>
+                @foreach (var item in Model)
+                {
+                   // if(item.registerheads!=null||item.registerheads.Count>0)
+                    //{
+                     //   var dt=item.registerheads.Where(x=>x.c_id==item.Id&&x.status!="0").FirstOrDefault();
+                  /*  var datas =  dt.Registerdetail
+    .Where(x => x.c_id == item.c_id)
+    .Select(x => new
+    {
+        RegisterHead = x,
+        StudentCount = x.
+            .Where(d => d.Type == "student"&&d.c_id==item.c_id) // ตัวอย่างเงื่อนไขที่ต่างออกไป เช่น สถานะของนักเรียน
+            .Count()
+    })
+    .ToList();
+     var datat =  models
+    .Where(x => x.c_id == item.c_id)
+    .Select(x => new
+    {
+        RegisterHead = x,
+        StudentCount = x.Registerdetail
+            .Where(d => d.Type == "teacher"&&d.c_id==item.c_id) // ตัวอย่างเงื่อนไขที่ต่างออกไป เช่น สถานะของนักเรียน
+            .Count()
+    })
+    .ToList();*/
+                    int studentCount = item.TeacherCount;
+                    int tescherCount = 0;
+                    int teamCount=0;
+                    //if(dt!=null){    
+                  //  studentCount = datas[0].StudentCount;
+                    //tescherCount = datat[0].StudentCount;
+                    //teamCount=models.Count(x=>x.c_id==item.c_id);
+                    //studentCount = dt.Registerdetail.Count(x=>x.Type=="student");
+                    //tescherCount = dt.Registerdetail.Count(x=>x.Type=="teacher");
+                   // teamCount= item.registerheads.Count(s=>s.status!="0");
+                    <tr data-widget="expandable-table" aria-expanded="false">
+                        <td align="center">
+                            @i
+                        </td>
+                        <td align="center">
+                            @Html.DisplayFor(modelItem => item.Id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td align="center">
+                            @Html.DisplayFor(modelItem => item.Type)
+                        </td>
+                        <td align="center">
+                            @item.TeamCount
+                        </td>
+                        <td align="center">@item.StudentCount
+                        </td>
+                        <td align="center">
+                           @item.TeacherCount
+                        </td>
+                        <td> 
+                             <a href="@Url.Action("frmmanagerscore", "Manager", new { c_id=@item.Id,s_id= @item.c_id})" class="btn btn-block bg-gradient-danger">จัดการคะแนน</a>
+                        </td>
+                    </tr>
+                    i+=1;
+                   // }
+                    //}     
+                }
+            </tbody>
+     </table>
+  </div>
+</div>
+<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script>$(function () {
+        $('.select2').select2()
+        $("#example1").DataTable({
+            "responsive": true, "lengthChange": false, "autoWidth": false, "ordering": true, "pageLength": 20, "orderMulti":true,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+        });
+    });
+  
+    </script>
+    
+   

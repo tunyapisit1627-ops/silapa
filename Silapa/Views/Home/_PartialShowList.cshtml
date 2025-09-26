@@ -1,0 +1,28 @@
+@foreach (var category in Model)
+{
+    <h3>@category.CategoryName</h3> <!-- Display the Category Name -->
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>วันที่แข่งขัน</th>
+                <th>จำนวนกรรมการดำเนินงาน</th>
+                <th>ชื่อกรรมการดำเนินงาน</th>
+                <th>จำนวนกรรมการตัดสิน</th>
+                <th>ชื่อกรรมการตัดสิน</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var race in category.Races)
+            {
+                <tr>
+                    <td>@race.RaceDate</td>
+                    <td>@race.TotalOperationalCount</td>
+                    <td>@string.Join(", ", race.OperationalReferees)</td>
+                    <td>@race.TotalJudgingCount</td>
+                    <td></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,0 +1,223 @@
+@{
+    IList<Competitionlist> competitionlists=ViewBag.Competitionlist;
+    IList<referee> referees=ViewBag.referee;
+    int sumtotal= ViewBag.StudentCount+ViewBag.TeacherCount+ViewBag.CommitteeCount+ViewBag.OperationCommitteeCount;
+     System.Globalization.CultureInfo thaiCulture = new System.Globalization.CultureInfo("th-TH");
+}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>กราฟ</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">สรุปยอด</a></li>
+                       
+                    </ol>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- DONUT CHART -->
+                    <div class="card card-danger">
+                        <div class="card-header">
+                            <h3 class="card-title">สรุปยอดผู้เกี่ยวข้องในการเข้าร่วมแข่งขัน</h3>
+
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="donutChart"
+                                style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+            <div class="card">
+              <div class="card-header border-transparent">
+                <h3 class="card-title">รายการแข่งขัน</h3>
+
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <button type="button" class="btn btn-tool" data-card-widget="remove">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table m-0">
+                    <thead>
+                    <tr>
+                      <th>รายการ</th>
+                      <th>วันที่แข่งขัน</th>
+                      <th>จำนวนนักเรียน</th>
+                      <th>จำนวนครู</th>
+                      <th>กรรมการ</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @{
+                        foreach(var dr in competitionlists){
+                        var datar=dr.registerheads.Where(x=>x.c_id==dr.Id).FirstOrDefault();
+                        var datarece=dr.racedetails.Where(x=>x.c_id==dr.Id).FirstOrDefault();
+                        var dd = "";
+                        string[] startdate;
+                        string[] enddate;
+                        string[] ddsub;
+                        var sCount=0;
+                        var tCount=0;
+                        var ttCount=0;
+                        if(datarece!=null){
+                    dd = datarece.daterace ?? "";
+                    ddsub = dd.Split('-');
+                    if (ddsub.Length == 2)
+                    {
+                      startdate = ddsub[0].Split('/');
+                      enddate = ddsub[1].Split('/');
+                      if (startdate.Length == 3 && enddate.Length == 3)
+                      {
+                        DateTime startDateNow = new DateTime(Convert.ToInt16(startdate[2]), Convert.ToInt16(startdate[0]), Convert.ToInt16(startdate[1]));
+                        DateTime endDateNow = new DateTime(Convert.ToInt16(enddate[2]), Convert.ToInt16(enddate[0]), Convert.ToInt16(enddate[1]));
+                        int buddhistYearS = startDateNow.Year + 543;
+                        int buddhistYearN = endDateNow.Year + 543;
+                        dd = $"{startDateNow.ToString("dd MMMM", thaiCulture)} {buddhistYearS}-{endDateNow.ToString("dd MMMM", thaiCulture)} {buddhistYearN}";
+                      }
+                    }
+                        }
+                        if(datar!=null){
+                            sCount=datar.Registerdetail.Count(x=>x.Type=="student");
+                            tCount=datar.Registerdetail.Count(x=>x.Type=="teacher");
+                            ttCount=referees.Count(x=>x.c_id==dr.Id);
+                        }
+                    <tr>
+                      <td><a asp-action="frmmanagerscore" asp-controller="Manager" asp-route-c_id="@dr.Id">@dr.Name</a></td>
+                      <td>@dd</td>
+                      <td align="center"> <div class="sparkbar" data-color="#00a65a" data-height="20">@sCount คน</div></td>
+                      <td align="center">
+                        <div class="sparkbar" data-color="#00a65a" data-height="20">@tCount คน</div>
+                      </td>
+                      <td align="center">
+                        <div class="sparkbar" data-color="#00a65a" data-height="20">@ttCount คน</div>
+                      </td>
+                    </tr>   
+                        }
+                    }
+                    
+                    
+                    </tbody>
+                  </table>
+                </div>
+                <!-- /.table-responsive -->
+              </div>
+              <!-- /.card-body -->
+             
+              <!-- /.card-footer -->
+            </div>
+            <div class="col-md-4">
+                 <div class="info-box mb-3 bg-warning">
+              <span class="info-box-icon"><i class="fas fa-tag"></i></span>
+               <div class="info-box-content">
+                <span class="info-box-text">ยอดรวมทั้งหมด</span>
+                <span class="info-box-number">@sumtotal คน</span>
+              </div>
+                 </div>
+            <div class="info-box mb-3 bg-success">
+              <span class="info-box-icon"><i class="far fa-heart"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">จำนวนนักเรียน</span>
+                <span class="info-box-number">@ViewBag.StudentCount คน</span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+            <div class="info-box mb-3 bg-danger">
+              <span class="info-box-icon"><i class="fas fa-cloud-download-alt"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">จำนวนครู</span>
+                <span class="info-box-number">@ViewBag.TeacherCount คน</span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+            <div class="info-box mb-3 bg-info">
+              <span class="info-box-icon"><i class="far fa-comment"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">กรรมการ/กรรมการดำเนินการ</span>
+                @{
+                    var dynamic=ViewBag.CommitteeCount+ViewBag.OperationCommitteeCount;
+                }
+                <span class="info-box-number">@ViewBag.CommitteeCount/@ViewBag.OperationCommitteeCount รวม @dynamic คน</span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            </div>
+            </div>
+            </div>
+            <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+</div>
+
+<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script>
+    $(function () {
+        var donutChartCanvas = $('#donutChart').get(0).getContext('2d')
+        var donutData = {
+            labels: [
+                'นักเรียน',
+                'ครู',
+                'กรรมการ',
+                'คณะกรรมการดำเนินงาน',
+                
+            ],
+            datasets: [
+                {
+                    data: [ @ViewBag.StudentCount, 
+                    @ViewBag.TeacherCount, 
+                    @ViewBag.CommitteeCount, 
+                    @ViewBag.OperationCommitteeCount],
+                    backgroundColor: ['#f56954', '#00a65a', '#f39c12', '#00c0ef'],
+                }
+            ]
+        }
+        var donutOptions = {
+            maintainAspectRatio: false,
+            responsive: true,
+        }
+        //Create pie or douhnut chart
+        // You can switch between pie and douhnut using the method below.
+        new Chart(donutChartCanvas, {
+            type: 'doughnut',
+            data: donutData,
+            options: donutOptions
+        })
+    });
+</script>

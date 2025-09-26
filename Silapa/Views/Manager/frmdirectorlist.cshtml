@@ -1,0 +1,130 @@
+@model IEnumerable<referee>
+@{
+    ViewData["Title"] = "ข้อมูลกรรมการดำเนินการ";
+    int i=1;
+   // IList<Registerhead> models=ViewBag.data;
+}
+<div class="card">
+ <div class="card-header">
+        <h2 class="card-title">ข้อมูลกรรมการดำเนินการ</h2>
+    </div>
+ <div>
+    <form asp-controller="Manager" asp-action="frmmanagerRegister">
+            <div class="card-body">
+                <!-- Main content -->
+                <section class="content">
+                    <div class="container-fluid">
+                        <!-- SELECT2 EXAMPLE -->
+                        <div class="card card-default">
+                            <div class="card-header">
+                                <h3 class="card-title">เงื่อนไขการค้นหา</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">หมวดหมู่</label>
+                                    <div class="col-sm-10">
+                                       
+                                    </div>
+                                </div>
+                            </div>  
+                        </div>
+                    </div>
+                    <!-- /.container-fluid -->
+                </section>
+                <!-- /.content -->
+                <!-- /.card-body -->
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-info">ค้นหา</button>
+                    <button type="submit" class="btn btn-default float-right">Cancel</button>
+                </div>
+                <!-- /.card-footer -->
+            </div>
+        </form>
+ </div>
+  <div class="card-body">
+     <table id="example1" class="table table-bordered table-striped">
+        <thead>
+                <tr>
+                    <th>
+                        #
+                    </th>
+                    <th>
+                        รูป
+                    </th>
+                    <th>
+                        ชื่อ-สกุล
+                    </th>
+                    <th>
+                        บทบาท
+                    </th>
+                    <th>
+                        ตำแหน่ง
+                    </th>
+                    <th>
+                        <a asp-action="frmdirectoradd" asp-controller="Manager" class="btn btn-outline-success"><i class="fa fa-plus-square"></i>Create New</a>
+                    </th>
+                </tr>
+            </thead>
+             <tbody>
+                @foreach (var item in Model)
+                {
+                     
+                    <tr data-widget="expandable-table" aria-expanded="false">
+                        <td align="center">
+                            @i
+                        </td>
+                        <td align="center">
+                            <img width="128" height="128" src="@item.ImageUrl" alt="User Image"/>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.name)
+                        </td>
+                        <td align="center">
+                            @Html.DisplayFor(modelItem => item.role)
+                        </td>
+                        <td align="center">
+                            @Html.DisplayFor(modelItem => item.position)
+                        </td>
+                        
+                        <td> 
+                             <a asp-action="frmdirectoradd" asp-route-id="@item.id"><i class="fa fa-edit fa-lg"></i></a> |
+                             <a asp-action="frmdirectordel" asp-route-id="@item.id" class="text-danger ml-1" onclick="return confirm('Are you sure to delete this record?')"><i class="fa fa-trash fa-lg"></i></a>
+                        </td>
+                    </tr>
+                    i+=1;
+                    
+                }
+            </tbody>
+     </table>
+  </div>
+</div>
+<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script>$(function () {
+        $('.select2').select2()
+        $("#example1").DataTable({
+            "responsive": true, "lengthChange": false, "autoWidth": false, "ordering": true, "pageLength": 20, "orderMulti":true,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+        });
+    });</script>

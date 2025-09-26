@@ -1,0 +1,9 @@
+@model uploadfilepdf
+<div>
+    <input id="cc_id" name="cc_id" value="@Model.c_id" hidden>
+    <input id="ss_id" name="ss_id" value="@Model.s_id" hidden>
+    <p>ชื่อไฟล์: @Model.filename</p>
+    <p>รายละเอียด: @Model.msg</p>
+    <!-- เพิ่มข้อมูลอื่นๆ ตามที่ต้องการ -->
+     <a href="@Url.Action("DownloadFile", "Manager", new { id = Model.id })" class="btn btn-primary">ดาวน์โหลด</a>
+</div>

@@ -1,0 +1,16 @@
+namespace Silapa.Models
+{
+    public class contacts
+    {
+        public int id { get; set; }
+        public string title { get; set; }
+        public string name { get; set; }
+        public string position { get; set; }
+        public string Location { get; set; }
+        public string tel { get; set; }
+        public string? ImageUrl { get; set; }
+        public string u_id { get; set; }
+        public string status { get; set; }
+        public DateTime lastupdate { get; set; }
+    }
+}

@@ -1,0 +1,115 @@
+@using Syncfusion.EJ2
+@{
+    ViewData["Title"] = "ข้อมูลผู้ใช้งานระบบ";
+}
+<div class="control-section">
+  @Html.EJS().Grid("DialogTemplateEdit").DataSource((IEnumerable<object>)ViewBag.dataSource).ActionComplete("actionComplete").Columns(col =>
+   {
+            col.Field("Id").HeaderText("ID").IsPrimaryKey(true).Width("120").Add();
+            col.Field("FirstName").HeaderText("First Name").Width("150").Add();
+            col.Field("LastName").HeaderText("Last Name").Width("150").Add();
+            col.Field("Email").HeaderText("Email").Width("200").Add();
+        }).AllowPaging().PageSettings(page => page.PageCount(2)).AllowSorting().AllowFiltering().FilterSettings(filter => { filter.Type(Syncfusion.EJ2.Grids.FilterType.Excel); }).EditSettings(edit => { edit.AllowAdding(true).AllowEditing(true).AllowDeleting(true).Mode(Syncfusion.EJ2.Grids.EditMode.Dialog).Template("#dialogtemplate"); }).Toolbar(new List<string>() { "Add", "Edit", "Delete", "Update", "Cancel" }).Render()
+</div>
+<script>
+        function actionComplete(args) {
+            if(args.requestType==="save")
+            {
+               var ajax = new ej.base.Ajax({
+    url: '@Url.Action("Insert", "Account")', // Make sure the action and controller names are correct
+    type: 'POST',
+    contentType: 'application/json', // Sending JSON to the server
+    data: JSON.stringify({ value: args.rowData })
+});
+ajax.send().then(function (data) {
+    console.log("Operation successful", data);
+    // Perform any success actions, like refreshing the grid
+}).catch(function (xhr) {
+    console.log("Operation failed", xhr);
+    // Handle the error case
+});
+            }
+            if (args.requestType === 'beginEdit' || args.requestType === 'add') {
+                let spinner = ej.popups.createSpinner({ target: args.dialog.element });
+                ej.popups.showSpinner(args.dialog.element);
+                if (args.requestType === 'beginEdit') {
+                    var ajax = new ej.base.Ajax({
+                        url: "@Url.Action("Editpartial", "Account")", //render the partial view
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({ value: args.rowData })
+                    });
+                    ajax.send().then(function (data) {
+                        appendElement(data, args.form); //render the edit form with selected record
+                        args.form.elements.namedItem('Id').focus();
+                        ej.popups.hideSpinner(args.dialog.element);
+                    }).catch(function (xhr) {
+                        console.log(xhr);
+                        ej.popups.hideSpinner(args.dialog.element);
+                    });
+                }
+                if (args.requestType === 'add') {
+                    var ajax = new ej.base.Ajax({
+                        url: "@Url.Action("Addpartial","Account")", //render the partial view
+                        type: "POST",
+                        contentType: "application/json",
+                    });
+                    ajax.send().then(function (data) {
+                       // alert("test");
+                        appendElement(data, args.form); //Render the edit form with selected record
+                        args.form.elements.namedItem('Id').focus();
+                        ej.popups.hideSpinner(args.dialog.element);
+                    }).catch(function (xhr) {
+                        console.log(xhr);
+                        ej.popups.hideSpinner(args.dialog.element);
+                    });
+                }
+            }
+        }
+        function appendElement(elementString, form) {
+           
+            form.querySelector("#dialogTemp").innerHTML = elementString;
+            form.ej2_instances[0].addRules('Id', { required: true, number: true });
+            form.ej2_instances[0].addRules('FirstName', { required: true });
+            form.ej2_instances[0].addRules('LastName', { required: true });
+            form.ej2_instances[0].addRules('Email', { required: true, email: true }); 
+            form.ej2_instances[0].refresh();  // refresh method of the formObj
+            var script = document.createElement('script');
+            script.type = "text/javascript";
+            var serverScript = form.querySelector("#dialogTemp").querySelector('script');
+            script.textContent = serverScript.innerHTML;
+            document.head.appendChild(script);
+            serverScript.remove();
+        }
+    </script>
+<style>
+    .form-group.col-md-6 {
+        width: 250px;
+    }
+    #ShipAddress{
+        resize: vertical;
+    }
+    :-ms-fullscreen, .e-dialog{
+        max-width: 552px;
+    }
+    @@media only screen and (max-width: 991px) {
+        .e-dialog.e-control.e-popup {
+            min-width: 300px !important;
+        }    
+    }
+    @@media only screen and (min-width: 992px) {
+        .e-edit-dialog.e-dialog.e-control.e-popup {
+            min-width: 550px !important;
+            min-height: 415px;
+        }
+
+        .e-bigger.e-edit-dialog.e-dialog.e-control.e-popup,
+        .e-bigger .e-edit-dialog.e-dialog.e-control.e-popup {
+            min-height: 496px;
+        }
+    }
+    </style>
+<script id='dialogtemplate' type="text/x-template">
+        <div id="dialogTemp">
+        </div>
+</script>

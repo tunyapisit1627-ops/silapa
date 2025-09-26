@@ -1,0 +1,76 @@
+@model uploadfilepdf
+@{
+    ViewData["Title"] = "เพิ่มข้อมูลไฟล์ PDF ประกอยการสมัคร";
+}
+
+<body class="hold-transition sidebar-mini">
+
+    <div class="card card-info">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="card-header">
+            <h2 class="card-title">เพิ่มข้อมูลไฟล์ PDF ประกอยการสมัคร</h2>
+        </div>
+    </div>
+    <form asp-action="frmuploadpdf" asp-controller="Member" method="post" enctype="multipart/form-data">
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card-header">
+                            <h3 class="card-title">รายละเอียดกิจกรรม</h3>
+                            <input asp-for="id" hidden>
+                            <input asp-for="status" hidden>
+                            <input asp-for="msg" hidden>
+                            <input asp-for="c_id" value="@ViewBag.c_id" hidden>
+                            <input asp-for="s_id" value="@ViewBag.s_id" hidden>
+                            <label>@ViewBag.msg</label>
+                        </div>
+                        <div class="card-body">
+                            @if (Model.id != 0)
+                            {
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">ไฟล์</label>
+                                    <div class="col-sm-10"><a href="~/uploads/pdf/@Model.filename" target="_blank">
+                                            <span class="info-box-text">ไฟล์ PDF</span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">สถานะ</label>
+                                    <div class="col-sm-10">
+                                        @if (Model.status == "1")
+                                        {
+                                            <span class="badge bg-danger" >รอการตรวจสอบ</span>
+                                        }
+                                        else if (Model.status == "2")
+                                        {
+                                            <span class="badge bg-success">ตรวจสอบเรียบร้อย ผ่าน</span>
+                                        }
+                                        else if (Model.status == "0")
+                                        {
+                                             <span class="badge bg-danger">ไม่ผ่านเกณฑ์</span> @Model.msg
+                                        }
+
+                                    </div>
+                                </div>
+                            }
+                            <div class="form-group row">
+                                <label for="inputEmail3" class="col-sm-2 col-form-label">ไฟล์ PDF</label>
+                                <div class="col-sm-10">
+                                    <input type="file" name="pdfUpload" accept=".pdf" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-10 offset-sm-2">
+                                    <button type="submit" id="saveButton" class="btn btn-primary">บันทึก</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </form>
+</body>

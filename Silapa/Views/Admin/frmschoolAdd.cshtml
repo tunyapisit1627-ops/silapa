@@ -1,0 +1,89 @@
+@model school
+@{
+    ViewData["Title"] = "เพิ่มข้อมูลโรงเรียน";
+}
+<body class="hold-transition sidebar-mini">
+    <div class="card">
+        <form asp-action="frmschoolAdd" asp-controller="Admin" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="Id" hidden>
+             <div class="card card-info">
+                <div class="card-header">
+                    <h2 class="card-title">เพิ่มข้อมูลโรงเรียน</h2>
+                </div>
+                <div class="card-body">
+                    <!-- Main content -->
+                    <section class="content">
+                        <div class="container-fluid">
+                         <div class="card card-default">
+                                <div class="card-body">
+                                    <div class="form-group row">
+                                        <label for="inputEmail3" class="col-sm-2 col-form-label">ชื่อโรงเรียน</label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="Name" class="form-control" />
+                                            <span asp-validation-for="Name" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                     <div class="form-group row">
+                                        <label for="inputEmail3" class="col-sm-2 col-form-label">กลุ่ม</label>
+                                        <div class="col-sm-10">
+                                           @Html.DropDownList("g_id", (IEnumerable<SelectListItem>)ViewBag.levelData, "ทั้งหมด", new { @name = "", @class = "form-control select2", @style = "width: 100%;", @selected = (int)ViewBag.currentTypelevel })
+                                            <span asp-validation-for="g_id" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="inputEmail3" class="col-sm-2 col-form-label">สังกัด</label>
+                                        <div class="col-sm-10">
+                                           @Html.DropDownList("a_id", (IEnumerable<SelectListItem>)ViewBag.levelData1, "ทั้งหมด", new { @name = "", @class = "form-control select2", @style = "width: 100%;", @selected = (int)ViewBag.currentTypelevel1 })
+                                            <span asp-validation-for="a_id" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                     
+                                    <div class="form-group row">
+                                        <label for="inputEmail3" class="col-sm-2 col-form-label">คำนำหน้าชื่อผู้ประสายงาน</label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="titlename" class="form-control" />
+                                            <span asp-validation-for="titlename" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                     <div class="form-group row">
+                                        <label for="inputEmail3" class="col-sm-2 col-form-label">ชื่อผู้ประสายงาน</label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="FirstName" class="form-control" />
+                                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                     <div class="form-group row">
+                                        <label for="inputEmail3" class="col-sm-2 col-form-label">นามสกุลผู้ประสายงาน</label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="LastName" class="form-control" />
+                                            <span asp-validation-for="LastName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                     <div class="form-group row">
+                                        <label for="inputEmail3" class="col-sm-2 col-form-label">เบอร์โทร</label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="tel" class="form-control" />
+                                            <span asp-validation-for="tel" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                         </div>
+                        </div>
+                    </section>
+                    <div class="card-footer">
+                        <button type="submit" value="Submit" class="btn btn-info">บันทึกข้อมูล</button>
+                        <button asp-action="frmschoolList" asp-controller="Admin" class="btn btn-default float-right">Cancel</button>
+                    </div>
+                </div>
+             </div>
+        </form>
+    </div>
+</body>
+ <link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
+    <script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+    <script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
+    <script src="~/plugins/jquery/jquery.min.js"></script>
+    <script>$(function () {
+        $('.select2').select2()
+        });
+    </script>

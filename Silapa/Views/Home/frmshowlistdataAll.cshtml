@@ -1,0 +1,128 @@
+@using System.IO
+@model IEnumerable<Registerhead>
+@{
+  ViewData["Title"] = "รายการแข่งขันจำนวนทีม";
+  System.Globalization.CultureInfo thaiCulture = new System.Globalization.CultureInfo("th-TH");
+  int i = 1;
+}
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">ข้อมูลรายการแข่งขันจำนวนทีม</h2>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">ข้อมูล : @ViewBag.name</h3>
+          </div>
+          <div class="card-body">
+            <table class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>โรงเรียน</th>
+                  <th>วันที่แข่ง</th>
+                  <th>เวลา</th>
+                  <th>สถานที่</th>
+                  <th>อาคาร</th>
+                  <th>ห้อง</th>
+                </tr>
+              </thead>
+              <tbody>
+                @foreach (var dr in Model)
+                {
+                  var datadd = dr.Competitionlist?.racedetails.FirstOrDefault(x => x.c_id == dr.c_id);
+                  var dd = "";
+                  string[] startdate;
+                  string[] enddate;
+                  string[] ddsub;
+                  var building = "";
+                  var room = "";
+                  var name = "";
+                  var time = "";
+
+                  if (datadd != null)
+                  {
+                    dd = datadd.daterace ?? "";
+                    ddsub = dd.Split('-');
+                    if (ddsub.Length == 2)
+                    {
+                      startdate = ddsub[0].Split('/');
+                      enddate = ddsub[1].Split('/');
+                      if (startdate.Length == 3 && enddate.Length == 3)
+                      {
+                        DateTime startDateNow = new DateTime(Convert.ToInt16(startdate[2]), Convert.ToInt16(startdate[0]), Convert.ToInt16(startdate[1]));
+                        DateTime endDateNow = new DateTime(Convert.ToInt16(enddate[2]), Convert.ToInt16(enddate[0]), Convert.ToInt16(enddate[1]));
+                        int buddhistYearS = startDateNow.Year + 543;
+                        int buddhistYearN = endDateNow.Year + 543;
+                        dd = $"{startDateNow.ToString("dd MMMM", thaiCulture)} {buddhistYearS}-{endDateNow.ToString("dd MMMM", thaiCulture)} {buddhistYearN}";
+                      }
+                    }
+                    time = datadd.time;
+                    building = datadd.building ?? "";
+                    room = datadd.room ?? "";
+                    name = datadd.Racelocation?.name ?? "";
+                  }
+
+                  <tr data-widget="expandable-table" aria-expanded="false">
+                    <td>@i</td>
+                    <td>@dr.School?.Name</td>
+                    <td>@dd</td>
+                    <td>@time</td>
+                    <td>@name</td>
+                    <td>@building</td>
+                    <td>@room</td>
+                  </tr>
+                  <tr class="expandable-body">
+                    <td colspan="7">
+                      <div class="card-body p-0">
+                        <table class="table table-striped">
+                          <thead>
+                            <tr>
+                              <th style="width: 250px">นักเรียน</th>
+                              <th style="width: 250px">ครู</th>
+                              <th>รายละเอียด</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td style="text-align: left; vertical-align: top;">
+                                @{
+                                  var srs = dr.Registerdetail?.Where(x => x.h_id == dr.id && x.Type == "student").ToList() ?? new List<Registerdetail>();
+                                  foreach (var ddr in srs)
+                                  {
+                                    @($"{ddr.no} {ddr.Prefix} {ddr.FirstName} {ddr.LastName}")
+                                    <br>
+                                  }
+                                }
+                              </td>
+                              <td style="text-align: left; vertical-align: top;">
+                                @{
+                                  var trg = dr.Registerdetail?.Where(x => x.h_id == dr.id && x.Type == "teacher").ToList() ?? new List<Registerdetail>();
+                                  foreach (var ddt in trg)
+                                  {
+                                    @($"{ddt.no} {ddt.Prefix} {ddt.FirstName} {ddt.LastName}")
+                                    <br>
+                                  }
+                                }
+                              </td>
+                              <td>
+                                <p>@Html.Raw(datadd?.details ?? "")</p>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </td>
+                  </tr>
+                  i++;
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

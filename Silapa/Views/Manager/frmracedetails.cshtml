@@ -1,0 +1,79 @@
+@model IEnumerable<Competitionlist>
+@{
+    ViewData["Title"] = "ข้อมูลวันที่จัดการแข่งขันและสถานที่แข่งขัน";
+    IList<racedetails> datarace = ViewBag.race;
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">สถานที่และวันแข่งขัน</h3>
+            </div>
+            <!-- ./card-header -->
+            <div class="card-body">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>ชื่อรายการ</th>
+                            <th>วันที่แข่งขัน</th>
+                            <th>เวลา</th>
+                            <th>สถานที่แข่งขัน</th>
+                            <th>อาคาร</th>
+                            <th>ห้อง</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var dr in Model)
+                        {
+                            var dd = datarace.Where(x => x.c_id == dr.Id).FirstOrDefault();
+                            var id=0;
+                            var date = "";
+                            var location = "";
+                            var time="";
+                            var detail = "";
+                            var building="";
+                            var room="";
+                            if (dd != null)
+                            {
+                                id=dd.id;
+                                date = dd.daterace;
+                                location = dd.Racelocation.name;
+                                detail = dd.details;
+                                time=dd.time;
+                                building=dd.building;
+                                room=dd.room;
+                            }
+                            <tr data-widget="expandable-table" aria-expanded="false">
+                                <td>@dr.Id</td>
+                                <td>@dr.Name</td>
+                                <td>@date</td>
+                                <td>@time</td>
+                                <td>@location</td>
+                                <td>@building</td>
+                                <td>@room</td>
+                            </tr>
+                            <tr class="expandable-body">
+                                <td colspan="7">
+                                    <p>
+                                       @Html.Raw(@detail) <!-- แสดงข้อความ HTML จากฐานข้อมูล -->
+                                    </p>
+                                    <button type="button" class="btn btn-primary"
+                                        onclick="redirectToForm(@id,@dr.Id,'@dr.Name')">แก้ไขข้อมูล</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+</div>
+<script>
+    function redirectToForm(id,c_id,c_name) {
+        // สร้าง URL จาก action และ controller ที่ระบุ
+        window.location.href = '@Url.Action("frmracedetailsAdd", "Manager")' + '?id=' + id+ '&c_id=' + c_id+'&c_name=' + c_name;
+    }
+</script>

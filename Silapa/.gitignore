@@ -1,0 +1,17 @@
+# Binary and Build Artifacts
+[Bb]in/
+[Oo]bj/
+*.exe
+*.dll
+*.pdb
+*.suo
+
+# IDE/Editor Specific files
+.vs/
+.vscode/
+
+# NuGet Packages
+/Packages
+ 
+# Configuration Secrets (ห้าม Commit รหัสลับ)
+appsettings.Development.json

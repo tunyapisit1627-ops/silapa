@@ -1,0 +1,57 @@
+
+@{
+    ViewData["Title"] = "รายชื่อโรงเรียนทั้งหมด";
+  //  IList<Registerhead> data = ViewBag.data;
+    int i = 1;
+}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">รายชื่อโรงเรียนทั้งหมด</h2>
+    </div>
+    <div class="card-body">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">รายชื่อโรงเรียนทั้งหมด</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body p-0">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th style="width: 10px">#</th>
+                            <th>โรงเรียน</th>
+                            <th>จำนวนรายการ</th>
+                            <th>จำนวนนักเรียน</th>
+                            <th>จำนวนครู</th>
+                            <th>สรุปการลงทะเบียน</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var dr in Model)
+                        {
+                            /*
+                            var sumr = data.Count(x => x.s_id == dr.Id);
+                            var sums = data.Where(x=>x.s_id==dr.Id).Sum(x => x.Registerdetail.Count(detail => detail.Type == "student"));
+                            
+                            var sumt = data.Where(x=>x.s_id==dr.Id).Sum(x => x.Registerdetail.Count(detail => detail.Type == "teacher"));
+                            var datar = data.Count(x => x.s_id == dr.Id);*/
+                            
+                                <tr>
+                                    <td>@i</td>
+                                    <td><a asp-action="frmschoolDetail" asp-controller="Home" asp-route-id="@dr.SchoolId" asp-route-name="@dr.SchoolName">@dr.SchoolName</a></td>
+                                    <td align="center"><span class="badge bg-danger">@dr.TotalRegistrations</span></td>
+                                    <td align="center"><span class="badge bg-primary">@dr.TotalStudents</span></td>
+                                    <td align="center"><span class="badge bg-warning">@dr.TotalTeachers</span></td>
+                                    <td align="center"><a asp-action="GenePdfregister" asp-controller="Pdfmember" asp-route-s_id="@dr.SchoolId" target="_blank"><span
+                                            class="badge bg-danger">ดาวน์โหลด</span></a></td>
+                                </tr>
+                            i += 1;
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+    </div>
+</div>

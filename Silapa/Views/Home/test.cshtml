@@ -1,0 +1,548 @@
+@{
+    ViewData["Title"] = "งานศิลปหัตถกรรมนักเรียนครั้งที่ 72 ปีการศึกษา 2567 จังหวัดนครราชสีมา";
+    var setupsystem = ViewBag.setupsystem;
+    // กำหนดรายการสีที่ต้องการใช้
+    var progressBarColors = new List<string> { "bg-primary", "bg-success", "bg-info", "bg-warning", "bg-danger" };
+    var random = new Random();
+}
+<div class="container">
+    <div class="text-center">
+        <img src="@Url.Content(setupsystem.LogoPath)" width="200" alt="Logo">
+    </div>
+</div>
+<div class="container bootdey">
+
+    <div class="row">
+        <div class="col-12 text-center">
+            <div class="section-title mb-4 pb-2">
+                <h4 class="title mb-4">สรุปผลการแข่งขัน</h4>
+                <p class="text-muted para-desc mx-auto mb-0">
+                    @setupsystem.name
+                </p>
+                <p class="text-muted para-desc mx-auto mb-0">
+                </p>
+            </div>
+        </div>
+        <!--end col-->
+    </div>
+    <!--end row-->
+</div>
+<div class="row">
+    <div class="col-12">
+        <!-- Custom Tabs -->
+        <div class="card">
+            <div class="card-header d-flex p-0">
+                <h3 class="card-title p-3">สรุปผลการแข่งขัน</h3>
+                <ul class="nav nav-pills ml-auto p-2">
+                    <li class="nav-item"><a class="nav-link active" href="#tab_1"
+                            data-toggle="tab">สรุปตามเหรียญรางวัล</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab">สรุปตามอันดับ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab">สรุปภาพรวมการแข่งขัน</a>
+                    <li class="nav-item"><a class="nav-link" href="#tab_4" data-toggle="tab">สรุปภาพตามสังกัด</a>
+                    </li>
+                </ul>
+            </div><!-- /.card-header -->
+            <div class="card-body">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_1">
+                        <div class="row">
+                            <div class="col-xl-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover mb-0">
+                                                <thead>
+                                                    <tr class="align-self-center">
+                                                        <th>ลำดับที่</th>
+                                                        <th>โรงเรียน</th>
+                                                        <th>เหรียญทอง</th>
+                                                        <th>เหรียญเงิน</th>
+                                                        <th>เหรียญทองแดง</th>
+                                                        <th>เข้าร่วม</th>
+                                                        <th>รวมเหรียญ</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @{
+                                                        int rank = 1;
+                                                        foreach (var item in ViewBag.MedalSummary)
+                                                        {
+                                                            <tr>
+                                                                <td align="center">@rank</td>
+                                                                <td>@item.SchoolName</td>
+                                                                <td>
+                                                                    <div style="display: flex; align-items: center;">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20"
+                                                                            height="27" viewBox="0 0 24 24" fill="#FFD700"
+                                                                            stroke="#f5a623" stroke-width="1"
+                                                                            stroke-linecap="round" stroke-linejoin="round">
+                                                                            <polygon
+                                                                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                                                                            </polygon>
+                                                                        </svg>
+                                                                        <span>@item.GoldCount</span>
+                                                                <td>
+                                                                    <div style="display: flex; align-items: center;">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20"
+                                                                            height="27" viewBox="0 0 24 24" fill="#C0C0C0"
+                                                                            stroke="#f5a623" stroke-width="1"
+                                                                            stroke-linecap="round" stroke-linejoin="round">
+                                                                            <polygon
+                                                                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                                                                            </polygon>
+                                                                        </svg>
+                                                                        <span>@item.SilverCount</span>
+                                                                </td>
+                                                                <td>
+                                                                    <div style="display: flex; align-items: center;">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20"
+                                                                            height="27" viewBox="0 0 24 24" fill="#B87333"
+                                                                            stroke="#f5a623" stroke-width="1"
+                                                                            stroke-linecap="round" stroke-linejoin="round">
+                                                                            <polygon
+                                                                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                                                                            </polygon>
+                                                                        </svg>
+                                                                        <span>@item.BronzeCount</span>
+                                                                </td>
+                                                                <td>
+                                                                    <span>@item.ParticipationCount</span>
+                                                                </td>
+                                                                <td><b>@item.TotalMedals</b></td>
+                                                            </tr>
+                                                            rank++;
+                                                        }
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.tab-pane -->
+                    <div class="tab-pane" id="tab_2">
+                        <div class="row">
+                            <div class="col-xl-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover mb-0">
+                                                <thead>
+                                                    <tr class="align-self-center">
+                                                        <th>ลำดับที่</th>
+                                                        <th>โรงเรียน</th>
+                                                        <th>ชนะเลิศ</th>
+                                                        <th>รองชนะเลิศอันดับ 1</th>
+                                                        <th>รองชนะเลิศอันดับ 2</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @{
+                                                        int rank1 = 1;
+                                                        foreach (var item in ViewBag.numberSummary)
+                                                        {
+                                                            <tr>
+                                                                <td align="center">@rank1</td>
+                                                                <td>
+                                                                    <a href="#" class="school-name-link"
+                                                                        data-school="@item.SchoolName">@item.SchoolName</a>
+                                                                </td>
+                                                                <td align="center">
+                                                                    <span>@item.number1</span>
+                                                                <td align="center">
+                                                                    <span>@item.number2</span>
+                                                                </td>
+                                                                <td align="center">
+                                                                    <span>@item.number3</span>
+                                                                </td>
+                                                            </tr>
+                                                            rank1++;
+                                                        }
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane" id="tab_3">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title">สรุปภาพรวมการแข่งขันทั้งหมด</h5>
+
+                                        <div class="card-tools">
+                                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <div class="btn-group">
+                                                <button type="button" class="btn btn-tool dropdown-toggle"
+                                                    data-toggle="dropdown">
+                                                    <i class="fas fa-wrench"></i>
+                                                </button>
+                                                <div class="dropdown-menu dropdown-menu-right" role="menu">
+                                                    <a href="#" class="dropdown-item">Action</a>
+                                                    <a href="#" class="dropdown-item">Another action</a>
+                                                    <a href="#" class="dropdown-item">Something else here</a>
+                                                    <a class="dropdown-divider"></a>
+                                                    <a href="#" class="dropdown-item">Separated link</a>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <!-- /.card-header -->
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <p class="text-center">
+                                                    <strong>@setupsystem.racedate</strong>
+                                                </p>
+
+                                                <div class="chart">
+                                                    <!-- Sales Chart Canvas -->
+                                                    <canvas id="competitionChart" height="180"
+                                                        style="height: 180px;"></canvas>
+                                                </div>
+                                                <!-- /.chart-responsive -->
+                                            </div>
+                                            <!-- /.col -->
+                                            <div class="col-md-4">
+                                                <p class="text-center">
+                                                    <strong>จำนวนทีมที่สมัครแข่งขัน</strong>
+                                                </p>
+                                                @foreach (var dr in ViewBag.categoriessummary)
+                                                {
+                                                    // สุ่มเลือกสีจากรายการ
+                                                    var randomColor =
+                                                    progressBarColors[random.Next(progressBarColors.Count)];
+                                                    var percentage = (dr.RegistrationCount /
+                                                    (double)dr.RegistrationCounttotal) * 100;
+                                                    <div class="progress-group">
+                                                        @dr.CategoryName
+                                                        <span
+                                                            class="float-right"><b>@dr.RegistrationCount</b>/@dr.RegistrationCounttotal</span>
+                                                        <div class="progress progress-sm">
+                                                            <div class="progress-bar @randomColor"
+                                                                style="width: @percentage%"></div>
+                                                        </div>
+                                                    </div>
+                                                }
+
+
+                                                <!-- /.progress-group -->
+                                            </div>
+                                            <!-- /.col -->
+                                        </div>
+                                        <!-- /.row -->
+                                    </div>
+                                    <!-- ./card-body -->
+                                    <div class="card-footer">
+                                        <div class="row">
+                                            <div class="col-sm-3 col-6">
+                                                <div class="description-block border-right">
+                                                    <span class="description-percentage text-success"><i
+                                                            class="fas fa-caret-up"></i>
+                                                        @ViewBag.AwardSummary.Gold.Percentage%</span>
+                                                    <h5 class="description-header">@ViewBag.AwardSummary.Gold.Count</h5>
+                                                    <span class="description-text">เหรียญทอง</span>
+                                                </div>
+                                                <!-- /.description-block -->
+                                            </div>
+                                            <!-- /.col -->
+                                            <div class="col-sm-3 col-6">
+                                                <div class="description-block border-right">
+                                                    <span class="description-percentage text-warning"><i
+                                                            class="fas fa-caret-left"></i>
+                                                        @ViewBag.AwardSummary.Silver.Percentage%</span>
+                                                    <h5 class="description-header">@ViewBag.AwardSummary.Silver.Count
+                                                    </h5>
+                                                    <span class="description-text">เหรียญเงิน</span>
+                                                </div>
+                                                <!-- /.description-block -->
+                                            </div>
+                                            <!-- /.col -->
+                                            <div class="col-sm-3 col-6">
+                                                <div class="description-block border-right">
+                                                    <span class="description-percentage text-success"><i
+                                                            class="fas fa-caret-up"></i>
+                                                        @ViewBag.AwardSummary.Bronze.Percentage%</span>
+                                                    <h5 class="description-header">@ViewBag.AwardSummary.Bronze.Count
+                                                    </h5>
+                                                    <span class="description-text">เหรียญทองแดง</span>
+                                                </div>
+                                                <!-- /.description-block -->
+                                            </div>
+                                            <!-- /.col -->
+                                            <div class="col-sm-3 col-6">
+                                                <div class="description-block">
+                                                    <span class="description-percentage text-danger"><i
+                                                            class="fas fa-caret-down"></i>
+                                                        @ViewBag.AwardSummary.Participation.Percentage%</span>
+                                                    <h5 class="description-header">
+                                                        @ViewBag.AwardSummary.Participation.Count</h5>
+                                                    <span class="description-text">เข้าร่วม</span>
+                                                </div>
+                                                <!-- /.description-block -->
+                                            </div>
+                                        </div>
+                                        <!-- /.row -->
+                                    </div>
+                                    <!-- /.card-footer -->
+                                </div>
+                                <!-- /.card -->
+                            </div>
+                            <!-- /.col -->
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab_4">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title">สรุปภาพรวมการแข่งขันทั้งหมด</h5>
+
+                                        <div class="card-tools">
+                                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <div class="btn-group">
+                                                <button type="button" class="btn btn-tool dropdown-toggle"
+                                                    data-toggle="dropdown">
+                                                    <i class="fas fa-wrench"></i>
+                                                </button>
+                                                <div class="dropdown-menu dropdown-menu-right" role="menu">
+                                                    <a href="#" class="dropdown-item">Action</a>
+                                                    <a href="#" class="dropdown-item">Another action</a>
+                                                    <a href="#" class="dropdown-item">Something else here</a>
+                                                    <a class="dropdown-divider"></a>
+                                                    <a href="#" class="dropdown-item">Separated link</a>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <!-- /.card-header -->
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <p class="text-center">
+                                                    <strong>@setupsystem.racedate</strong>
+                                                </p>
+
+                                                <div class="chart">
+                                                    <!-- Sales Chart Canvas -->
+                                                    <canvas id="competitionChart" height="180"
+                                                        style="height: 180px;"></canvas>
+                                                </div>
+                                                <!-- /.chart-responsive -->
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xl-12">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <div class="table-responsive">
+                                                            <table class="table table-hover mb-0">
+                                                                <thead>
+                                                                    <tr class="align-self-center">
+                                                                        <th>ลำดับที่</th>
+                                                                        <th>สังกัด</th>
+                                                                        <th>จำนวนโรงเรียน</th>
+                                                                        <th>จำนวนนักเรียน</th>
+                                                                        <th>จำนวนครู</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @{
+                                                                        int no = 1;
+                                                                        foreach (var item in  ViewBag.schoolDataByAffiliation)
+                                                                        {
+                                                                            <tr>
+                                                                                <td align="center">@no</td>
+                                                                                <td>
+                                                                                    @item.AffiliationName
+                                                                                </td>
+                                                                                <td align="center">
+                                                                                    <span>@item.SchoolCount</span>
+                                                                                <td align="center">
+                                                                                    <span>@item.StudentCount</span>
+                                                                                </td>
+                                                                                <td align="center">
+                                                                                    <span>@item.TeacherCount</span>
+                                                                                </td>
+                                                                            </tr>
+                                                                            no++;
+                                                                        }
+                                                                    }
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /.row -->
+                                    </div>
+                                    <!-- ./card-body -->
+
+                                    <!-- /.card-footer -->
+                                </div>
+                                <!-- /.card -->
+                            </div>
+                            <!-- /.col -->
+                        </div>
+                    </div>
+                    
+                    <!-- /.tab-pane -->
+                </div>
+                <!-- /.tab-content -->
+            </div><!-- /.card-body -->
+        </div>
+        <!-- ./card -->
+    </div>
+    <!-- /.col -->
+</div>
+<div class="modal fade" id="schoolModal" tabindex="-1" role="dialog" aria-labelledby="schoolModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="schoolModalLabel">รายการแข่งขัน</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Data will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <script src="~/plugins/chart.js/Chart.min.js"></script>
+    <style>
+        body {
+            background: #f5f5f5;
+            margin-top: 20px;
+        }
+
+        .card {
+            border: none;
+            -webkit-box-shadow: 1px 0 20px rgba(96, 93, 175, .05);
+            box-shadow: 1px 0 20px rgba(96, 93, 175, .05);
+            margin-bottom: 30px;
+        }
+
+        .table th {
+            font-weight: 500;
+            color: #827fc0;
+        }
+
+        .table thead {
+            background-color: #f3f2f7;
+        }
+
+        .table>tbody>tr>td,
+        .table>tfoot>tr>td,
+        .table>thead>tr>td {
+            padding: 14px 12px;
+            vertical-align: middle;
+        }
+
+        .table tr td {
+            color: #8887a9;
+        }
+
+        .thumb-sm {
+            height: 32px;
+            width: 32px;
+        }
+
+        .badge-soft-warning {
+            background-color: rgba(248, 201, 85, .2);
+            color: #f8c955;
+        }
+
+        .badge {
+            font-weight: 500;
+        }
+
+        .badge-soft-primary {
+            background-color: rgba(96, 93, 175, .2);
+            color: #605daf;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var ctx = document.getElementById('competitionChart').getContext('2d');
+            var competitionData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.CompetitionData));
+
+            var labels = competitionData.map(function (item) { return item.CategoryName; });
+            var studentCounts = competitionData.map(function (item) { return item.StudentCount; });
+            var teacherCounts = competitionData.map(function (item) { return item.TeacherCount; });
+
+            var competitionChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'จำนวนนักเรียน',
+                            data: studentCounts,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'จำนวนครู',
+                            data: teacherCounts,
+                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+        $(document).on('click', '.school-name-link', function (e) {
+            e.preventDefault();
+            var schoolName = $(this).data('school');
+
+            // Fetch data for the modal via AJAX
+            $.ajax({
+                url: '/Home/GetSchoolDetails', // Adjust this to your controller and action
+                method: 'GET',
+                data: { schoolName: schoolName },
+                success: function (data) {
+                    // Populate modal content with fetched data
+                    $('#schoolModal .modal-body').html(data);
+
+                    // Show the modal
+                    $('#schoolModal').modal('show');
+                },
+                error: function () {
+                    alert('Error loading data.');
+                }
+            });
+        });
+    </script>
+}

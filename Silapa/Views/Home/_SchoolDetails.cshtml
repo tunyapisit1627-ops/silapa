@@ -1,0 +1,17 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th>รายการแข่งขัน</th>
+            <th>รางวัล</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.CompetitionName</td>
+                <td>@item.RankDescription</td>
+            </tr>
+        }
+    </tbody>
+</table>

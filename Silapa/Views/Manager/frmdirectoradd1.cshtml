@@ -1,0 +1,347 @@
+@model IEnumerable<referee>
+@{
+    ViewData["Title"] = "รายชื่อคณะกรรมการ";
+    int i = 1;
+    IList<category> categories = ViewBag.list;
+}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">ข้อมูลรายชื่อคณะกรรมการ @ViewBag.c_name (@ViewBag.r_name)</h2>
+        <input id="g_id" name="g_id" value="@ViewBag.g_id" hidden>
+        <input id="c_id" name="c_id" value="@ViewBag.c_id" hidden>
+        <input id="r_name" name="r_name" value="@ViewBag.r_name" hidden>
+        <input id="duty" name="duty" value="@ViewBag.duty" hidden>
+    </div>
+    <div class="card-body">
+        <table id="example1" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        #
+                    </th>
+                    <th>รูปภาพ</th>
+                    <th>
+                        ชื่อ-สกุล
+                    </th>
+                    <th>
+                        ตำแหน่ง/โรงเรียน
+                    </th>
+                    <th>
+                        บทบาทหน้าที่
+                    </th>
+                    <th>
+                        <a href="javascript:void(0)" class="btn btn-outline-success" data-toggle="modal"
+                            data-target="#createNewModal">
+                            <i class="fa fa-plus-square"></i> Create New
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+
+                    <tr data-widget="expandable-table" aria-expanded="false">
+                        <td align="center">
+                            @i
+                        </td>
+                        <td>
+                            <img src="@item.ImageUrl" width="80" height="80" />
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.name)
+                        </td>
+                        <td align="center">
+                            @Html.DisplayFor(modelItem => item.position)
+                        </td>
+                        <td align="center">
+                            @Html.DisplayFor(modelItem => item.role)
+                        </td>
+                        <td>
+                            <button class="btn btn-primary btn-sm edit-button" data-id="@item.id">แก้ไข</button>
+                            <button class="btn btn-danger btn-sm delete-button" data-id="@item.id">ลบ</button>
+                        </td>
+                    </tr>
+                    i += 1;
+
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal fade" id="createNewModal" tabindex="-1" role="dialog" aria-labelledby="createNewModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createNewModalLabel">เพิ่มข้อมูลใหม่</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createNewForm">
+                    @foreach (var dr in categories)
+                    {   
+                        if(dr.Id==ViewBag.c_id)
+                        {
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input class="custom-control-input" type="checkbox" name="categories" id="checkbox_@dr.Id" value="@dr.Id"
+                                    checked>
+                                <label for="checkbox_@dr.Id" class="custom-control-label">@dr.Name</label>
+                            </div>
+                        </div>
+                        }else
+                        {
+                       <!-- <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input class="custom-control-input" type="checkbox" name="categories" id="checkbox_@dr.Id" value="@dr.Id"
+                                    >
+                                <label for="checkbox_@dr.Id" class="custom-control-label">@dr.Name</label>
+                            </div>
+                        </div>-->
+                        }
+                    }
+                    <div class="form-group">
+                        <label for="name">ชื่อ-สกุล</label>
+                        <input id="id" name="id" hidden>
+                        <input type="text" class="form-control" id="name" name="Name" required>
+                        <small class="form-text text-danger" style="display:none;"
+                            id="nameError">กรุณากรอกหัวข้อชื่อคณะกรรมการ</small>
+                    </div>
+                   <div class="form-group">
+                    <label for="role">บทบาทหน้าที่</label>
+                        <select class="form-control select2" id="role" name="role" required>
+                             <option value="">กรุณาเลือกบทบาท</option>
+                             <option value="ประธาน">ประธาน</option>
+                             <option value="รองประธาน">รองประธาน</option>
+                             <option value="กรรมการ">กรรมการ</option>
+                             <option value="กรรมการและเลขานุการ">กรรมการและเลขานุการ</option>
+                        </select>
+                        <small class="form-text text-danger" style="display:none;" id="dutyError">กรุณาเลือกบทบาทหน้าที่</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="position">ตำแหน่ง/โรงเรียน</label>
+                        <input type="text" class="form-control" id="position" name="position" required>
+                        <small class="form-text text-danger" style="display:none;"
+                            id="dutyError">ตำแหน่ง/โรงเรียน</small>
+                    </div>
+                    <!-- Image upload with cropping -->
+                    <div class="form-group">
+                        <label for="imageUpload">อัพโหลดรูปภาพ</label>
+                        <input type="file" class="form-control" id="imageUpload" accept="image/*">
+                        <div id="imagePreview" class="mt-2" style="display:none;">
+                            <img id="imagePreviewImg" src="" alt="Preview" style="max-width: 100%;">
+                        </div>
+                        <small class="form-text text-danger" style="display:none;"
+                            id="imageError">กรุณาเลือกและครอบภาพ</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
+                <button id="saveButton" class="btn btn-primary">บันทึก</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Add these to the <head> of your HTML -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet" />
+
+<!-- Add these just before the closing </body> tag -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script>$(function () {
+        $('.select2').select2()
+        $("#example1").DataTable({
+            "responsive": true, "lengthChange": false, "autoWidth": false, "ordering": true, "pageLength": 20, "orderMulti": true,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+        });
+    });</script>
+<script>
+    $('#createNewModal').on('hidden.bs.modal', function () {
+        $(this).find('form')[0].reset();
+    });
+</script>
+<script>
+
+    let cropper;
+    let croppedImageDataURL = "";
+
+    $(document).ready(function () {
+        // Handle image upload
+        $('#imageUpload').on('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const image = document.getElementById('imagePreviewImg');
+                    image.src = event.target.result;
+                    $('#imagePreview').show();
+
+                    // Initialize Cropper.js
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+                    cropper = new Cropper(image, {
+                        aspectRatio: 1, // Aspect ratio 1:1 (Square)
+                        viewMode: 1,
+                        responsive: true,
+                        autoCropArea: 0.65,
+                        crop: function (event) {
+                            // You can get the cropped data here if needed
+                            croppedImageDataURL = cropper.getCroppedCanvas().toDataURL();
+                        }
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Handle form submission and save
+        $('#saveButton').on('click', function () {
+            const id = parseInt($("#id").val()) || 0; // ถ้าไม่มีค่าให้เป็น 0
+            const name = $('#name').val().trim();
+            const c_id = $('#c_id').val().trim();
+            const g_id = $('#g_id').val().trim();
+            const role = $('#role').val().trim();
+            const position = $('#position').val();
+            const r_name = $('#r_name').val();
+            const duty = $('#duty').val();
+
+            const selectedCategories = [];
+            $('input[name="categories"]:checked').each(function () {
+                selectedCategories.push($(this).val()); // ดึงค่า value ของ Checkbox ที่ถูกเลือก
+            });
+
+            // Validate inputs
+            if (!name || !role || !position) {
+                alert("กรุณากรอกข้อมูลทั้งหมด");
+                return;
+            }
+
+            /* if (!croppedImageDataURL) {
+                 alert("กรุณาครอบภาพก่อนบันทึก");
+                 return;
+             }*/
+
+            const formData = {
+                id: id,
+                c_id: c_id,
+                g_id: g_id,
+                r_name:r_name,
+                duty:duty,
+                name: name,
+                role: role,
+                position: position,
+                ImageUrl: croppedImageDataURL, // Include the cropped image
+                categories: selectedCategories
+            };
+
+            // Submit the data via AJAX (example for Save)
+            $.ajax({
+                url: '/Manager/SaveReferee',
+                type: 'POST',
+                data: JSON.stringify(formData),
+                contentType: 'application/json',
+                success: function (response) {
+                    if (response.success) {
+                        alert("บันทึกข้อมูลสำเร็จ");
+                        $('#createNewModal').modal('hide');
+                        location.reload(); // Reload the page to reflect the changes
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert("เกิดข้อผิดพลาดในการบันทึก");
+                }
+            });
+        });
+    });
+    // Event: When clicking the edit button
+$('.edit-button').on('click', function () {
+    const id = $(this).data('id');
+
+    // Fetch data by ID
+    $.ajax({
+        url: '/Manager/GetRefereeById', // API endpoint to get data
+        type: 'GET',
+        data: { id: id },
+        success: function (response) {
+            if (response.success) {
+                // Populate form with the fetched data
+                $('#id').val(response.data.id);
+                $('#name').val(response.data.name);
+                $('#role').val(response.data.role).trigger('change');
+                $('#position').val(response.data.position);
+
+                
+
+                // If image exists, show it
+                if (response.data.imageUrl) {
+                    $('#imagePreview').show();
+                    $('#imagePreviewImg').attr('src', response.data.imageUrl);
+                }
+
+                // Open modal
+                $('#createNewModal').modal('show');
+            } else {
+                alert("ไม่พบข้อมูล");
+            }
+        },
+        error: function () {
+            alert("เกิดข้อผิดพลาดในการดึงข้อมูล");
+        }
+    });
+});
+$('.delete-button').on('click', function () {
+    const id = $(this).data('id');
+
+    if (confirm("คุณต้องการลบข้อมูลนี้หรือไม่?")) {
+        // Delete request
+        $.ajax({
+            url: '/Manager/DeleteReferee1',
+            type: 'POST',
+            data: JSON.stringify({ id: id }),
+            contentType: 'application/json',
+            success: function (response) {
+                if (response.success) {
+                    alert("ลบข้อมูลสำเร็จ");
+                    location.reload(); // Refresh the page
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function () {
+                alert("เกิดข้อผิดพลาดในการลบข้อมูล");
+            }
+        });
+    }
+});
+document.getElementById('role').addEventListener('change', function() {
+    var roleError = document.getElementById('dutyError');
+    if (this.value) {
+        roleError.style.display = 'none';
+    } else {
+        roleError.style.display = 'block';
+    }
+});
+</script>
+<script>
+
+</script>

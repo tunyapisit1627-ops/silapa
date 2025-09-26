@@ -1,0 +1,323 @@
+@model IEnumerable<Competitionlist>
+@{
+    ViewData["Title"] = "ข้อมูลรายการแข่งขัน";
+    int i=1;
+    IList<Registerhead> models=ViewBag.data;
+    uploadfilepdf uploadfilepdf= ViewBag.filepdf;
+   // IList<Registerdetail> registerdetails=models.Where(x=>x.Registerdetail);
+}
+<div class="card">
+ <div class="card-header">
+        <h2 class="card-title">ลงทะเบียนข้อมูลรายการแข่งขัน</h2>
+    </div>
+ <div>
+    <form asp-controller="Member" asp-action="frmRegister">
+            <div class="card-body">
+                <!-- Main content -->
+                <section class="content">
+                    <div class="container-fluid">
+                        <!-- SELECT2 EXAMPLE -->
+                        <div class="card card-default">
+                            <div class="card-header">
+                                <h3 class="card-title">เงื่อนไขการค้นหา</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">หมวดหมู่</label>
+                                    <div class="col-sm-10">
+                                        @Html.DropDownList("c_id", (IEnumerable<SelectListItem>)ViewBag.levelData, "ทั้งหมด", new { @name = "", @class = "form-control select2", @style = "width: 100%;", @selected = (int)ViewBag.currentTypelevel })
+                                    </div>
+                                </div>
+                            </div>  
+                        </div>
+                    </div>
+                    <!-- /.container-fluid -->
+                </section>
+                <!-- /.content -->
+                <!-- /.card-body -->
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-info">ค้นหา</button>
+                    <button type="submit" class="btn btn-default float-right">Cancel</button>
+                </div>
+                <!-- /.card-footer -->
+            </div>
+        </form>
+ </div>
+  <div class="card-body">
+     <table id="example1" class="table table-bordered table-striped">
+        <thead>
+                <tr>
+                    <th>
+                        #
+                    </th>
+                    <th>
+                        รหัส
+                    </th>
+                    <th>
+                        ชื่อ
+                    </th>
+                    <th>
+                        ประเภท
+                    </th>
+                    <th>
+                        จำนวนนักเรียน
+                    </th>
+                    <th>
+                        จำนวนครู
+                    </th>
+                    <th>
+                        สถานะ
+                    </th>
+                </tr>
+            </thead>
+             <tbody>
+                @foreach (var item in Model)
+                {
+                    var dt=models.Where(x=>x.c_id==item.Id).FirstOrDefault();
+                    var registerdetails=models.Where(x=>x.c_id==item.Id).FirstOrDefault();
+                    var cs=0;
+                    var ct=0;
+                    var totals=item.student;
+                    var totalt=item.teacher;
+                    var strs="";
+                    var strt="";
+                    
+                     if(ViewBag.statusdateregister=="1"){    
+                    <tr data-widget="expandable-table" aria-expanded="false">
+                        <td align="center">
+                            @i
+                        </td>
+                        <td align="center">
+                            @Html.DisplayFor(modelItem => item.Id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name) 
+                            @if(item.Id==43){
+                                <br>@if(uploadfilepdf!=null)
+                            {
+                           
+                            <a asp-action="frmuploadpdf" asp-controller="Member" asp-route-c_id="@uploadfilepdf.c_id" asp-routes_id="@uploadfilepdf.s_id">
+                                            <span class="info-box-text">ไฟล์ PDF</span>
+                                             <span class="info-box-text">สถานะ : 
+                                                 @if(uploadfilepdf.status=="1"){
+                                        <span class="badge bg-danger" >รอการตรวจสอบ</span>
+                                    }else if(uploadfilepdf.status=="0")
+                                    {
+                                        <span class="badge bg-danger">ไม่ผ่านเกณฑ์</span>
+                                    }else
+                                    {
+                                        <span class="badge bg-success">ตรวจสอบเรียบร้อย</span>
+                                    }
+                                                  :@uploadfilepdf.msg</span>
+                                            </a>
+                            }
+                            }
+                            
+                        </td>
+                        <td align="center">
+                            @Html.DisplayFor(modelItem => item.type)
+                        </td>
+                        <td align="center">
+                            @if(registerdetails!=null)
+                    {
+                        //var dt=models.Where(x=>x.c_id==item.Id).FirstOrDefault();
+                        try{
+                              cs=registerdetails.Registerdetail.Count(x=>x.Type=="student" &&x.h_id==dt.id);
+                        }catch{
+                            cs=0;
+                        }
+                         var tts=(totals-cs);
+                        if(totals==cs)
+                        {
+                           
+                            <span class="badge bg-success">@cs (ครบ) </span>
+                        }else{
+                            <span class="badge bg-danger">@cs (ยังไม่ครบขาด @tts คน)</span>
+                        }
+                        
+                    }
+                        </td>
+                        <td align="center">
+                            @if(registerdetails!=null)
+                    {
+                        try{ct=registerdetails.Registerdetail.Count(x=>x.Type=="teacher" &&x.h_id==dt.id);}catch{ct=0;}
+                         var tts=(totalt-ct);
+                        if(totalt==ct)
+                        {
+                           
+                            <span class="badge bg-success">@ct (ครบ) </span>
+                        }else{
+                            <span class="badge bg-danger">@ct (ยังไม่ครบขาด @tts คน)</span>
+                        }
+                        
+                    }
+                        </td>
+                        <td>
+                            @try{
+                                
+                                if(dt!=null){
+                                    <a href="@Url.Action("frmRegister_add", "Member", new { id = @dt.id,c_id=@item.Id,c_name=@item.Name,type=@item.type,t=@item.teacher,s=@item.student })" class="btn btn-block bg-gradient-primary" >แก้ไขข้อมูล</a>
+                                    <a href="@Url.Action("frmmanagerpic", "Member", new { id = @dt.id,c_id=@item.Id,c_name=@item.Name,type=@item.type,t=@item.teacher,s=@item.student })" class="btn btn-block bg-gradient-primary" >จัดการภาพติดบัตร</a>
+                                 if(ViewBag.statusdateregister=="1"){
+                                    <a href="@Url.Action("frmRegister_del", "Member", new { id = @dt.id ,c_id=ViewBag.currentTypelevel})" class="btn btn-block bg-gradient-danger" onclick="return confirm('คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการลงทะเบียน?');">ยกเลิกการลงทะเบียน</a>
+                                 }
+                                }else{
+                                    if(ViewBag.statusdateregister=="1"){
+                                    <a href="@Url.Action("frmRegister_add", "Member", new { id = 0,c_id=@item.Id,c_name=@item.Name,type=@item.type,t=@item.teacher,s=@item.student })" class="btn btn-block bg-gradient-danger">ยังไม่ได้ลงทะเบียน</a>
+                                    }  else{
+                                        <label>ไม่อยู่ในช่วงเวลาลงทะเบียน</label>
+                                    }         
+                                     
+                                }
+                            }catch{
+                                    if(ViewBag.statusdateregister=="1"){
+                                    <a href="@Url.Action("frmRegister_add", "Member", new { id = 0,c_id=@item.Id,c_name=@item.Name,type=@item.type,t=@item.teacher,s=@item.student })" class="btn btn-block bg-gradient-danger">ยังไม่ได้ลงทะเบียน</a>
+                                    }  else{
+                                        <label>ไม่อยู่ในช่วงเวลาลงทะเบียน</label>
+                                    }  
+                            }                         
+                        </td>
+                    </tr>
+                    }else{
+                        if(dt!=null)
+                        {
+                    <tr data-widget="expandable-table" aria-expanded="false">
+                        <td align="center">
+                            @i
+                        </td>
+                        <td align="center">
+                            @Html.DisplayFor(modelItem => item.Id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name) 
+                            @if(item.Id==43){
+                                <br>@if(uploadfilepdf!=null)
+                            {
+                           
+                            <a asp-action="frmuploadpdf" asp-controller="Member" asp-route-c_id="@uploadfilepdf.c_id" asp-routes_id="@uploadfilepdf.s_id">
+                                            <span class="info-box-text">ไฟล์ PDF</span>
+                                             <span class="info-box-text">สถานะ : 
+                                                 @if(uploadfilepdf.status=="1"){
+                                        <span class="badge bg-danger" >รอการตรวจสอบ</span>
+                                    }else if(uploadfilepdf.status=="0")
+                                    {
+                                        <span class="badge bg-danger">ไม่ผ่านเกณฑ์</span>
+                                    }else
+                                    {
+                                        <span class="badge bg-success">ตรวจสอบเรียบร้อย</span>
+                                    }
+                                                  :@uploadfilepdf.msg</span>
+                                            </a>
+                            }
+                            }
+                            
+                        </td>
+                        <td align="center">
+                            @Html.DisplayFor(modelItem => item.type)
+                        </td>
+                        <td align="center">
+                            @if(registerdetails!=null)
+                    {
+                        //var dt=models.Where(x=>x.c_id==item.Id).FirstOrDefault();
+                        try{
+                              cs=registerdetails.Registerdetail.Count(x=>x.Type=="student" &&x.h_id==dt.id);
+                        }catch{
+                            cs=0;
+                        }
+                         var tts=(totals-cs);
+                        if(totals==cs)
+                        {
+                           
+                            <span class="badge bg-success">@cs (ครบ) </span>
+                        }else{
+                            <span class="badge bg-danger">@cs (ยังไม่ครบขาด @tts คน)</span>
+                        }
+                        
+                    }
+                        </td>
+                        <td align="center">
+                            @if(registerdetails!=null)
+                    {
+                        try{ct=registerdetails.Registerdetail.Count(x=>x.Type=="teacher" &&x.h_id==dt.id);}catch{ct=0;}
+                         var tts=(totalt-ct);
+                        if(totalt==ct)
+                        {
+                           
+                            <span class="badge bg-success">@ct (ครบ) </span>
+                        }else{
+                            <span class="badge bg-danger">@ct (ยังไม่ครบขาด @tts คน)</span>
+                        }
+                        
+                    }
+                        </td>
+                        <td>
+                            @try{
+                                
+                                if(dt!=null){
+                                    if( ViewBag.statusdateedit=="1"){
+                                    <a href="@Url.Action("frmRegister_add", "Member", new { id = @dt.id,c_id=@item.Id,c_name=@item.Name,type=@item.type,t=@item.teacher,s=@item.student })" class="btn btn-block bg-gradient-primary" >แก้ไขข้อมูล</a>
+                                   }
+                                    <a href="@Url.Action("frmmanagerpic", "Member", new { id = @dt.id,c_id=@item.Id,c_name=@item.Name,type=@item.type,t=@item.teacher,s=@item.student })" class="btn btn-block bg-gradient-primary" >จัดการภาพติดบัตร</a>
+                                 if(ViewBag.statusdateregister=="1"){
+                                    <a href="@Url.Action("frmRegister_del", "Member", new { id = @dt.id ,c_id=ViewBag.currentTypelevel})" class="btn btn-block bg-gradient-danger" onclick="return confirm('คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการลงทะเบียน?');">ยกเลิกการลงทะเบียน</a>
+                                 }
+                                }else{
+                                    if(ViewBag.statusdateregister=="1"){
+                                        if( ViewBag.statusdateedit=="1"){
+                                             <a href="@Url.Action("frmRegister_add", "Member", new { id = 0,c_id=@item.Id,c_name=@item.Name,type=@item.type,t=@item.teacher,s=@item.student })" class="btn btn-block bg-gradient-danger">ยังไม่ได้ลงทะเบียน</a>
+                                        }                              
+                                    }  else{
+                                        <label>ไม่อยู่ในช่วงเวลาลงทะเบียน</label>
+                                    }         
+                                     
+                                }
+                            }catch{
+                                    if(ViewBag.statusdateregister=="1"){
+                                   if( ViewBag.statusdateedit=="1"){
+                                             <a href="@Url.Action("frmRegister_add", "Member", new { id = 0,c_id=@item.Id,c_name=@item.Name,type=@item.type,t=@item.teacher,s=@item.student })" class="btn btn-block bg-gradient-danger">ยังไม่ได้ลงทะเบียน</a>
+                                        }  
+                                    }  else{
+                                        <label>ไม่อยู่ในช่วงเวลาลงทะเบียน</label>
+                                    }  
+                            }                         
+                        </td>
+                    </tr>
+                        }
+                         
+                    }
+                    i+=1;
+                }
+            </tbody>
+     </table>
+  </div>
+</div>
+<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script>$(function () {
+        $('.select2').select2()
+        $("#example1").DataTable({
+            "responsive": true, "lengthChange": false, "autoWidth": false, "ordering": true, "pageLength": 20, "orderMulti":true,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+        });
+    });</script>

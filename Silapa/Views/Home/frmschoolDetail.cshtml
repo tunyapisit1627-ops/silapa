@@ -1,0 +1,215 @@
+@model IEnumerable<Registerhead>
+@{
+    IList<Competitionlist> competitionlists=ViewBag.Competitionlist;
+    int sumtotal= ViewBag.StudentCount+ViewBag.TeacherCount;
+     System.Globalization.CultureInfo thaiCulture = new System.Globalization.CultureInfo("th-TH");
+}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>กราฟ</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">สรุปยอด</a></li>
+                    </ol>
+                    
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- DONUT CHART -->
+                    <div class="card card-danger">
+                        <div class="card-header">
+                            <h3 class="card-title">@ViewBag.name</h3>
+
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                         <div class="card-body">
+                          <input id="="s_id" value="@ViewBag.id" hidden>
+                <canvas id="pieChart" style="min-height: 350px; height: 350px; max-height: 350px; max-width: 100%;"></canvas>
+              </div>
+                        <!-- /.card-body -->
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+            <div class="card">
+              <div class="card-header border-transparent">
+                <h3 class="card-title">รายการแข่งขัน</h3>
+
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <button type="button" class="btn btn-tool" data-card-widget="remove">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table m-0">
+                    <thead>
+                    <tr>
+                      <th>รายการ</th>
+                      <th>วันที่แข่งขัน</th>
+                      <th>จำนวนนักเรียน</th>
+                      <th>จำนวนครู</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @{
+                        foreach(var dr in competitionlists){
+                        var datar=Model.Where(x=>x.c_id==dr.Id).FirstOrDefault();
+                        var datarece=dr.racedetails.Where(x=>x.c_id==dr.Id).FirstOrDefault();
+                        var dd = "";
+                        string[] startdate;
+                        string[] enddate;
+                        string[] ddsub;
+                        var sCount=0;
+                        var tCount=0;
+                        var ttCount=0;
+                        if(datarece!=null){
+                    dd = datarece.daterace ?? "";
+                    ddsub = dd.Split('-');
+                    if (ddsub.Length == 2)
+                    {
+                      startdate = ddsub[0].Split('/');
+                      enddate = ddsub[1].Split('/');
+                      if (startdate.Length == 3 && enddate.Length == 3)
+                      {
+                        DateTime startDateNow = new DateTime(Convert.ToInt16(startdate[2]), Convert.ToInt16(startdate[0]), Convert.ToInt16(startdate[1]));
+                        DateTime endDateNow = new DateTime(Convert.ToInt16(enddate[2]), Convert.ToInt16(enddate[0]), Convert.ToInt16(enddate[1]));
+                        int buddhistYearS = startDateNow.Year + 543;
+                        int buddhistYearN = endDateNow.Year + 543;
+                        dd = $"{startDateNow.ToString("dd MMMM", thaiCulture)} {buddhistYearS}-{endDateNow.ToString("dd MMMM", thaiCulture)} {buddhistYearN}";
+                      }
+                    }
+                        }
+                        if(datar!=null){
+                            sCount=datar.Registerdetail.Count(x=>x.Type=="student");
+                            tCount=datar.Registerdetail.Count(x=>x.Type=="teacher");
+                            
+                        }
+                        if(sCount>0&&tCount>0){
+                        <tr>
+                      <td><a href="#">@dr.Name</a></td>
+                      <td>@dd</td>
+                      <td align="center"> <div class="sparkbar" data-color="#00a65a" data-height="20">@sCount คน</div></td>
+                      <td align="center">
+                        <div class="sparkbar" data-color="#00a65a" data-height="20">@tCount คน</div>
+                      </td>
+                    </tr>   
+                        }
+                    
+                        }
+                    }
+                    
+                    
+                    </tbody>
+                  </table>
+                </div>
+                <!-- /.table-responsive -->
+              </div>
+              <!-- /.card-body -->
+             
+              <!-- /.card-footer -->
+            </div>
+            <div class="col-md-4">
+                 <div class="info-box mb-3 bg-warning">
+              <span class="info-box-icon"><i class="fas fa-tag"></i></span>
+               <div class="info-box-content">
+                <span class="info-box-text">ยอดรวมทั้งหมด</span>
+                <span class="info-box-number">@sumtotal คน</span>
+              </div>
+                 </div>
+            <div class="info-box mb-3 bg-success">
+              <span class="info-box-icon"><i class="far fa-heart"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">จำนวนนักเรียน</span>
+                <span class="info-box-number">@ViewBag.StudentCount คน</span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+            <div class="info-box mb-3 bg-danger">
+              <span class="info-box-icon"><i class="fas fa-cloud-download-alt"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">จำนวนครู</span>
+                <span class="info-box-number">@ViewBag.TeacherCount คน</span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+            <div class="info-box mb-3 bg-info">
+              <span class="info-box-icon"><i class="far fa-comment"></i></span>
+
+              
+              <!-- /.info-box-content -->
+            </div>
+            </div>
+            </div>
+            </div>
+            <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+</div>
+
+<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script>
+    $(function () {
+      var s_id=document.getElementById('s_id');
+        $.ajax({
+        url: '/api/ChartData/GetPieChartData?s_id='+s_id,
+        method: 'GET',
+        success: function (response) {
+            var pieChartCanvas = $('#pieChart').get(0).getContext('2d');
+
+            // ใช้ข้อมูลจาก API ในการสร้างกราฟ
+            new Chart(pieChartCanvas, {
+                type: 'pie',
+                data: {
+                    labels: response.labels,
+                    datasets: response.datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    }
+                }
+            });
+        },
+        error: function (error) {
+            console.error('Error loading data:', error);
+        }
+    });
+    });
+</script>

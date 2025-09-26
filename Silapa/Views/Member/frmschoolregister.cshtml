@@ -1,0 +1,207 @@
+@model IEnumerable<Registerhead>
+@{
+    ViewData["Title"] = "ข้อมูลรายการที่ลงทะเบียน";
+    int i = 1;
+    // IList<Registerhead> models=ViewBag.data;
+    System.Globalization.CultureInfo thaiCulture = new System.Globalization.CultureInfo("th-TH");
+}
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=TH+Sarabun+New:wght@400;700&display=swap" rel="stylesheet">
+<style>
+    .thsarabun {
+        font-family: 'TH Sarabun New', sans-serif;
+        font-size: 16px;
+    }
+</style>
+</head>
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">ข้อมูลรายการที่ลงทะเบียน</h2>
+    </div>
+    <div>
+        <form asp-controller="Member" asp-action="frmschoolregister">
+            <div class="card-body">
+                <!-- Main content -->
+                <section class="content">
+                    <div class="container-fluid">
+                        <!-- SELECT2 EXAMPLE -->
+                        <div class="card card-default">
+                            <div class="card-header">
+                                <h3 class="card-title">เงื่อนไขการค้นหา</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">หมวดหมู่</label>
+                                    <div class="col-sm-10">
+                                        @Html.DropDownList("c_id", (IEnumerable<SelectListItem>)ViewBag.levelData, "ทั้งหมด", new { @name = "", @class = "form-control select2", @style = "width: 100%;", @selected = (int)ViewBag.currentTypelevel })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.container-fluid -->
+                </section>
+                <!-- /.content -->
+                <!-- /.card-body -->
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-info">ค้นหา</button>
+                    <button type="submit" class="btn btn-default float-right">Cancel</button>
+                </div>
+                <!-- /.card-footer -->
+            </div>
+        </form>
+    </div>
+    <div class="card-body">
+        <table id="example1" class="table table-bordered table-striped thsarabun">
+            <thead>
+                <tr>
+                    <th>
+                        #
+                    </th>
+                    <th>
+                        ชื่อรายการ
+                    </th>
+                     <th>
+                        หมวดหมู่
+                    </th>
+                    
+                    <th>
+                        นักเรียน
+                    </th>
+                    <th>
+                        ครู
+                    </th>
+                    <th>
+                        วันที่แข่งขัน
+                    </th>
+                    <th>
+                        สถานที่
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                  var datadd = item.Competitionlist?.racedetails.FirstOrDefault(x => x.c_id == item.c_id);
+                  var dd = "";
+                  string[] startdate;
+                  string[] enddate;
+                  string[] ddsub;
+                  var building = "";
+                  var room = "";
+                  var name = "";
+                  var time = "";
+
+                  if (datadd != null)
+                  {
+                    dd = datadd.daterace ?? "";
+                    ddsub = dd.Split('-');
+                    if (ddsub.Length == 2)
+                    {
+                      startdate = ddsub[0].Split('/');
+                      enddate = ddsub[1].Split('/');
+                      if (startdate.Length == 3 && enddate.Length == 3)
+                      {
+                        DateTime startDateNow = new DateTime(Convert.ToInt16(startdate[2]), Convert.ToInt16(startdate[0]), Convert.ToInt16(startdate[1]));
+                        DateTime endDateNow = new DateTime(Convert.ToInt16(enddate[2]), Convert.ToInt16(enddate[0]), Convert.ToInt16(enddate[1]));
+                        int buddhistYearS = startDateNow.Year + 543;
+                        int buddhistYearN = endDateNow.Year + 543;
+                        dd = $"{startDateNow.ToString("dd MMMM", thaiCulture)} {buddhistYearS}-{endDateNow.ToString("dd MMMM", thaiCulture)} {buddhistYearN}";
+                      }
+                        time = datadd.time;
+                        building = datadd.building ?? "";
+                        room = datadd.room ?? "";
+                        name = datadd.Racelocation?.name ?? "";    
+                    }
+                    }
+                    <tr data-widget="expandable-table" aria-expanded="false">
+                        <td align="center">
+                            @i
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Competitionlist.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Competitionlist.Category.Name)
+                        </td>
+                        
+                        <td style="vertical-align: top; text-align: left;">
+                            @{
+                                var srs = item.Registerdetail?.Where(x => x.h_id == item.id && x.Type == "student").ToList() ?? new List<Registerdetail>();
+                                var studentNames = string.Join(Environment.NewLine, srs.Select(ddr => $"{ddr.no} {ddr.Prefix} {ddr.FirstName} {ddr.LastName}"));
+                                @Html.Raw(studentNames.Replace(Environment.NewLine, "<br>"))
+                            }
+                        </td>
+
+                        <td style="vertical-align: top; text-align: left;">
+                            @{
+                                var trg = item.Registerdetail?.Where(x => x.h_id == item.id && x.Type == "teacher").ToList() ?? new List<Registerdetail>();
+                                var teacherNames = string.Join(Environment.NewLine, trg.Select(ddt => $"{ddt.no} {ddt.Prefix} {ddt.FirstName} {ddt.LastName}"));
+                                @Html.Raw(teacherNames.Replace(Environment.NewLine, "<br>"))
+                            }
+                        </td>
+                        <td>
+                            @{    
+                             @($"{dd}")
+                            }
+                        </td>
+                        <td>
+                            @{
+                             @($"เวลา {time} อาคาร{building} ห้อง {room} {name}")
+                            }
+                        </td>
+                    </tr>
+                    i += 1;
+
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script>$(function () {
+        $('.select2').select2()
+       $("#example1").DataTable({
+    "responsive": true,
+    "lengthChange": false,
+    "autoWidth": false,
+    "ordering": true,
+    "pageLength": 20,
+    "orderMulti": true,
+    "buttons": [
+        {
+            extend: 'excelHtml5',
+            text: 'Export to Excel',
+            customize: function (xlsx) {
+                var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                // หาเซลล์ที่ต้องการปรับแต่ง
+                $('row c[r]', sheet).attr('s', '55'); // กำหนดสไตล์หากต้องการ
+                $('font', sheet).attr('name', 'TH Sarabun');
+            },
+            exportOptions: {
+                columns: ':visible',
+                format: {
+                    body: function (data, row, column, node) {
+                        // เปลี่ยน <br> กลับเป็น \n เพื่อให้ Excel แสดงผลบรรทัดใหม่
+                        return data.replace(/<br\s*\/?>/g, '\n');
+                    }
+                }
+            }
+        },
+        "copy", "csv", "print", "colvis"
+    ]
+}).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+    });</script>

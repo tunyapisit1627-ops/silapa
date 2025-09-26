@@ -1,0 +1,256 @@
+@model IEnumerable<contacts>
+@{
+    ViewData["Title"] = "ข้อมูลจัดการภาพติดบัตร";
+    int i = 1;
+
+}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">จัดการข้อมูลผู้ประสานงาน </h3>
+
+        <div class="card-tools">
+            <span class="badge badge-danger">@DateTime.Now</span>
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+            <button type="button" class="btn btn-tool" data-card-widget="remove">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body p-0">
+        <ul class="users-list clearfix">
+            @foreach (var dr in Model)
+            {
+                <li>
+                    <img width="128" height="128" src="@dr.ImageUrl" alt="User Image" data-id="@dr.id"
+                        onclick="openCropModal('@dr.id', '@dr.ImageUrl')">
+                    <a class="users-list-name" href="#">@dr.name</a>
+                    <span class="users-list-date"><a href="#"
+                            onclick="openEditModal('@dr.id','@dr.title','@dr.name','@dr.position','@dr.Location','@dr.tel','@dr.ImageUrl')">แก้ไข</a></span>
+                </li>
+            }
+        </ul>
+        <!-- /.users-list -->
+    </div>
+    <!-- /.card-body -->
+    <div class="card-footer text-center">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addContactModal">
+            เพิ่มข้อมูล
+        </button>
+    </div>
+    <!-- /.card-footer -->
+</div>
+<!-- Modal Structure -->
+<!-- Modal Structure -->
+<div class="modal fade" id="addContactModal" tabindex="-1" role="dialog" aria-labelledby="addContactModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addContactModalLabel">เพิ่มข้อมูลใหม่</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="addContactForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="title">ส่วนหัว</label>
+                        <input id="pid" name="pid" hidden>
+                        <input id="imgurl" name="imgurl" hidden>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="กรอกส่วนหัว">
+                    </div>
+                    <div class="form-group">
+                        <label for="name">ชื่อ</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="กรอกชื่อ">
+                    </div>
+                    <div class="form-group">
+                        <label for="position">ตำแหน่ง</label>
+                        <input type="text" class="form-control" id="position" name="position" placeholder="กรอกตำแหน่ง">
+                    </div>
+                    <div class="form-group">
+                        <label for="location">สถานที่</label>
+                        <input type="text" class="form-control" id="location" name="location" placeholder="กรอกสถานที่">
+                    </div>
+                    <div class="form-group">
+                        <label for="tel">เบอร์โทร</label>
+                        <input type="text" class="form-control" id="tel" name="tel" placeholder="กรอกเบอร์โทร">
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
+                    <button type="button" class="btn btn-primary">บันทึกข้อมูล</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal for cropping the image -->
+<div class="modal fade" id="imageCropModal" tabindex="-1" aria-labelledby="imageCropModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageCropModalLabel">Edit Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- File input to choose an image -->
+                <div class="form-group">
+                    <label for="imageInput">Choose an image</label>
+                    <input type="file" id="imageInput" class="form-control" accept="image/*"
+                        onchange="loadImage(event)">
+                </div>
+
+                <!-- Image container for cropping -->
+                <div class="img-container mt-3">
+                    <img id="imageToCrop" src="" alt="Image for cropping" style="max-width: 100%; display: none;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="cropImage()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Include Cropper.js CSS and JS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+<script>
+    var cropper;
+
+    // Load and preview the selected image
+    function loadImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const imageElement = document.getElementById('imageToCrop');
+                imageElement.src = e.target.result;
+                imageElement.style.display = 'block'; // Show the image
+
+                // Destroy any existing cropper instance
+                if (cropper) cropper.destroy();
+
+                // Initialize the cropper
+                cropper = new Cropper(imageElement, {
+                    aspectRatio: 1, // Adjust this ratio based on your requirements
+                    viewMode: 1
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // Crop the image and send it to the server
+    function cropImage() {
+        const croppedDataUrl = cropper.getCroppedCanvas().toDataURL('image/jpeg'); // Get cropped image data
+
+        // Send cropped image data to the server using AJAX
+        $.ajax({
+            url: '/Admin/UpdateImage', // Adjust with your actual controller path
+            type: 'POST',
+            data: {
+                croppedImage: croppedDataUrl,
+                id: selectedHId
+            },
+            success: function (response) {
+                // Handle success - update the image on the page
+                if (response.success) {
+                    // Update the image `src` with a timestamp to prevent caching
+                    const updatedImageUrl = `${response.newImageUrl}?t=${new Date().getTime()}`;
+
+                    // Target the img element using data attributes for `h_id` and `no`
+                    const imgElement = document.querySelector(`img[data-id="${selectedHId}"]`);
+
+                    if (imgElement) {
+                        imgElement.src = updatedImageUrl;
+                    }
+                    // Clear the modal data
+                    $('#imageInput').val(''); // Clear the file input
+                    $('#imageToCrop').attr('src', '').hide(); // Hide the cropped image preview
+                    $('#imageCropModal').modal('hide'); // Close modal
+                    alert("Image updated successfully!");
+                }
+            },
+            error: function () {
+                alert("An error occurred while updating the image.");
+            }
+        });
+    }
+    function openCropModal(id, imageUrl) {
+        // Save these IDs for use when saving
+        selectedHId = id;
+        // Set the existing image URL if you want to show the current image
+        document.getElementById('imageToCrop').src = imageUrl;
+        $('#imageCropModal').modal('show'); // Show the modal
+    }
+
+    document.querySelector("#addContactForm button.btn-primary").addEventListener("click", function () {
+        const id = document.querySelector("#pid").value.trim() || '0';
+        const title = document.querySelector("#title").value.trim();
+        const name = document.querySelector("#name").value.trim();
+        const position = document.querySelector("#position").value.trim();
+        const location = document.querySelector("#location").value.trim();
+        const tel = document.querySelector("#tel").value.trim();
+        const img = document.querySelector("#imgurl").value.trim();
+        // เช็คว่าข้อมูลที่จำเป็นกรอกครบหรือไม่
+        if (!title || !name || !position || !location || !tel) {
+            alert("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+            return;
+        }
+        const contactData = {
+            id: id,
+            title: title,
+            name: name,
+            position: position,
+            location: location,
+            tel: tel,
+            imageUrl: img,
+            u_id: '',
+            status: '1',
+            lastupdate: new Date().toISOString() // เพิ่มวันที่ปัจจุบัน
+        };
+
+        fetch("/Admin/saveContactModal", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(contactData)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Error in saving data");
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert("บันทึกข้อมูลสำเร็จ");
+                $('#addContactModal').modal('hide');
+                setTimeout(function () {
+                    window.location.reload(true); // โหลดหน้าใหม่จากเซิร์ฟเวอร์แทนการใช้แคช
+                }, 500); // Wait for 2 seconds before redirecting
+
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+            });
+    });
+    function openEditModal(id, title, name, position, Location, tel, imgurl) {
+        // เปิด modal โดยใช้ jQuery (หากคุณใช้ Bootstrap)
+        $('#addContactModal').modal('show');
+        document.querySelector("#addContactModal input[name='pid']").value = id;
+        document.querySelector("#addContactModal input[name='title']").value = title;
+        document.querySelector("#addContactModal input[name='name']").value = name;
+        document.querySelector("#addContactModal input[name='position']").value = position;
+        document.querySelector("#addContactModal input[name='location']").value = Location;
+        document.querySelector("#addContactModal input[name='tel']").value = tel;
+        document.querySelector("#addContactModal input[name='imgurl']").value = imgurl;
+    }
+</script>

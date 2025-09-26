@@ -1,0 +1,389 @@
+@model Competitionlist
+@{
+    ViewData["Title"] = "เพิ่มข้อมูลกิจกรรม";
+}
+
+<body class="hold-transition sidebar-mini">
+    <div class="card">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input asp-for="Id" id="hId" name="hId" hidden />
+        <div class="card card-info">
+            <div class="card-header">
+                <h2 class="card-title">เพิ่มข้อมูลรายการ</h2>
+            </div>
+            <div class="card-body">
+                <!-- Main content -->
+                <section class="content">
+                    <div class="container-fluid">
+                        <div class="card card-default">
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">ชื่อรายการ</label>
+                                    <div class="col-sm-10">
+                                        <input asp-for="Name" name="Name" class="form-control" />
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">หมวดหมู่</label>
+                                    <div class="col-sm-10">
+                                        @Html.DropDownList("c_id", (IEnumerable<SelectListItem>)ViewBag.levelData,
+                                                 "ทั้งหมด", new
+                                                 {
+                                                     @name = "c_id",
+                                                     @class = "form-control select2",
+                                                     @style =
+                                                 "width: 100%;",
+                                                     @selected = (int)ViewBag.currentTypelevel
+                                                 })
+                                        <span asp-validation-for="c_id" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">ประเภท</label>
+                                    <div class="col-sm-10">
+                                        <select asp-for="type" name="type" class="form-control select2"
+                                            id="typeDropdown">
+                                            <option selected disabled>เลือกประเภท</option>
+                                            <option value="เดี่ยว">เดี่ยว</option>
+                                            <option value="ทีม">ทีม</option>
+                                        </select>
+                                        <span asp-validation-for="type" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">จำนวนครู</label>
+                                    <div class="col-sm-10">
+                                        <input asp-for="teacher" name="teacher" class="form-control" />
+                                        <span asp-validation-for="teacher" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">จำนวนนักเรียน</label>
+                                    <div class="col-sm-10">
+                                        <input asp-for="student" name="student" class="form-control" />
+                                        <span asp-validation-for="student" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">จำนวนกรรมการ</label>
+                                    <div class="col-sm-10">
+                                        <input asp-for="director" name="director" class="form-control" />
+                                        <span asp-validation-for="director" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">รายละเอียด</label>
+                                    <div class="col-sm-10">
+                                        <input asp-for="details" name="details" class="form-control" />
+                                        <span asp-validation-for="details" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">เกณฑ์การให้คะแนน</h3>
+                                    </div>
+                                    <div class="row">
+                                        <input type="hidden" id="editRowId" value="" />
+                                        <div class="col-4">
+                                            <input type="text" class="form-control" id="name"
+                                                placeholder="เกณฑ์การให้คะแนน">
+                                        </div>
+                                        <div class="col-4">
+                                            <input type="text" class="form-control" id="position" placeholder="คะแนน"
+                                                min="0" max="100">
+                                        </div>
+                                        <div class="col-2">
+                                            <button type="button" class="btn btn-block bg-gradient-primary"
+                                                id="addRow">เพิ่ม</button>
+                                            <button type="button" class="btn btn-block bg-gradient-success"
+                                                id="saveEdit" style="display:none;">บันทึก</button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <table id="teacherTable" class="table table-bordered table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>เกณฑ์การให้คะแนน</th>
+                                                    <th>คะแนน</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tableBody">
+                                                @if (Model.dCompetitionlists != null)
+                                                {
+                                                    int no = 1;
+                                                    foreach (var dr in Model.dCompetitionlists)
+                                                    {
+                                                        <tr>
+                                                            <td>@no</td>
+                                                            <td>@dr.name</td>
+                                                            <td>@dr.scrol</td>
+                                                            <td>
+                                                                <input type="hidden" name="Id" value="@dr.id" />
+                                                                <!-- เพิ่มฟิลด์ Id -->
+                                                                <button class="btn btn-warning btn-sm"
+                                                                    onclick="editTeacherRowData(this)">แก้ไข</button>
+                                                                <button class="btn btn-danger btn-sm" data-id="@dr.id"
+                                                                    onclick="deleteTeacherRow(this)">ลบ</button>
+                                                            </td>
+                                                        </tr>
+                                                        no += 1;
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="card-footer">
+                    <button type="submit" id="saveData" value="Submit" class="btn btn-info">บันทึกข้อมูล</button>
+                    <button asp-action="frmList" asp-controller="Admin"
+                        class="btn btn-default float-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script>$(function () {
+        $('.select2').select2()
+    });
+</script>
+<script>
+    document.getElementById("addRow").addEventListener("click", function () {
+        // Get input values
+        const name = document.getElementById("name").value;
+        const scoreInput = document.getElementById("position");
+        const score = parseInt(scoreInput.value, 10); // Convert score to integer
+
+        // Basic validation to ensure fields are not empty and score is within 0-100
+        if (!name) {
+            alert("กรุณาใส่เกณฑ์การแข่งขัน");
+            return;
+        }
+        if (isNaN(score) || score < 0 || score > 100) {
+            alert("คะแนนต้องมีค่า 0 ถึง 100.");
+            scoreInput.focus();
+            return;
+        }
+
+        // Calculate the current total score
+        let currentTotal = 0;
+        document.querySelectorAll("#tableBody tr").forEach(row => {
+            const rowScore = parseInt(row.cells[2].innerText, 10); // Assumes score is in the third cell
+            currentTotal += rowScore;
+        });
+
+        // Check if adding the new score would exceed the total limit of 100
+        if (currentTotal + score > 100) {
+            alert("คะแนนรวมทุกเกณฑ์การแข่งขันต้องไม่เกิน 100 คะแนน");
+            return;
+        }
+
+        // Add a new row to the table
+        const tableBody = document.getElementById("tableBody");
+        const rowCount = tableBody.rows.length + 1; // This gives the current number of rows + 1 for new row
+
+        // Create a new row element
+        const newRow = document.createElement("tr");
+
+        // Adding a unique ID to the new row
+        newRow.id = `row-${rowCount}`; // Set the ID of the new row
+
+        newRow.innerHTML = `
+        <td>${rowCount}</td>
+        <td>${name}</td>
+        <td>${score}</td>
+        <td>
+            <input type="hidden" name="Id" value="${rowCount}" /> <!-- Store the rowCount as Id -->
+            <button class="btn btn-warning btn-sm" onclick="editTeacherRowData(this)">แก้ไข</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteTeacherRow(this)">ลบ</button>
+        </td>
+    `;
+
+        tableBody.appendChild(newRow);
+
+        // Clear the input fields for the next entry
+        document.getElementById("name").value = "";
+        scoreInput.value = "";
+    });
+    function editTeacherRowData(button) {
+        // Find the row that contains the clicked button
+        const row = button.closest('tr');
+
+        // Get the values from the row
+        const name = row.cells[1].innerText; // Assumes name is in the second cell
+        const score = row.cells[2].innerText; // Assumes score is in the third cell
+        const id = row.querySelector('input[name="Id"]').value; // Get the hidden ID
+
+        // Set the input fields to the current row's values
+        document.getElementById("name").value = name;
+        document.getElementById("position").value = score;
+
+        // Store the ID in a hidden input or a variable for later use
+        document.getElementById("editRowId").value = id; // Assuming you have a hidden input to hold the ID for saving
+
+        // Show the save button and hide the add button
+        document.getElementById("saveEdit").style.display = "block";
+        document.getElementById("addRow").style.display = "none";
+    }
+    document.getElementById("saveEdit").onclick = function () {
+        const scoreInput = document.getElementById("position");
+        const score = parseInt(scoreInput.value, 10); // Convert score to integer
+
+        // Check if the score is a valid number
+        if (isNaN(score) || score < 0 || score > 100) {
+            alert("คะแนนต้องมีค่า 0 ถึง 100 และต้องเป็นตัวเลขเท่านั้น.");
+            scoreInput.focus(); // Focus on the score input field
+            return; // Exit the function if validation fails
+        }
+
+        const id = document.getElementById("editRowId").value;
+        const rows = document.querySelectorAll("#tableBody tr");
+        let rowToUpdate;
+
+        rows.forEach(row => {
+            if (row.querySelector('input[name="Id"]').value === id) {
+                rowToUpdate = row;
+            }
+        });
+
+        if (rowToUpdate) {
+            rowToUpdate.cells[1].innerText = document.getElementById("name").value;
+            rowToUpdate.cells[2].innerText = score; // Use validated score
+
+            // Update the hidden input if necessary
+        }
+
+        // Clear the input fields
+        document.getElementById("name").value = "";
+        scoreInput.value = "";
+
+        // Hide the save button and show the add button again
+        document.getElementById("saveEdit").style.display = "none";
+        document.getElementById("addRow").style.display = "block";
+
+        // Update row numbers
+        updateRowNumbers();
+    };
+    function deleteTeacherRow(button) {
+        // Find the row that contains the clicked button
+        const row = button.closest("tr");
+
+        // Optionally, confirm the deletion
+        const confirmDelete = confirm("คุณแน่ใจหรือว่าต้องการลบเกณฑ์นี้?");
+        if (confirmDelete) {
+            // Remove the row from the table
+            row.remove();
+
+            // Update the row numbers after deletion
+            updateRowNumbers();
+        }
+    }
+    function updateRowNumbers() {
+        const rows = document.querySelectorAll("#teacherTable tbody tr");
+        rows.forEach((row, index) => {
+            row.cells[0].innerText = index + 1; // Update the first cell with the row number
+        });
+    }
+    document.getElementById("saveData").addEventListener("click", function (event) {
+        event.preventDefault();
+        const hid=document.querySelector("#hId").value;
+        const type = document.querySelector("#typeDropdown").value;
+        const c_id = document.querySelector("#c_id").value;
+        const viewModel = {
+            Competition: {
+                Id: hid,
+                name: document.querySelector("input[name='Name']").value,
+                type: type,
+                c_id: c_id,
+                teacher: document.querySelector("input[name='teacher']").value,
+                student: document.querySelector("input[name='student']").value,
+                director: document.querySelector("input[name='director']").value,
+                details: document.querySelector("input[name='details']").value,
+                status: "1",
+                lastupdate: new Date().toISOString()
+            },
+            DCompetition: []
+        };
+
+        // เก็บข้อมูลใน DCompetition
+        gatherDCompetitionDataFromTeacherTable(viewModel);
+
+        // ตรวจสอบว่ามีข้อมูลใน competition และ DCompetition หรือไม่
+        if (!viewModel.Competition.name || viewModel.DCompetition.length === 0) {
+            alert("กรุณากรอกข้อมูลการแข่งขันและเพิ่มข้อมูลในตารางก่อนบันทึก");
+            return; // หยุดการทำงานหากไม่มีข้อมูล
+        }
+
+
+        fetch("/Admin/SaveCompetition", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(viewModel)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    setTimeout(function () {
+                        window.location.href = data.redirectUrl;
+                    }, 500); // Wait for 2 seconds before redirecting
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+            });
+
+    });
+    function gatherDCompetitionDataFromTeacherTable(viewModel) {
+        const tableRows = document.querySelectorAll("#teacherTable tbody#tableBody tr");
+        let totalScore = 0;
+        if (tableRows.length === 0) {
+            alert("ไม่มีข้อมูลในตาราง");
+            return; // หยุดการทำงานหากไม่มีแถวในตาราง
+        }
+
+        tableRows.forEach(row => {
+            const name = row.cells[1].textContent.trim(); // ชื่อจากคอลัมน์ที่สอง
+            const scroll = parseInt(row.cells[2].textContent.trim()) || 0; // คะแนนจากคอลัมน์ที่สาม
+            const id = row.querySelector("input[name='Id']").value; // Id ที่ซ่อนอยู่
+            totalScore += scroll; // รวมคะแนนจากแต่ละแถว
+            if (name) { // ตรวจสอบว่าชื่อมีค่า
+                // เพิ่มข้อมูลลงใน DCompetition array
+                viewModel.DCompetition.push({
+                    name: name,
+                    scrol: scroll,
+                    h_id: id,
+                    id: 0, // ปรับเปลี่ยนตามที่ต้องการ
+                    u_id: "123", // กำหนดค่า u_id ตามที่จำเป็น
+                    lastupdate: new Date().toISOString()
+                });
+            }
+        });
+
+        // ตรวจสอบว่าคะแนนรวมเป็น 100 หรือไม่
+        if (totalScore !== 100) {
+            alert("คะแนนรวมในตารางต้องเป็น 100 คะแนนเท่านั้น (คะแนนรวมปัจจุบัน: " + totalScore + ")");
+            viewModel.DCompetition = []; // ล้างข้อมูลใน DCompetition เพื่อป้องกันการบันทึก
+            return;
+        }
+    }
+</script>

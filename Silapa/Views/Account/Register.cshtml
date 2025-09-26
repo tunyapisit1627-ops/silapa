@@ -1,0 +1,93 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+}
+<form asp-action="Register" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input asp-for="s_id" value="" hidden>
+    <input asp-for="tel" value="" hidden>
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="UserName"></label>
+        <input asp-for="UserName" class="form-control" />
+        <span asp-validation-for="UserName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Password"></label>
+        <input asp-for="Password" class="form-control" type="password" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ConfirmPassword"></label>
+        <input asp-for="ConfirmPassword" class="form-control" type="password" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="titlename"></label>
+        <input asp-for="titlename" class="form-control" />
+        <span asp-validation-for="titlename" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="FirstName"></label>
+        <input asp-for="FirstName" class="form-control" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="LastName"></label>
+        <input asp-for="LastName" class="form-control" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="a_id" class="control-label"></label>
+        @Html.DropDownListFor(m => m.a_id, ViewBag.ParentList as SelectList, "เลือกกลุ่ม", new
+            {
+                @class =
+                 "form-control select2",
+                id = "userRole"
+            })
+        <span asp-validation-for="a_id" class="text-danger"></span>
+    </div>
+
+    <!-- DropDown สำหรับการเลือกกลุ่มการแข่งขัน -->
+    <div class="form-group" id="competitionDropdown" style="display:none;">
+        <label asp-for="m_id" class="control-label"></label>
+        <div class="select2-purple">
+            @Html.DropDownListFor(m => m.m_id, ViewBag.CompetitionList as SelectList, "" ,
+                     new { @class = "select2",@multiple="multiple"})
+            <span asp-validation-for="m_id" class="text-danger"></span>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Register</button>
+</form>
+<link rel="stylesheet" href="~/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script src="~/plugins/moment/moment.min.js"></script>
+<script src="~/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+<!-- jQuery สำหรับการซ่อน/แสดง DropDown -->
+<script>
+    $(document).ready(function () {
+        // เมื่อมีการเปลี่ยนแปลงใน dropdown ของ user role
+        $('#userRole').change(function () {
+            var selectedValue = $(this).val();
+            if (selectedValue === "Manager") {
+                $('#competitionDropdown').show(); // แสดง DropDown เมื่อเลือก "Member"
+            } else {
+                $('#competitionDropdown').hide(); // ซ่อน DropDown เมื่อไม่เลือก "Member"
+            }
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.select2').select2();
+    });
+</script>

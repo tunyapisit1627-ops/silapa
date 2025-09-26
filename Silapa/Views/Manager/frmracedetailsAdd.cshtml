@@ -1,0 +1,120 @@
+@model racedetails
+@{
+    ViewData["Title"] = "เพิ่มข้อมูลสถานที่จัดการแข่งขันและวันที่";
+}
+<form asp-action="frmracedetailsAdd" asp-controller="Manager" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div> <!-- แสดงสรุปข้อผิดพลาด -->
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-outline card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <input asp-for="id" hidden />
+                            <input asp-for="c_id" hidden value="@ViewBag.c_id" />
+                            <input asp-for="status" value="1" hidden />
+                            ข้อมูลสถานที่และวันที่แข่งขัน
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group row">
+                            <label>ชื่อรายการ</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control float-right" name="c_name"
+                                    value="@ViewBag.c_name" readonly>
+                            </div>
+                            <!-- /.input group -->
+                        </div>
+                        <div class="form-group row">
+                            <label>วันที่จัดการแข่งขัน</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="far fa-calendar-alt"></i>
+                                    </span>
+                                </div>
+                                <input type="text" class="form-control float-right" id="reservation" asp-for="daterace">
+                            </div>
+                            <!-- /.input group -->
+                        </div>
+                        <div class="form-group">
+                            <label>เวลา:</label>
+
+                            <div class="input-group date" id="timepicker" data-target-input="nearest">
+                                <input asp-for="time" type="text" class="form-control datetimepicker-input"
+                                    data-target="#timepicker" />
+                                <div class="input-group-append" data-target="#timepicker" data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="far fa-clock"></i></div>
+                                </div>
+                            </div>
+                            <!-- /.input group -->
+                        </div>
+                        <div class="form-group row">
+                            <label for="inputEmail3">สถานที่</label>
+                            <div class="input-group">
+                                @Html.DropDownList("r_id", (IEnumerable<SelectListItem>)ViewBag.locationData, "", new
+                                    {
+                                        @name = "",
+                                        @class = "form-control select2",
+                                        @style = "width: 100%;",
+                                        @selected =
+                                         (int)ViewBag.currentTypelocation
+                                    })
+                                <span asp-validation-for="r_id" class="text-danger"></span> <!-- ข้อความตรวจสอบ -->
+                            </div>
+                        </div>
+                         <div class="form-group row">
+                            <label asp-for="building"></label>
+                            <div class="input-group">
+                               <input type="text" class="form-control float-right" asp-for="building">
+                                <span asp-validation-for="building" class="text-danger"></span> <!-- ข้อความตรวจสอบ -->
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label asp-for="room"></label>
+                            <div class="input-group">
+                               <input type="text" class="form-control float-right" asp-for="room">
+                                <span asp-validation-for="room" class="text-danger"></span> <!-- ข้อความตรวจสอบ -->
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label>รายละเอียดการแข่งขัน</label>
+                            <div class="input-group">
+                                <textarea id="summernote" asp-for="details">
+                            @Model.details
+                             </textarea>
+                                <span asp-validation-for="details" class="text-danger"></span> <!-- ข้อความตรวจสอบ -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="submit" value="Submit" class="btn btn-info">บันทึกข้อมูล</button>
+                </div>
+            </div>
+        </div>
+        <!-- /.col-->
+        </div>
+    </section>
+</form>
+<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script>
+    $(function () {
+        // Summernote
+        $('#summernote').summernote()
+        $('.select2').select2()
+        $('#reservation').daterangepicker()
+        //Timepicker
+        $('#timepicker').datetimepicker({
+            format: 'LT'
+        })
+        // CodeMirror
+        CodeMirror.fromTextArea(document.getElementById("codeMirrorDemo"), {
+            mode: "htmlmixed",
+            theme: "monokai"
+        });
+    })
+</script>

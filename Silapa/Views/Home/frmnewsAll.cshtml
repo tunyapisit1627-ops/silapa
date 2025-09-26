@@ -1,0 +1,36 @@
+@using X.PagedList
+@using X.PagedList.Mvc.Core
+@model IPagedList<news>
+@{
+    ViewData["Title"] = "งานศิลปหัตภกรรมนักเรียนครั้งที่ 72 ปีการศึกษา 2567 จังหวัดนครราชสีมา";
+   // IList<news> news=ViewBag.news;
+    int n=1;
+}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">ข่าวประชาสัมพันธ์ทั้งหมด</h2>
+    </div>
+    <div class="card-body">
+        <section class="content">
+            <div class="row">
+            @foreach(var dn in Model)
+            {
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <img src="@dn.ImageUrl" class="card-img-top" alt="ข่าว @n">
+                    <div class="card-body">
+                        <h5 class="card-title">@dn.titlename</h5>
+                        <p class="card-text">ลงวันที่ : @dn.lastupdate</p>
+                        <a asp-action="frmnewsshow" asp-controller="Home" asp-route-id="@dn.id" class="btn btn-primary">อ่านเพิ่มเติม</a>
+                    </div>
+                </div>
+            </div>
+            n+=1;
+            }           
+        </div>
+        <div class="pagination justify-content-center">
+            @Html.PagedListPager(Model, page => Url.Action("frmnewsAll", new { page }))
+        </div>
+        </section>
+    </div>
+</div>

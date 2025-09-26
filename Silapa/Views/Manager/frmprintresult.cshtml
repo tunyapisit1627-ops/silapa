@@ -1,0 +1,48 @@
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <h2 class="text-center display-4">รายละเอียดที่ต้องการปริ้น</h2>
+             <form action="enhanced-results.html">
+                <div class="row">
+                    <div class="col-md-10 offset-md-1">
+                        <div class="row">
+                             <div class="col-12">
+                                <div class="form-group">
+                                    <label>หมวดหมู่:</label>
+                                    @Html.DropDownList("c_id", (IEnumerable<SelectListItem>)ViewBag.levelData, "ทั้งหมด", new { @name = "", @class = "form-control select2", @style = "width: 100%;", @selected = (int)ViewBag.currentTypelevel })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                             <div class="col-12">
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-info btn-block btn-flat" onclick="downloadPdf()"><i class="fa fa-bell"></i> ปริ้นผลการแข่งขัน</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             </form>
+        </div>
+    </section>
+</div>
+@section Scripts
+{
+ <script>$(function () {
+        $('.select2').select2()
+        $("#example1").DataTable({
+            "responsive": true, "lengthChange": false, "autoWidth": false, "ordering": true, "pageLength": 20, "orderMulti":true,
+            "buttons": ["copy", "csv", "excel", "print", "colvis"]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        });
+        function downloadPdf() {
+        var c_id=document.getElementById("c_id").value;
+        // สร้าง URL สำหรับดาวน์โหลดไฟล์
+        var url = '@Url.Action("GenePdfresult", "Pdfmember")' + '?c_id=' + c_id;
+        // เปลี่ยนเส้นทางไปยัง URL เพื่อเริ่มการดาวน์โหลด
+        window.location.href = url;
+    }
+        </script>
+}

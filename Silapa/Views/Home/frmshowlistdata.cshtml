@@ -1,0 +1,45 @@
+@model IEnumerable<Competitionlist>
+@{
+    ViewData["Title"] = "รายการแข่งขัน";
+    int i = 1;
+    IList<Registerhead> registerheads=ViewBag.data;
+}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">ข้อมูลรายการแข่งขัน</h2>
+    </div>
+    <div class="card-body">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">หมวดหมู่รายการแข่งขัน : @ViewBag.c_name</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body p-0">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th style="width: 10px">#</th>
+                            <th>รายการแข่งขัน</th>
+                            <th>ประเภท</th>
+                            <th align="center">จำนวนทีม</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var dr in Model)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td><a asp-action="frmshowlistdataAll" asp-route-id="@dr.Id" asp-route-name="@dr.Name">@dr.Name</a></td>
+                                <td>@dr.type นักเรียน @dr.student คน / ครู @dr.teacher คน</td>
+                                <td align="center">@registerheads.Count(x=>x.c_id==dr.Id)</td>
+                            </tr>
+                            i+=1;
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+    </div>
+</div>

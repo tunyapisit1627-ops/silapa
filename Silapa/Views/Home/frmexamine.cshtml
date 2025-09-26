@@ -1,0 +1,204 @@
+@{
+   // IList<Registerhead> registerheads=ViewBag.Data;
+}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <h2 class="text-center display-4">ค้นหาข้อมูลและปริ้นเกียรติบัตร</h2>
+        </div>
+        <!-- /.container-fluid -->
+    </section>
+    <section class="content">
+        <div class="container-fluid">
+            <form method="get" action="/Home/frmexamine">
+                <div class="row">
+                    <div class="col-md-10 offset-md-1">
+                        <div class="row">
+                            <div class="col-9">
+                                <div class="form-group">
+                                    <label>ค้นหาจากงาน:</label>
+                                   @Html.DropDownList("c_id", (IEnumerable<SelectListItem>)ViewBag.levelData, "ทั้งหมด", new { @name = "", @class = "form-control select2", @style = "width: 100%;", @selected = (int)ViewBag.currentTypelevel })
+                                </div>
+                            </div>
+                           
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label>ค้นหาจาก:</label>
+                                    @Html.DropDownList("type", (IEnumerable<SelectListItem>)ViewBag.TypeOptions, new { @class = "form-control select2", @style = "width: 100%;", @selected = (string)ViewBag.currentType })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group input-group-lg">
+                                <input type="search" name="search" class="form-control form-control-lg"
+                                    placeholder="Type your keywords here" value="@ViewBag.search">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-lg btn-default">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+           @if(ViewBag.Data!=null){
+            if(ViewBag.type=="1"){
+            <div class="row mt-3">
+                <div class="col-md-10 offset-md-1">
+                    <div class="list-group">
+                       @foreach(var dr in ViewBag.Data)
+                       {
+                        <div class="list-group-item">
+                           
+                                 <div class="row">
+                                <div class="col-auto">
+                                    <img class="img-fluid" src="@dr.ImageUrl" alt="Photo"
+                                        style="max-height: 160px;">
+                                        <input type="hidden" id="settingIdInput" value="@dr.Settingid" />
+                                </div>
+                                <div class="col px-4">
+                                    <div>
+                                        <div class="float-right"> <button type="button" id="printCertificate" class="btn btn-primary float-right" style="margin-right: 5px;"
+                                        onclick="downloadCertificate(this)"
+                                        data-settingid="@dr.Settingid" 
+                                        data-id="@dr.Id" 
+                                        data-no="@dr.RegistrationNo"
+                                        data-name="@dr.Fullname" 
+                                        data-schoolname="@dr.SchoolName" 
+                                        data-roledescription="@dr.RoleDescription @dr.CompetitionlistName" 
+                                        data-Location="ณ @dr.Location"
+                                        data-Award="ได้รับรางวัล @dr.Rank @dr.Award"
+                                        data-type="1"
+                                        disabled>
+                                    <i class="fas fa-download"></i> ดาวน์โหลดเกียรติบัตร
+                                    </button></div>
+                                        <h3>@dr.Fullname</h3>
+                                         <p class="mb-0">@dr.Namejob</p>
+                                        <p class="mb-0">รายการ @dr.CompetitionlistName</p>
+                                        <p class="mb-0">รางวัล @dr.RoleDescription @dr.Rank @dr.Award</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                       }
+                    </div>
+                </div>
+            </div>
+            }else if(ViewBag.type=="2"){
+                 <div class="row mt-3">
+                <div class="col-md-10 offset-md-1">
+                    <div class="list-group">
+                       @foreach(var dr in ViewBag.Data)
+                       {
+                        <div class="list-group-item">
+                           
+                                 <div class="row">
+                                <div class="col-auto">
+                                    <img class="img-fluid" src="@dr.ImageUrl" alt="Photo"
+                                        style="max-height: 160px;">
+                                        <input type="hidden" id="settingIdInput" value="@dr.Settingid" />
+                                </div>
+                                <div class="col px-4">
+                                    <div>
+                                        <div class="float-right"> <button type="button" id="printCertificate" class="btn btn-primary float-right" style="margin-right: 5px;"
+                                        onclick="downloadCertificate(this)" 
+                                        data-settingid="@dr.Settingid" 
+                                        data-id="@dr.Id" 
+                                        data-name="@dr.Fullname" 
+                                        data-schoolname="@dr.SchoolName" 
+                                        data-roledescription="@dr.RoleDescription" 
+                                        data-Category="@dr.Category"
+                                        data-type="2"
+                                        disabled
+                                        >
+                                    <i class="fas fa-download"></i> ดาวน์โหลดเกียรติบัตร
+                                    </button></div>
+                                        <h3>@dr.Fullname</h3>
+                                         <p class="mb-0">@dr.Namejob</p>
+                                        <p class="mb-0"> @dr.SchoolName</p>
+                                        <p class="mb-0">@dr.RoleDescription</p>
+                                         <p class="mb-0">@dr.Category</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                       }
+                    </div>
+                </div>
+            </div>
+            }  
+           }
+        </div>
+    </section>
+</div>
+@section Scripts
+{
+    <script>$(function () {
+         $('.select2').select2()
+         
+        });
+        </script>
+        <script>
+    function downloadCertificate(button) {
+    const settingId = button.getAttribute('data-settingid');
+    const id = button.getAttribute('data-id');
+    const idNo=button.getAttribute('data-no')
+    const name = button.getAttribute('data-name');
+    const schoolName = button.getAttribute('data-schoolname');
+    const roleDescription = button.getAttribute('data-roledescription');
+    const Category=button.getAttribute('data-Category');
+    const type = button.getAttribute('data-type');
+    const Location =button.getAttribute('data-Location');
+    const Award = button.getAttribute('data-Award');
+
+    // สร้าง URL สำหรับคำขอ
+    const url = `/Pdfmember/GenePdfCertificateIndividual?settingId=${settingId}&id=${id}&idNo=${idNo}&name=${encodeURIComponent(name)}&Award=${encodeURIComponent(Award)}&SchoolName=${encodeURIComponent(schoolName)}&RoleDescription=${encodeURIComponent(roleDescription)}&Category=${encodeURIComponent(Category)}&Location=${encodeURIComponent(Location)}&type=${encodeURIComponent(type)}`;
+    window.location.href = url;
+    }
+   document.addEventListener("DOMContentLoaded", async () => {
+    // ดึง input ทั้งหมดที่มี id="settingIdInput"
+    const settingIdInputs = document.querySelectorAll("input[id='settingIdInput']");
+
+    try {
+        for (const input of settingIdInputs) {
+            const settingId = input.value; // ดึงค่าจาก input แต่ละตัว
+
+            // เรียก API พร้อมพารามิเตอร์ settingId
+            const response = await fetch(`/Home/GetCertificateDate?settingId=${settingId}`);
+            const result = await response.json();
+
+            if (!result.success) {
+                // แสดงข้อความแจ้งเตือนถ้าไม่พบข้อมูล
+                alert(`Setting ID ${settingId}: ${result.message || "ไม่สามารถดึงข้อมูลวันที่ได้"}`);
+                continue; // ข้ามไปยัง input ถัดไป
+            }
+
+            // แปลงวันที่ BE เป็น CE
+            const certificatedateBE = result.certificatedate; // เช่น 05/01/2568
+            const [day, month, yearBE] = certificatedateBE.split("/");
+            const yearCE = parseInt(yearBE, 10) - 543;
+            const certificatedate = new Date(`${yearCE}-${month}-${day}`);
+            const now = new Date();
+
+            // ค้นหาปุ่มที่เกี่ยวข้องกับ input นี้ (สมมติว่าอยู่ในบรรทัดเดียวกัน)
+            const button = input.closest('.row').querySelector('button[id="printCertificate"]');
+
+            if (button) {
+                if (now >= certificatedate) {
+                    button.disabled = false;
+                } else {
+                    const timeUntilEnable = certificatedate - now;
+                    setTimeout(() => {
+                        button.disabled = false;
+                    }, timeUntilEnable);
+                }
+            }
+        }
+    } catch (error) {
+        console.error("เกิดข้อผิดพลาดขณะดึงข้อมูล:", error);
+    }
+});
+        </script>
+}

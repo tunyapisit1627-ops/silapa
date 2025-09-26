@@ -1,0 +1,319 @@
+@model IEnumerable<groupreferee>
+@{
+    ViewData["Title"] = "ข้อมูลกรรมการดำเนินการ";
+    int i = 1;
+    // IList<Registerhead> models=ViewBag.data;
+}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">ข้อมูลกรรมการดำเนินการ</h2>
+    </div>
+    <div>
+        <form asp-controller="Manager" asp-action="frmgroupreferee">
+            <div class="card-body">
+                <!-- Main content -->
+                <section class="content">
+                    <div class="container-fluid">
+                        <!-- SELECT2 EXAMPLE -->
+                        <div class="card card-default">
+                            <div class="card-header">
+                                <h3 class="card-title">เงื่อนไขการค้นหา</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">หมวดหมู่</label>
+                                    <div class="col-sm-10">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.container-fluid -->
+                </section>
+                <!-- /.content -->
+                <!-- /.card-body -->
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-info">ค้นหา</button>
+                    <button type="submit" class="btn btn-default float-right">Cancel</button>
+                </div>
+                <!-- /.card-footer -->
+            </div>
+        </form>
+    </div>
+    <div class="card-body">
+        <table id="example1" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        #
+                    </th>
+                    <th>
+                        หัวข้อชื่อคณะกรรมการ
+                    </th>
+                    <th>
+                        บทบาทหน้าที่
+                    </th>
+                    <th>
+                        หมวดหมู่
+                    </th>
+                    <th>
+                       <!-- <a href="javascript:void(0)" class="btn btn-outline-success" data-toggle="modal"
+                            data-target="#createNewModal">
+                            <i class="fa fa-plus-square"></i> Create New
+                        </a>col-->
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+
+                    <tr data-widget="expandable-table" aria-expanded="false">
+                        <td align="center">
+                            @i
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.name)
+                        </td>
+                        <td align="center">
+                            @Html.DisplayFor(modelItem => item.duty)
+                        </td>
+                        <td align="center">
+                            @Html.DisplayFor(modelItem =>  item.Category.Name)
+                        </td>
+                        <td>
+                           <!-- <button class="btn btn-primary btn-sm edit-button" data-id="@item.id">แก้ไข</button>
+                            <button class="btn btn-danger btn-sm delete-button" data-id="@item.id">ลบ</button>-->
+                            <button class="btn btn-success btn-sm">
+                                <a href="@Url.Action("frmdirectoradd1", "Manager", new { id = item.Category.Id,g_id=item.id,c_name=item.Category.Name,r_name=item.name,duty=item.duty })"
+                                    class="text-white">เพิ่มกรรมการ</a>
+                            </button>
+                        </td>
+                    </tr>
+                    i += 1;
+
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal fade" id="createNewModal" tabindex="-1" role="dialog" aria-labelledby="createNewModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createNewModalLabel">เพิ่มข้อมูลใหม่</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createNewForm">
+                    <div class="form-group">
+                        <label for="name">หัวข้อชื่อคณะกรรมการ</label>
+                        <input id="id" name="id" hidden>
+                        <input type="text" class="form-control" id="name" name="Name" required>
+                        <small class="form-text text-danger" style="display:none;"
+                            id="nameError">กรุณากรอกหัวข้อชื่อคณะกรรมการ</small>
+                        <small class="form-text text-danger" id="nameError" style="display:none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="duty">บทบาทหน้าที่</label>
+                        <input type="text" class="form-control" id="duty" name="duty" required>
+                        <small class="form-text text-danger" style="display:none;"
+                            id="dutyError">กรุณากรอกบทบาทหน้าที่</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="categoryId">หมวดหมู่</label>
+                        <select class="form-control select2" id="c_id" name="c_id" required>
+                            <option value="">เลือกหมวดหมู่</option>
+                            @foreach (var category in ViewBag.Categories as List<category>)
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                            }
+                        </select>
+                        <small class="form-text text-danger" style="display:none;"
+                            id="categoryError">กรุณาเลือกหมวดหมู่</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
+                <button id="saveButton" class="btn btn-primary">บันทึก</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="alertModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">แจ้งเตือน</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- ข้อความแจ้งเตือนจะแสดงที่นี่ -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
+            </div>
+        </div>
+    </div>
+</div>
+<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script>$(function () {
+        $('.select2').select2()
+        $("#example1").DataTable({
+            "responsive": true, "lengthChange": false, "autoWidth": false, "ordering": true, "pageLength": 20, "orderMulti": true,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+        });
+    });</script>
+<script>
+    $('#createNewModal').on('hidden.bs.modal', function () {
+        $(this).find('form')[0].reset();
+    });
+</script>
+<script>
+    document.getElementById("createNewForm").addEventListener("saveButton", function (e) {
+        let isValid = true;
+
+        // ตรวจสอบฟิลด์ 'name'
+        const nameField = document.getElementById("name");
+        if (!nameField.value.trim()) {
+            document.getElementById("nameError").style.display = "block";
+            isValid = false;
+        } else {
+            document.getElementById("nameError").style.display = "none";
+        }
+
+        // ตรวจสอบฟิลด์ 'duty'
+        const dutyField = document.getElementById("duty");
+        if (!dutyField.value.trim()) {
+            document.getElementById("dutyError").style.display = "block";
+            isValid = false;
+        } else {
+            document.getElementById("dutyError").style.display = "none";
+        }
+
+        // ตรวจสอบฟิลด์ 'categoryId'
+        const categoryField = document.getElementById("c_id");
+        if (!categoryField.value) {
+            document.getElementById("categoryError").style.display = "block";
+            isValid = false;
+        } else {
+            document.getElementById("categoryError").style.display = "none";
+        }
+
+        // ถ้าไม่ผ่าน validation ให้ยกเลิกการส่งฟอร์ม
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+    $(document).ready(function () {
+        $("#saveButton").on("click", function (e) {
+            e.preventDefault();
+            const id = parseInt($("#id").val()) || 0; // ถ้าไม่มีค่าให้เป็น 0
+            const formData = {
+                id: id,
+                name: $("#name").val(),
+                c_id: parseInt($("#c_id").val()), // ตรวจสอบว่าเป็น number
+                duty: $("#duty").val()
+            };
+
+            $.ajax({
+                url: '/Manager/Save',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    if (!response.success) {
+                        // แสดง Modal พร้อมข้อความแจ้งเตือน
+                        $("#alertModal .modal-body").text(response.message);
+                        $("#alertModal").modal("show");
+                    } else {
+                        alert(response.message); // หรือแสดงแจ้งเตือนสำเร็จ
+                        location.reload(); // รีโหลดหน้าถ้าต้องการ
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error:", error);
+                }
+            });
+        });
+    });
+    $(document).on('click', '.edit-button', function () {
+        const id = $(this).data('id'); // ดึง ID จากปุ่ม
+
+        // เรียก AJAX เพื่อดึงข้อมูลจากเซิร์ฟเวอร์
+        $.ajax({
+            url: `/Manager/GetDetails/${id}`, // ส่ง ID ไปดึงข้อมูล
+            type: 'GET',
+            success: function (response) {
+                if (response.success) {
+                    // เติมข้อมูลลงในฟอร์มใน Modal
+                    $('#createNewModal #id').val(response.data.id);
+                    $('#createNewModal #name').val(response.data.name);
+                    $('#createNewModal #c_id').val(response.data.c_id).trigger('change'); // ใช้ trigger('change') เพื่อให้ Select2 หรือ UI อื่นๆ อัพเดท
+                    $('#createNewModal #duty').val(response.data.duty);
+
+                    // เปิด Modal
+                    $('#createNewModal').modal('show');
+                } else {
+                    alert(response.message || "ไม่พบข้อมูล");
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error:", error);
+                alert("เกิดข้อผิดพลาดในการดึงข้อมูล");
+            }
+        });
+    });
+    // ลบข้อมูล
+    $(document).on('click', '.delete-button', function () {
+        const id = parseInt($(this).data('id'), 10) || 0;
+        if (confirm("คุณต้องการลบข้อมูลนี้ใช่หรือไม่? ถ้ามีการลบหัวข้อนี้รายชื่อกรรมการที่อยู่ในหัวข้อนี้จะถูกลบทั้งหมด")) {
+            $.ajax({
+                url: '/Manager/Deletegroupreferees',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ id: id }),
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload(); // Reload หน้าเพื่ออัปเดตข้อมูล
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error:", error);
+                }
+            });
+        }
+    });
+</script>

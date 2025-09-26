@@ -1,0 +1,245 @@
+@model IEnumerable<Competitionlist>
+@{
+    ViewData["Title"] = "ข้อมูลรายกรรมการ";
+    int i = 1;
+    int x = 1;
+    IList<groupreferee> models = ViewBag.groupreferee;
+}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>รายชื่อกรรมการ</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home"
+                                class="nav-link">Home</a></li>
+                        <li class="breadcrumb-item active"></li>
+                    </ol>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <!-- Default box -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">รายชื่อกรรมการ</h3>
+
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-striped projects">
+                    <thead>
+                        <tr>
+                            <th style="width: 1%">
+                                #
+                            </th>
+                            <th style="width: 20%">
+                                ชื่อรายการ
+                            </th>
+                            <th style="width: 30%">
+                                รายชื่อกรรมการ
+                            </th>
+
+                            <th style="width: 20%">
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var dr in Model)
+                        {
+                            var sqldata = dr.referees.Where(x => x.c_id == dr.Id).ToList();
+                            <tr>
+                                <td>
+                                    @i
+                                </td>
+                                <td>
+                                    @dr.Name
+                                </td>
+                                <td>
+                                    <ul class="list-inline">
+                                        @foreach (var ddr in sqldata)
+                                        {
+                                            <li class="list-inline-item">
+                                                <img alt="Avatar" class="table-avatar" data-id="@ddr.id" src="@ddr.ImageUrl">
+                                                <a class="users-list-name"
+                                                    onclick="openCropModal('@ddr.id', '@ddr.ImageUrl')">@ddr.name</a>
+                                            </li>
+                                        }
+
+                                    </ul>
+                                </td>
+
+                                <td class="project-actions text-right">
+                                    <a class="btn btn-primary btn-sm" asp-action="GeneratePdf" asp-controller="Pdf"
+                                        asp-route-id="@dr.Id" asp-route-type="r">
+                                        <i class="fas fa-folder">
+                                        </i>
+                                        ปริ้นบัตร
+                                    </a>
+
+                                </td>
+                            </tr>
+                            i += 1;
+                        }
+
+                        @foreach (var dr in models)
+                        {
+                            var sqldata = dr.referees.Where(x => x.g_id == dr.id).ToList();
+                            <tr>
+                                <td>
+                                    @x
+                                </td>
+                                <td>
+                                    @dr.name
+                                </td>
+                                <td>
+                                    <ul class="list-inline">
+                                        @foreach (var ddr in sqldata)
+                                        {
+                                            <li class="list-inline-item">
+                                                <img alt="Avatar" class="table-avatar" data-id="@ddr.id" src="@ddr.ImageUrl">
+                                                <a class="users-list-name"
+                                                    onclick="openCropModal('@ddr.id', '@ddr.ImageUrl')">@ddr.name</a>
+                                            </li>
+                                        }
+
+                                    </ul>
+                                </td>
+
+                                <td class="project-actions text-right">
+                                    <a class="btn btn-primary btn-sm" asp-action="GeneratePdf" asp-controller="Pdf"
+                                        asp-route-id="@dr.c_id" asp-route-g_id="@dr.id" asp-route-type="rr" asp-route-g_id="25">
+                                        <i class="fas fa-folder">
+                                        </i>
+                                        ปริ้นบัตร
+                                    </a>
+
+                                </td>
+                            </tr>
+                            x += 1;
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+
+    </section>
+    <!-- /.content -->
+</div>
+<div class="modal fade" id="imageCropModal" tabindex="-1" aria-labelledby="imageCropModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageCropModalLabel">Edit Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- File input to choose an image -->
+                <div class="form-group">
+                    <label for="imageInput">Choose an image</label>
+                    <input type="file" id="imageInput" class="form-control" accept="image/*"
+                        onchange="loadImage(event)">
+                </div>
+
+                <!-- Image container for cropping -->
+                <div class="img-container mt-3">
+                    <img id="imageToCrop" src="" alt="Image for cropping" style="max-width: 100%; display: none;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="cropImage()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Include Cropper.js CSS and JS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+<script>
+    var cropper;
+
+    // Load and preview the selected image
+    function loadImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const imageElement = document.getElementById('imageToCrop');
+                imageElement.src = e.target.result;
+                imageElement.style.display = 'block'; // Show the image
+
+                // Destroy any existing cropper instance
+                if (cropper) cropper.destroy();
+
+                // Initialize the cropper
+                cropper = new Cropper(imageElement, {
+                    aspectRatio: 1, // Adjust this ratio based on your requirements
+                    viewMode: 1
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // Crop the image and send it to the server
+    function cropImage() {
+        const croppedDataUrl = cropper.getCroppedCanvas().toDataURL('image/jpeg'); // Get cropped image data
+
+        // Send cropped image data to the server using AJAX
+        $.ajax({
+            url: '/Manager/UpdateImagerefer', // Adjust with your actual controller path
+            type: 'POST',
+            data: {
+                croppedImage: croppedDataUrl,
+                id: selectedHId
+            },
+            success: function (response) {
+                // Handle success - update the image on the page
+                if (response.success) {
+                    // Update the image `src` with a timestamp to prevent caching
+                    const updatedImageUrl = `${response.newImageUrl}?t=${new Date().getTime()}`;
+
+                    // Target the img element using data attributes for `h_id` and `no`
+                    const imgElement = document.querySelector(`img[data-id="${selectedHId}"]`);
+
+                    if (imgElement) {
+                        imgElement.src = updatedImageUrl;
+                    }
+                    // Clear the modal data
+                    $('#imageInput').val(''); // Clear the file input
+                    $('#imageToCrop').attr('src', '').hide(); // Hide the cropped image preview
+                    $('#imageCropModal').modal('hide'); // Close modal
+                    alert("Image updated successfully!");
+                }
+            },
+            error: function () {
+                alert("An error occurred while updating the image.");
+            }
+        });
+    }
+    function openCropModal(id, imageUrl) {
+        // Save these IDs for use when saving
+        selectedHId = id;
+        // Set the existing image URL if you want to show the current image
+        document.getElementById('imageToCrop').src = imageUrl;
+        $('#imageCropModal').modal('show'); // Show the modal
+    }
+</script>

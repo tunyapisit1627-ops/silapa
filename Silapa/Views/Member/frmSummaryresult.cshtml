@@ -1,0 +1,260 @@
+@{
+    ViewData["Title"] = "ข้อมูลสรุปผลการแข่งขัน";
+    int i = 1;
+    // IList<Registerhead> models=ViewBag.data;
+    System.Globalization.CultureInfo thaiCulture = new System.Globalization.CultureInfo("th-TH");
+}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">ข้อมูลสรุปผลการแข่งขัน</h2>
+    </div>
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 col-sm-6 col-md-3">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-gold elevation-1"><i class="fas fa-cog"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">เหรียญทอง</span>
+                            <span class="info-box-number">
+                                @ViewBag.AwardSummary.Gold.Count
+                                <small>คิดเป็น @ViewBag.AwardSummary.Gold.Percentage%</small>
+                            </span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                    <!-- /.info-box -->
+                </div>
+                <!-- /.col -->
+                <div class="col-12 col-sm-6 col-md-3">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-silver elevation-1"><i class="fas fa-cog"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">เหรียญเงิน</span>
+                            <span class="info-box-number">
+                                @ViewBag.AwardSummary.Silver.Count
+                                <small>คิดเป็น @ViewBag.AwardSummary.Silver.Percentage%</small>
+                            </span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                </div>
+                <!-- fix for small devices only -->
+                <div class="clearfix hidden-md-up"></div>
+
+                <div class="col-12 col-sm-6 col-md-3">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-bronze elevation-1"><i class="fas fa-cog"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">เหรียญทองแดง</span>
+                            <span class="info-box-number">
+                                @ViewBag.AwardSummary.Bronze.Count
+                                <small>คิดเป็น @ViewBag.AwardSummary.Bronze.Percentage%</small>
+                            </span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                </div>
+                <!-- /.col -->
+                <div class="col-12 col-sm-6 col-md-3">
+                    <div class="info-box mb-3">
+                        <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-users"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">เข้าร่วม</span>
+                            <span class="info-box-number">@ViewBag.AwardSummary.Participation.Count คิดเป็น
+                                @ViewBag.AwardSummary.Participation.Percentage%</span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                    <!-- /.info-box -->
+                </div>
+                <!-- /.col -->
+            </div>
+        </div>
+    </section>
+    <div>
+        <form asp-controller="Member" asp-action="frmSummaryresult">
+            <div class="card-body">
+                <!-- Main content -->
+                <section class="content">
+                    <div class="container-fluid">
+                        <!-- SELECT2 EXAMPLE -->
+                        <div class="card card-default">
+                            <div class="card-header">
+                                <h3 class="card-title">เงื่อนไขการค้นหา</h3>
+                                <input id="s_id" value="@ViewBag.s_id" hidden />
+                              <!-- #region <input id="c_id" value="@ViewBag.currentTypelevel" hidden />-->  
+                                <input id="settingId" value="@ViewBag.settingId" hidden />
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">หมวดหมู่</label>
+                                    <div class="col-sm-10">
+                                        @Html.DropDownList("c_id", (IEnumerable<SelectListItem>)ViewBag.levelData,
+                                                 "ทั้งหมด", new
+                                                 {
+                                                     @id="c_id",
+                                                     @name = "c_id",
+                                                     @class = "form-control select2",
+                                                     @style =
+                                                 "width: 100%;",
+                                                     @selected = (int)ViewBag.currentTypelevel
+                                                 })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.container-fluid -->
+                </section>
+                <!-- /.content -->
+                <!-- /.card-body -->
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-info">ค้นหา</button>
+                    <button type="button" class="btn btn-primary" id="printCertificate" onclick="downloadPdf()"
+                        disabled>พิมพ์เกียรติบัตรตามหมวดหมู่</button>
+                    <button type="submit" class="btn btn-default float-right">Cancel</button>
+                </div>
+                <!-- /.card-footer -->
+            </div>
+        </form>
+    </div>
+    <div class="card-body">
+        <table id="example1" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        #
+                    </th>
+                    <th>
+                        ชื่อรายการ
+                    </th>
+                    <th>
+                        ระดับ
+                    </th>
+                    <th>
+                        อันดับ
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in ViewBag.data)
+                {
+                    <tr>
+                        <td align="center">
+                            @i
+                        </td>
+                        <td>
+                            @item.Competitionlistname
+                        </td>
+                        <td>
+                            @item.Award
+                        </td>
+                        <td align="center">
+                            @item.RankDescription
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-primary" id="printCertificate" onclick="downloadPdf(this)"
+                                data-id="@item.Id" data-settingid="@item.SettingId" disabled>ดาวน์โหลดเกียรติบัตร</button>
+                        </td>
+                    </tr>
+                    i += 1;
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@section Scripts
+{
+    <script>$(function () {
+            $('.select2').select2()
+            $("#example1").DataTable({
+                "responsive": true, "lengthChange": false, "autoWidth": false, "ordering": true, "pageLength": 20, "orderMulti": true,
+                "buttons": ["copy", "csv", "excel", "print", "colvis"]
+            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        });
+    </script>
+    <script>
+        function downloadPdf(button) {
+            // ดึงค่า h_id และ settingId จาก data-* attributes
+            var h_id = button.getAttribute("data-id");
+            var settingId = button.getAttribute("data-settingid");
+
+            // สร้าง URL สำหรับดาวน์โหลดไฟล์
+            var url = '@Url.Action("GenePdfCertificate1", "Pdfmember")' + '?settingId=' + settingId + '&h_id=' + h_id + '&type=1';
+
+            // เปลี่ยนเส้นทางไปยัง URL เพื่อเริ่มการดาวน์โหลด
+            window.location.href = url;
+        }
+        document.addEventListener("DOMContentLoaded", async () => {
+            // ดึงข้อมูล certificatedate จากเซิร์ฟเวอร์
+            const response = await fetch('/Home/GetCertificateDate');
+            const data = await response.json();
+            const certificatedateBE = data.certificatedate; // รูปแบบวันที่ BE เช่น 05/01/2568
+
+            // แปลงวันที่ BE เป็น CE
+            const [day, month, yearBE] = certificatedateBE.split("/");
+            const yearCE = parseInt(yearBE, 10) - 543; // แปลงปี BE เป็น CE
+            const certificatedate = new Date(`${yearCE}-${month}-${day}`); // สร้าง Date ใน JavaScript
+
+            // ตรวจสอบเวลาปัจจุบัน
+            const now = new Date();
+
+            // เลือกปุ่มทั้งหมดที่มี ID หรือคลาสเฉพาะ เช่น "printCertificate"
+            const buttons = document.querySelectorAll('button[id="printCertificate"]');
+
+            // จัดการปุ่มทีละปุ่ม
+            buttons.forEach(button => {
+                if (now >= certificatedate) {
+                    // หากถึงเวลาที่กำหนด ให้เปิดใช้งานปุ่ม
+                    button.disabled = false;
+                } else {
+                    // หากยังไม่ถึงเวลา ตั้งตัวจับเวลาเพื่อตรวจสอบอีกครั้ง
+                    const timeUntilEnable = certificatedate - now; // คำนวณเวลาที่เหลือเป็นมิลลิวินาที
+                    setTimeout(() => {
+                        button.disabled = false;
+                    }, timeUntilEnable);
+                }
+            });
+        });
+        function downloadPdf() {
+            var c_id = document.getElementById("c_id").value;
+            var s_id = document.getElementById("s_id").value;
+            var settingId = document.getElementById("settingId").value;
+            // สร้าง URL สำหรับดาวน์โหลดไฟล์
+            var url = '@Url.Action("GenePdfCertificate2", "Pdfmember")' + '?settingId=' + settingId + '&c_id=' + c_id + '&s_id='+ s_id + '&type=1';
+            // เปลี่ยนเส้นทางไปยัง URL เพื่อเริ่มการดาวน์โหลด
+            window.location.href = url;
+        }
+    </script>
+    <style>
+        .bg-gold {
+            background-color: #ffd700;
+            /* Hex code for gold */
+        }
+
+        /* กำหนดสีพื้นหลังเป็นสีเงิน */
+        .bg-silver {
+            background-color: #C0C0C0;
+        }
+
+        /* กำหนดสีพื้นหลังเป็นสีทองแดง */
+        .bg-bronze {
+            background-color: #CD7F32;
+        }
+    </style>
+}

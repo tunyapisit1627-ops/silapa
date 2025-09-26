@@ -1,0 +1,38 @@
+@model LoginViewModel
+<form asp-action="Login" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="Username"></label>
+        <input asp-for="Username" class="form-control" />
+        <span asp-validation-for="Username" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Password"></label>
+        <input asp-for="Password" class="form-control" type="password" id="passwordInput" />
+         <div class="input-group-append">
+            <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility()">
+                Show
+            </button>
+        </div>
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input asp-for="RememberMe" type="checkbox" />
+        <label asp-for="RememberMe">Remember Me</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>
+<script>
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById("passwordInput");
+        const showButton = passwordInput.nextElementSibling.querySelector("button");
+
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            showButton.textContent = "Hide";
+        } else {
+            passwordInput.type = "password";
+            showButton.textContent = "Show";
+        }
+    }
+</script>

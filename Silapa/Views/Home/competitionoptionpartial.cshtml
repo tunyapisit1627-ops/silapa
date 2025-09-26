@@ -1,0 +1,12 @@
+<option value="">--เลือกรายการแข่งขัน--</option>
+@if (ViewBag.competition != null)
+    {
+
+        foreach (var item in ViewBag.competition)
+        {
+
+        <option value="@item.Value">@item.Text </option>
+
+    }
+
+}

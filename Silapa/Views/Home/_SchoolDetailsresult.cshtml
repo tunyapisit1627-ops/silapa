@@ -1,0 +1,46 @@
+@model dynamic
+
+<input id="h_id" hidden value="@Model.H_id" />
+<input id="settingId" hidden value="@Model.settingId" />
+<h3>รายละเอียดการแข่งขัน</h3>
+<p>ชื่อการแข่งขัน: @Model.CompetitionName</p>
+<p>อันดับ: @Model.RankDescription</p>
+
+<h4>รายชื่อผู้เข้าร่วม</h4>
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>ชื่อ</th>
+                <th>ประเภท</th>
+                <th>รูปภาพ</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var participant in Model.Participants)
+            {
+                <tr>
+                    <td>@participant.FullName</td>
+                    <td>@participant.Type</td>
+                    <td>
+                        <img src="@Url.Content(participant.ImageUrl)" alt="รูปภาพของ @participant.FullName" class="img-thumbnail" style="width: 100px; height: auto;" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        alert('test');
+        // ตรวจสอบว่าอันดับเป็นที่ 1 หรือไม่
+        if (@Model.Rank === 'ชนะเลิศ') {
+            const container = document.getElementById('fireworks-container');
+            const fireworks = new Fireworks(container, {
+                speed: 2,  // ปรับความเร็วของพลุ
+                opacity: 0.7  // ปรับความโปร่งใสของพลุ
+            });
+            fireworks.start();
+        }
+    });
+</script>

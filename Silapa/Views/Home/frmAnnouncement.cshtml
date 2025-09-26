@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ประกาศผลการแข่งขัน</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.min.js"></script>
+    <style>
+        body {
+            font-family: "Arial", sans-serif;
+            margin: 20px;
+        }
+
+        h1,
+        h2 {
+            text-align: center;
+        }
+
+        .group-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #007bff;
+            margin-top: 20px;
+        }
+
+        .result-item {
+            margin-left: 20px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>ผลการแข่งขัน</h1>
+        <h2>มหกรรมวิชาการ "Robo Revolution" 2024</h2>
+        <p class="text-center">ระหว่างวันที่ 11-12 มิถุนายน 2567 ณ ศูนย์การศึกษาสีน้ำทรัพย์</p>
+        <hr>
+
+        <!-- ส่วนแสดงผลการแข่งขัน -->
+        <div id="resultsContainer">
+            <!-- ผลการแข่งขันจะแสดงที่นี่ -->
+        </div>
+    </div>
+
+    <script>
+        // เชื่อมต่อกับ SignalR Hub
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/resultsHub") // URL ของ SignalR Hub
+            .withAutomaticReconnect()
+            .build();
+
+        // รับข้อความหรือข้อมูลผลการแข่งขันใหม่
+        connection.on("UpdateResults", function (data) {
+            console.log("Received data:", data); // ตรวจสอบข้อมูลที่ได้รับใน Console
+            const resultsContainer = document.getElementById("resultsContainer");
+            resultsContainer.innerHTML = ""; // ล้างข้อมูลเก่า
+
+            data.forEach(group => {
+                const groupTitle = document.createElement("div");
+                groupTitle.className = "group-title";
+                groupTitle.textContent = `${group.Code} ${group.Name}`;
+                resultsContainer.appendChild(groupTitle);
+
+                
+            });
+        });
+
+        // เริ่มการเชื่อมต่อ
+        connection.start()
+            .then(() => console.log("Connected to SignalR Hub"))
+            .catch(err => console.error("Connection error:", err));
+    </script>
+</body>
+
+</html>

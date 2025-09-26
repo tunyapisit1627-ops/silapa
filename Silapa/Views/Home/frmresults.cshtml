@@ -1,0 +1,491 @@
+@{
+    ViewData["Title"] = "งานศิลปหัตถกรรมนักเรียนครั้งที่ 72 ปีการศึกษา 2567 จังหวัดนครราชสีมา";
+    var setupsystem = ViewBag.setupsystem;
+}
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<div class="container">
+    <div class="text-center">
+       <img src="@Url.Content(setupsystem.LogoPath)" class="img-fluid w-25" alt="Logo">
+        </div>
+</div>
+<div class="container bootdey">
+
+    <div class="row">
+        <div class="col-12 text-center">
+            <div class="section-title mb-4 pb-2">
+                <h4 class="title mb-4">ผลการแข่งขัน</h4>
+                <p class="text-muted para-desc mx-auto mb-0">
+                    @setupsystem.name
+                </p>
+                <p class="text-muted para-desc mx-auto mb-0">
+                    
+                </p>
+            </div>
+        </div>
+        <!--end col-->
+    </div>
+    <!--end row-->
+</div>
+
+<!-- end table -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 card-margin">
+            <div class="card search-form">
+                <div class="card-body p-0">
+                    <form id="search-form">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="row no-gutters">
+                                    <div class="col-lg-4 col-md-3 col-sm-12 p-0">
+                                        @Html.DropDownList("c_id", (IEnumerable<SelectListItem>)ViewBag.levelData, "ทั้งหมด", new { @name = "", @class = "form-control select2", @style = "width: 100%;", @selected = (int)ViewBag.currentTypelevel })
+                                    </div>
+                                    <div class="col-lg-8 col-md-6 col-sm-12 p-0">
+                                        <select class="form-control select2" id="exampleFormControlSelect2">
+                                           <option value="">กรุณาเลือก</option>
+                                        </select>
+                                    </div>
+                                    <!-- <div class="col-lg-1 col-md-3 col-sm-12 p-0">
+                                            <button type="submit" class="btn btn-base">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                            </button>
+                                        </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-margin">
+                <div class="card-body">
+                    <div class="row search-body">
+                        <div class="col-lg-12">
+                            <div class="search-result">
+                                <!--  -->
+
+                                <div class="result-body">
+                                    <div class="table-responsive">
+                                        <table class="table widget-26">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col" style="text-align: center;">ลำดับที่</th>
+                                                    <th scope="col">โรงเรียน</th>
+                                                    <th scope="col" style="text-align: center;">คะแนน</th>
+                                                    <th scope="col" style="text-align: center;">ระดับ</th>
+                                                    <th scope="col">หมายเหตุ</th>
+                                                </tr>
+                                            </thead>
+                                             <tbody id="resultsTableBody">
+        
+                                             </tbody>
+                                       </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal fade" id="schoolModal" tabindex="-1" role="dialog" aria-labelledby="schoolModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="schoolModalLabel">รายละเอียดโรงเรียน</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div id="fireworks-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
+            <div class="modal-body">
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
+                <button type="button" class="btn btn-primary" id="printCertificate" onclick="downloadPdf()" disabled>พิมพ์เกียรติบัตร</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/fireworks-js@latest/dist/fireworks.js"></script>
+
+<!-- SweetAlert2 JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+       body {
+    font-size: 1rem;
+}
+
+h4.title {
+    font-size: 2rem;
+}
+
+.text-muted {
+    font-size: 1rem;
+}
+
+@@media (max-width: 768px) {
+    body {
+        font-size: 0.775rem; /* ลดขนาดตัวอักษรลงสำหรับแท็บเล็ต */
+    }
+    h4.title {
+        font-size: 1.25rem;
+    }
+    .text-muted {
+        font-size: 0.775rem;
+    }
+}
+
+@@media (max-width: 480px) {
+    body {
+        font-size: 0.65rem; /* ลดขนาดตัวอักษรลงสำหรับมือถือ */
+    }
+    h4.title {
+        font-size: 1rem;
+    }
+    .text-muted {
+        font-size: 0.65rem;
+    }
+}
+        .table-responsive {
+    position: relative;
+    height: 500px; /* Set a height for the table container */
+    overflow-y: auto; /* Enable vertical scrolling */
+}
+
+.table thead th {
+    position: sticky;
+    top: 0; /* Stick the header to the top */
+    background-color: #f8f9fa; /* Match the header background to table's styling */
+    z-index: 2; /* Ensure header stays above other elements */
+    text-align: center;
+}
+        .widget-26 {
+            color: #3c4142;
+            font-weight: 400;
+        }
+
+        .widget-26 tr:first-child td {
+            border: 0;
+        }
+
+        .widget-26 .widget-26-job-emp-img img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+        }
+
+        .widget-26 .widget-26-job-title {
+            min-width: 90px;
+        }
+
+        .widget-26 .widget-26-job-title a {
+            font-weight: 400;
+            font-size: 0.875rem;
+            color: #3c4142;
+            line-height: 1.5;
+        }
+
+        .widget-26 .widget-26-job-title a:hover {
+            color: #68CBD7;
+            text-decoration: none;
+        }
+
+        .widget-26 .widget-26-job-title .employer-name {
+            margin: 0;
+            line-height: 1.5;
+            font-weight: 400;
+            color: #3c4142;
+            font-size: 0.8125rem;
+            color: #3c4142;
+        }
+
+        .widget-26 .widget-26-job-title .employer-name:hover {
+            color: #68CBD7;
+            text-decoration: none;
+        }
+
+        .widget-26 .widget-26-job-title .time {
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        .widget-26 .widget-26-job-info {
+            min-width: 100px;
+            font-weight: 400;
+        }
+
+        .widget-26 .widget-26-job-info p {
+            line-height: 1.5;
+            color: #3c4142;
+            font-size: 0.8125rem;
+        }
+
+        .widget-26 .widget-26-job-info .location {
+            color: #3c4142;
+        }
+
+        .widget-26 .widget-26-job-salary {
+            min-width: 70px;
+            font-weight: 400;
+            color: #3c4142;
+            font-size: 0.8125rem;
+        }
+
+        .widget-26 .widget-26-job-category {
+            padding: .5rem;
+            display: inline-flex;
+            white-space: nowrap;
+            border-radius: 15px;
+        }
+
+        .widget-26 .widget-26-job-category .indicator {
+            width: 13px;
+            height: 13px;
+            margin-right: .5rem;
+            float: left;
+            border-radius: 50%;
+        }
+
+        .widget-26 .widget-26-job-category span {
+            font-size: 0.8125rem;
+            color: #3c4142;
+            font-weight: 600;
+        }
+
+        .widget-26 .widget-26-job-starred svg {
+            width: 20px;
+            height: 20px;
+            color: #fd8b2c;
+        }
+
+        .widget-26 .widget-26-job-starred svg.starred {
+            fill: #fd8b2c;
+        }
+
+        .bg-soft-base {
+            background-color: #e1f5f7;
+        }
+
+        .bg-soft-warning {
+            background-color: #fff4e1;
+        }
+
+        .bg-soft-success {
+            background-color: #d1f6f2;
+        }
+
+        .bg-soft-danger {
+            background-color: #fedce0;
+        }
+
+        .bg-soft-info {
+            background-color: #d7efff;
+        }
+    </style>
+
+    <script>$(function () {
+        $('.select2').select2()
+        $("#example1").DataTable({
+            "responsive": true, "lengthChange": false, "autoWidth": false, "ordering": true, "pageLength": 20, "orderMulti": true,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+        });
+        $(document).on('click', '.school-link', function(e) {
+    e.preventDefault();
+                var id = $(this).data('id');
+
+            // Fetch data for the modal via AJAX
+            $.ajax({
+                url: '/Home/GetSchoolDetailsresult', // Adjust this to your controller and action
+                method: 'GET',
+                data: { id: id },
+                success: function (data) {
+                    // Populate modal content with fetched data
+                    $('#schoolModal .modal-body').html(data);
+
+                    // Show the modal
+                    $('#schoolModal').modal('show');
+                },
+                error: function () {
+                    alert('Error loading data.');
+                }
+            });
+    
+});
+
+
+        $("#c_id").change(function () {
+        const selectedValue = $(this).val();
+
+        if (selectedValue) {
+            // ตัวอย่างการเรียก API (หรือใช้ข้อมูลที่มีอยู่)
+            $.ajax({
+                url: '/Home/GetCompetitionsresult', // URL ไปยังเมธอดใน Controller
+                type: 'GET',
+                data: { c_id: selectedValue },
+                success: function (data) {
+                    if(!data || data.length === 0)
+                    {
+                     Swal.fire({
+                         icon: 'info',
+                         title: 'ยังไม่มีการประกาศผล',
+                         text: 'หมวดหมู่รายการแข่งขันนี้ยังไม่มีรายการที่ประกาศผล กรุณารอการประกาศผลในภายหลัง',
+                         confirmButtonText: 'ตกลง'
+                       });
+                    }else
+                    {
+                    // ล้าง dropdown ตัวที่สองก่อนเพิ่มข้อมูลใหม่
+                    $("#exampleFormControlSelect2").empty().append('<option value="">กรุณาเลือก</option>');
+
+                    // เพิ่มข้อมูลลงใน dropdown
+                    data.forEach(item => {
+                        $("#exampleFormControlSelect2").append(`<option value="${item.id}">${item.name}</option>`);
+                    });
+                   //  $('#thankYouModal').modal('show');
+                   }
+                },
+                error: function () {
+                    alert('เกิดข้อผิดพลาดในการดึงข้อมูล');
+                }
+            });
+        } else {
+            // ล้าง dropdown ตัวที่สองเมื่อไม่มีการเลือกค่า
+            $("#exampleFormControlSelect2").empty().append('<option value="">กรุณาเลือก</option>');
+        }
+    });
+    
+   
+    });</script>
+    <script>
+        $("#exampleFormControlSelect2").change(function () {
+    const selectedValue = $(this).val();
+
+    if (selectedValue) {
+        $.ajax({
+            url: '/Home/GetResults',
+            type: 'GET',
+            data: { competitionId: selectedValue },
+            success: function (data) {
+                const tableBody = $("#resultsTableBody"); // Use jQuery to reference the table body
+                tableBody.empty(); // Clear existing rows
+
+                data.forEach((item, index) => {
+                    const medalColor = getMedalColor(item.notes); // Determine medal color based on level
+                    // กำหนดข้อความในช่องหมายเหตุ
+                    let notesText = ""; // ค่าเริ่มต้นจากฐานข้อมูล
+                    if (item.level === 1) notesText = "ชนะเลิศ";
+                    else if (item.level === 2) notesText = "รองชนะเลิศอันดับ 1";
+                    else if (item.level === 3) notesText = "รองชนะเลิศอันดับ 2";
+                    const competitionName = item.CompetitionName || 'ข้อมูลไม่พร้อมใช้งาน';
+                    const row = `
+                        <tr>
+                            <td style="text-align: center;">${item.level}</td>
+                            <td>
+                           <a href="#" class="school-link"
+                              data-id="${item.id}">
+                              ${item.school}
+                            </a>
+                           </td>
+                            <td style="text-align: center;">${item.score}</td>
+                            <td style="text-align: center;">${item.notes}</td>
+                            <td style="text-align: center;">
+                                <div class="widget-26-job-starred">
+                                    <a href="#">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                            fill="${medalColor}" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" class="feather feather-star">
+                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                        </svg>
+                                    </a>
+                                </div>
+                                ${notesText || ""}
+                            </td>
+                            
+                        </tr>
+                    `;
+                    tableBody.append(row);
+                });
+            },
+            error: function () {
+                alert('เกิดข้อผิดพลาดในการดึงข้อมูล');
+            }
+        });
+    } else {
+        $("#resultsTableBody").empty(); // Clear table body when no selection
+    }
+});
+document.addEventListener("DOMContentLoaded", async () => {
+    const printButton = document.getElementById("printCertificate");
+
+    // เรียกข้อมูลจากเซิร์ฟเวอร์เพื่อนำค่าของ certificatedate
+    const response = await fetch('/Home/GetCertificateDate');
+    const data = await response.json();
+    const certificatedateBE = data.certificatedate; // รูปแบบวันที่ BE เช่น 05/01/2568
+
+    // แปลงวันที่ BE เป็น CE
+    const [day, month, yearBE] = certificatedateBE.split("/");
+    const yearCE = parseInt(yearBE, 10) - 543; // แปลงปี BE เป็น CE
+    const certificatedate = new Date(`${yearCE}-${month}-${day}`); // สร้าง Date ใน JavaScript
+
+    // ตรวจสอบเวลาปัจจุบัน
+    const now = new Date();
+
+    if (now >= certificatedate) {
+        // หากถึงเวลาที่กำหนด ปุ่มจะเปิดใช้งาน
+        printButton.disabled = false;
+    } else {
+        // หากยังไม่ถึงเวลา ตั้งตัวจับเวลาเพื่อตรวจสอบอีกครั้ง
+        const timeUntilEnable = certificatedate - now; // คำนวณเวลาที่เหลือเป็นมิลลิวินาที
+        setTimeout(() => {
+            printButton.disabled = false;
+        }, timeUntilEnable);
+    }
+});
+function getMedalColor(level) {
+    switch (level) {
+        case "เหรียญทอง":
+            return "#FFD700"; // Gold
+        case "เหรียญเงิน":
+            return "#C0C0C0"; // Silver
+        case "เหรียญทองแดง":
+            return "#B87333"; // Bronze
+        default:
+            return "none"; // No fill for "เข้าร่วม"
+    }
+}
+ function downloadPdf() {
+        var h_id= document.getElementById("h_id").value;
+        var settingId=document.getElementById("settingId").value;
+        // สร้าง URL สำหรับดาวน์โหลดไฟล์
+        var url = '@Url.Action("GenePdfCertificate1", "Pdfmember")' + '?settingId='+settingId + '&h_id=' + h_id+'&type=1';
+        // เปลี่ยนเส้นทางไปยัง URL เพื่อเริ่มการดาวน์โหลด
+        window.location.href = url;
+}
+
+    </script>
+   
+}
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->

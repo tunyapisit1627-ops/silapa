@@ -1,0 +1,373 @@
+@model setupsystem
+@{
+    ViewData["Title"] = "ข้อมูลการตั้งค่าระบบ";
+}
+
+<body class="hold-transition sidebar-mini">
+    <div class="card">
+        <form asp-action="frmsetupsystem" asp-controller="Admin" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="id" hidden>
+            <input asp-for="certificate" hidden>
+            <input asp-for="cardstudents" hidden>
+            <input asp-for="cardteacher" hidden>
+            <input asp-for="carddirector" hidden>
+            <input asp-for="cardreferee" hidden>
+            <input asp-for="LogoPath" hidden>
+            <input asp-for="status" hidden>
+            <div class="card card-info">
+                <div class="card-header">
+                    <h2 class="card-title">ข้อมูลการตั้งค่าระบบ</h2>
+                </div>
+                <div class="card-body">
+                    <!-- Main content -->
+                    <section class="content">
+                        <div class="container-fluid">
+                            <div class="card card-default">
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label for="logo">อัปโหลดโลโก้ (PNG, JPG)</label>
+                                        <input type="file" asp-for="Logo" class="form-control"
+                                            accept="image/png, image/jpeg">
+                                        <span asp-validation-for="Logo" class="text-danger"></span>
+
+    
+                                        @if (!string.IsNullOrEmpty(Model.LogoPath))
+                                        {
+                                            <div class="mt-3">
+                                                <p>โลโก้ปัจจุบัน:</p>
+                                                <img src="@Url.Content(Model.LogoPath)" alt="Current Logo"
+                                                    style="max-width: 200px; max-height: 200px;">
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="inputEmail3">ชื่องาน</label>
+                                        <div class="input-group">
+                                            <input asp-for="name" class="form-control" />
+                                            <span asp-validation-for="name" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                     <div class="form-group row">
+                                        <label for="inputEmail3">ชื่อหน่วยงาน</label>
+                                        <div class="input-group">
+                                            <input asp-for="nameagency" class="form-control" />
+                                            <span asp-validation-for="nameagency" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                     <div class="form-group row">
+                                        <label for="inputEmail3">ครั้งที่</label>
+                                        <div class="input-group">
+                                            <input asp-for="time" class="form-control" />
+                                            <span asp-validation-for="time" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                     <div class="form-group row">
+                                        <label for="inputEmail3">ปีการศึกษา</label>
+                                        <div class="input-group">
+                                            <input asp-for="yaer" class="form-control" />
+                                            <span asp-validation-for="yaer" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label asp-for="racedate"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="far fa-calendar-alt"></i>
+                                                </span>
+                                            </div>
+                                            <input type="text" class="form-control float-right" id="reservation"
+                                                asp-for="racedate">
+                                        </div>
+                                        <!-- /.input group -->
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label" asp-for="startregisterdate"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i
+                                                        class="far fa-calendar-alt"></i></span>
+                                            </div>
+                                            <input type="text" id="startregisterdate" asp-for="startregisterdate"
+                                                class="form-control" data-inputmask-alias="datetime"
+                                                data-inputmask-inputformat="dd/mm/yyyy" data-mask>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label" asp-for="endgisterdate"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i
+                                                        class="far fa-calendar-alt"></i></span>
+                                            </div>
+                                            <input type="text" id="endgisterdate" asp-for="endgisterdate"
+                                                class="form-control" data-inputmask-alias="datetime"
+                                                data-inputmask-inputformat="dd/mm/yyyy" data-mask>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label" asp-for="startedit"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i
+                                                        class="far fa-calendar-alt"></i></span>
+                                            </div>
+                                            <input type="text" id="startedit" asp-for="startedit" class="form-control"
+                                                data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy"
+                                                data-mask>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label" asp-for="endedit"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i
+                                                        class="far fa-calendar-alt"></i></span>
+                                            </div>
+                                            <input type="text" id="endedit" asp-for="endedit" class="form-control"
+                                                data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy"
+                                                data-mask>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label" asp-for="certificatedate"></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i
+                                                        class="far fa-calendar-alt"></i></span>
+                                            </div>
+                                            <input type="text" id="certificatedate" asp-for="certificatedate" class="form-control"
+                                                data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy"
+                                                data-mask>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label" asp-for="Coordinator"></label>
+                                        <div class="input-group">
+                                            <textarea class="form-control" asp-for="Coordinator" rows="3"
+                                                placeholder="Enter ..."></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="inputEmail3" asp-for="token"></label>
+                                        <div class="input-group">
+                                            <input asp-for="token" class="form-control" />
+                                            <span asp-validation-for="token" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="certificate">อัปโหลดใบประกาศ (PNG, JPG)</label>
+                                        <input type="file" asp-for="certificate" class="form-control"
+                                            accept="image/png, image/jpeg">
+                                        <span asp-validation-for="certificate" class="text-danger"></span>
+                                        @if (!string.IsNullOrEmpty(Model.certificate))
+                                        {
+                                            <button type="button" class="btn btn-link" data-toggle="modal"
+                                                data-target="#viewcertificateModal">
+                                                ดูบัตรนักเรียน
+                                            </button>
+                                        }
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="cardstudents">อัปโหลดบัตรนักเรียน (PDF)</label>
+                                        <input type="file" asp-for="cardstudents" class="form-control"
+                                            accept="application/pdf">
+                                        <span asp-validation-for="cardstudents" class="text-danger"></span>
+
+                                        @if (!string.IsNullOrEmpty(Model.cardstudents))
+                                        {
+                                            <button type="button" class="btn btn-link" data-toggle="modal"
+                                                data-target="#viewcardstudentsModal">
+                                                ดูบัตรนักเรียน
+                                            </button>
+                                        }
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="cardteacher">อัปโหลดบัตรครู (PDF)</label>
+                                        <input type="file" asp-for="cardteacher" class="form-control"
+                                            accept="application/pdf">
+                                        <span asp-validation-for="cardteacher" class="text-danger"></span>
+                                        @if (!string.IsNullOrEmpty(Model.cardteacher))
+                                        {
+                                            <button type="button" class="btn btn-link" data-toggle="modal"
+                                                data-target="#viewcardteacherModal">
+                                                ดูบัตรครู
+                                            </button>
+                                        }
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="carddirector">อัปโหลดบัตรคณะดำเนินงาน (PDF)</label>
+                                        <input type="file" asp-for="carddirector" class="form-control"
+                                            accept="application/pdf">
+                                        <span asp-validation-for="carddirector" class="text-danger"></span>
+
+                                        @if (!string.IsNullOrEmpty(Model.carddirector))
+                                        {
+                                            <button type="button" class="btn btn-link" data-toggle="modal"
+                                                data-target="#viewcarddirectorModal">
+                                                ดูบัตรคณะดำเนินงาน
+                                            </button>
+                                        }
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="cardreferee">อัปโหลดบัตรกรรมการ (PDF)</label>
+                                        <input type="file" asp-for="cardreferee" class="form-control"
+                                            accept="application/pdf">
+                                        <span asp-validation-for="cardreferee" class="text-danger"></span>
+                                        @if (!string.IsNullOrEmpty(Model.cardreferee))
+                                        {
+                                            <button type="button" class="btn btn-link" data-toggle="modal"
+                                                data-target="#viewcardrefereeModal">
+                                                ดูบัตรกรรมการ
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                    </section>
+                    <div class="card-footer">
+                        <button type="submit" value="Submit" class="btn btn-info">บันทึกข้อมูล</button>
+                        <button asp-action="frmschoolList" asp-controller="Admin"
+                            class="btn btn-default float-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- Modal for Certificate -->
+    <div class="modal fade" id="viewCertificateModal" tabindex="-1" role="dialog" aria-labelledby="viewCertificateLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewCertificateLabel">ใบประกาศ</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <iframe src="@Url.Content($"~/card/{Model.certificate}")" frameborder="0" width="100%"
+                        height="500px"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal for Certificate -->
+    <div class="modal fade" id="viewcardstudentsModal" tabindex="-1" role="dialog"
+        aria-labelledby="viewcardstudentsLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewcardstudentsLabel">บัตรนักเรียน</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <iframe src="@Url.Content($"~/card/{Model.cardstudents}")" frameborder="0" width="100%"
+                        height="500px"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal for Certificate -->
+    <div class="modal fade" id="viewcardteacherModal" tabindex="-1" role="dialog" aria-labelledby="viewcardteacherLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewcardteacherLabel">บัตรครู</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <iframe src="@Url.Content($"~/card/{Model.cardteacher}")" frameborder="0" width="100%"
+                        height="500px"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="viewcardrefereeModal" tabindex="-1" role="dialog" aria-labelledby="viewcardrefereeLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewcardrefereeLabel">บัตรกรรมการ</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <iframe src="@Url.Content($"~/card/{Model.cardreferee}")" frameborder="0" width="100%"
+                        height="500px"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="viewcarddirectorModal" tabindex="-1" role="dialog"
+        aria-labelledby="viewcarddirectorLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewcarddirectorLabel">บัตรกรรมการดำเนินการ</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <iframe src="@Url.Content($"~/card/{Model.carddirector}")" frameborder="0" width="100%"
+                        height="500px"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script>$(function () {
+        $('#startregisterdate').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
+        $('#endgisterdate').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
+        $('#startedit').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
+        $('#endedit').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
+        $('#certificatedate').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
+        // Summernote
+        $('#summernote').summernote()
+        $('.select2').select2()
+        $('#reservation').daterangepicker()
+        //Timepicker
+        $('#timepicker').datetimepicker({
+            format: 'LT'
+        })
+        // CodeMirror
+        CodeMirror.fromTextArea(document.getElementById("codeMirrorDemo"), {
+            mode: "htmlmixed",
+            theme: "monokai"
+        });
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var tempDataMessage = '@TempData["Message"]';
+
+        if (tempDataMessage) {
+            var msg = JSON.parse(tempDataMessage.replace(/&quot;/g, '"'));
+
+            Swal.fire({
+                title: msg.title,
+                text: msg.message,
+                icon: msg.icon,
+                confirmButtonText: 'ตกลง'
+            });
+        }
+    });
+</script>

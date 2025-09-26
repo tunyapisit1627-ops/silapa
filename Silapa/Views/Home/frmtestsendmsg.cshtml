@@ -1,0 +1,62 @@
+<div class="container mt-3">
+    <h3>ประกาศผลการแข่งขัน</h3>
+    <!-- Input สำหรับกรอกข้อความ -->
+    <div class="mb-3">
+        <label for="resultMessage" class="form-label">ผลการแข่งขัน</label>
+        <input type="text" id="resultMessage" class="form-control" placeholder="กรอกผลการแข่งขัน">
+    </div>
+
+    <!-- Input สำหรับเลือก Competition ID -->
+    <div class="mb-3">
+        <label for="competitionId" class="form-label">รหัสการแข่งขัน</label>
+        <input type="number" id="competitionId" class="form-control" placeholder="กรอกรหัสการแข่งขัน">
+    </div>
+
+    <!-- ปุ่มส่งข้อมูล -->
+    <button id="sendResultButton" class="btn btn-primary">
+        <i class="fas fa-paper-plane"></i> ส่งข้อมูล
+    </button>
+
+    <!-- แสดงสถานะการส่งข้อมูล -->
+    <div id="statusMessage" class="mt-3"></div>
+</div>
+
+<!-- JavaScript สำหรับจัดการ -->
+<script>
+    document.getElementById('sendResultButton').addEventListener('click', function () {
+        // ดึงค่าจาก input
+        const resultMessage = document.getElementById('resultMessage').value;
+        const competitionId = document.getElementById('competitionId').value;
+
+        // ตรวจสอบว่ากรอกข้อมูลครบหรือไม่
+        if (!resultMessage || !competitionId) {
+            document.getElementById('statusMessage').innerHTML =
+                '<div class="alert alert-danger">กรุณากรอกผลการแข่งขันและรหัสการแข่งขัน</div>';
+            return;
+        }
+
+        // ส่งข้อมูลไปยังเซิร์ฟเวอร์
+        fetch('/Result/AnnounceResults', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ resultMessage: resultMessage, competitionId: competitionId })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('statusMessage').innerHTML =
+                        '<div class="alert alert-success">ส่งข้อมูลสำเร็จ!</div>';
+                } else {
+                    document.getElementById('statusMessage').innerHTML =
+                        '<div class="alert alert-danger">เกิดข้อผิดพลาด: ' + data.message + '</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('statusMessage').innerHTML =
+                    '<div class="alert alert-danger">ไม่สามารถส่งข้อมูลได้</div>';
+            });
+    });
+</script>

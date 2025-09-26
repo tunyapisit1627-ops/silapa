@@ -1,0 +1,293 @@
+@model Competitionlist
+@{
+    ViewData["Title"] = "เพิ่มข้อมูลกรรมการ";
+    var c_name = ViewBag.c_name;
+    IList<referee> referees = ViewBag.referees;
+    var s = 1;
+    var t = 1;
+}
+
+<body class="hold-transition sidebar-mini">
+
+    <div class="card card-info">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="card-header">
+            <h2 class="card-title">เพิ่มข้อมูลกรรมการ</h2>
+        </div>
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card-header">
+                            <h3 class="card-title">รายละเอียดกิจกรรม</h3>
+                            <input asp-for="Id" id="c_Id" name="c_Id" hidden>
+
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <label for="inputEmail3" class="col-sm-2 col-form-label">ชื่อรายการ</label>
+                                <div class="col-sm-10">
+                                    <input hidden id="c_id" value="@ViewBag.c_id">
+                                    <input hidden id="m_id" value="@ViewBag.m_id">
+                                    <input value="@c_name" id="c_name" readonly class="form-control" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="inputEmail3" class="col-sm-2 col-form-label">ประเภท</label>
+                                <div class="col-sm-10">
+                                    <input value="@ViewBag.type" id="type" readonly class="form-control" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="inputEmail3" class="col-sm-2 col-form-label">จำนวนกรรมการ</label>
+                                <div class="col-sm-10">
+                                    <input value="@ViewBag.d" id="d" readonly class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">กรรมการ</h3>
+                            </div>
+                            <div class="row">
+
+                                <div class="col-4">
+                                    <input type="text" class="form-control" id="name" placeholder="ชื่อ-สกุล">
+                                </div>
+                                <div class="col-2">
+                                    <select class="form-control select2" id="role">
+                                        <option value="">เลือกบทบาทหน้าที่</option>
+                                        <option value="ประธาน">ประธาน</option>
+                                        <option value="รองประธาน">รองประธาน</option>
+                                        <option value="กรรมการ">กรรมการ</option>
+                                        <option value="กรรมการและเลขานุการ">กรรมการและเลขานุการ</option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <input type="text" class="form-control" id="position"
+                                        placeholder="ตำแหน่ง/โรงเรียน">
+                                </div>
+                                <div class="col-2">
+                                    <button type="button" class="btn btn-block bg-gradient-primary"
+                                        id="addRow">เพิ่ม</button>
+                                    <button type="button" class="btn btn-block bg-gradient-success" id="saveEdit"
+                                        style="display:none;">บันทึก</button>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <table id="teacherTable" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>ชื่อ-สกุล</th>
+                                            <th>บทบาท</th>
+                                            <th>ตำแหน่ง/โรงเรียน</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBody">
+                                        @if (referees != null)
+                                        {
+                                            int no = 1;
+                                            foreach (var dr in referees)
+                                            {
+                                                <tr>
+                                                    <td>@no</td>
+                                                    <td>@dr.name</td>
+                                                    <td>@dr.role</td>
+                                                    <td>@dr.position</td>
+                                                    <td>
+                                                        <input type="hidden" name="Id" value="@dr.id" /> <!-- เพิ่มฟิลด์ Id -->
+                                                        <input type="hidden" name="ImageUrl" value="@dr.ImageUrl" />
+                                                        <input type="hidden" name="u_id" value="@dr.u_id" />
+                                                        <input type="hidden" name="status" value="@dr.status" />
+                                                        <input type="hidden" name="m_id" value="@dr.m_id" />
+                                                        <!-- เพิ่มฟิลด์ Id -->
+                                                        <button class="btn btn-warning btn-sm"
+                                                            onclick="editTeacherRowData(this)">แก้ไข</button>
+                                                        <button class="btn btn-danger btn-sm" data-id="@dr.id"
+                                                            onclick="deleteTeacherRow(this)">ลบ</button>
+                                                    </td>
+                                                </tr>
+                                                no += 1;
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-footer">
+                <button type="submit" id="saveData" value="Submit" class="btn btn-info">บันทึกข้อมูล</button>
+                <button asp-action="frmList" asp-controller="Admin" class="btn btn-default float-right">Cancel</button>
+            </div>
+        </section>
+
+    </div>
+</body>
+<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script>
+    <script>$(function () {
+        $('.select2').select2()
+    });
+</script>
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let rowCount = document.querySelectorAll("#teacherTable tbody tr").length;
+
+        document.getElementById("addRow").addEventListener("click", function () {
+            const maxRows = parseInt(document.getElementById("d").value); // ค่าที่ได้จาก ViewBag.d
+        const name = document.getElementById("name").value;
+        const role = document.getElementById("role").value;
+        const position = document.getElementById("position").value;
+
+        if (name && role && position) {
+                // ตรวจสอบจำนวนแถวที่มีอยู่แล้ว
+                if (rowCount >= maxRows) {
+            alert("ไม่สามารถเพิ่มเกิน ${maxRows} รายการ");
+        return;
+                }
+
+        rowCount++;
+
+        const tableBody = document.getElementById("tableBody");
+        const newRow = document.createElement("tr");
+        newRow.innerHTML = `
+        <td>${rowCount}</td>
+        <td>${name}</td>
+        <td>${role}</td>
+        <td>${position}</td>
+        <td>
+            <button class="btn btn-warning btn-sm" onclick="editTeacherRowData(this)">แก้ไข</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteTeacherRow(this)">ลบ</button>
+        </td>
+            `;
+                tableBody.appendChild(newRow);
+
+                // เคลียร์ค่าช่องอินพุต
+                document.getElementById("name").value = "";
+                document.getElementById("role").value = "";
+                document.getElementById("position").value = "";
+            } else {
+                alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+            }
+        });
+    });
+
+    function deleteTeacherRow(button) {
+    if (confirm("Are you sure you want to delete this referee?")) {
+        const refereeId = button.getAttribute('data-id'); // ดึง ID ของ referee
+        $.ajax({
+            url: '/Manager/Deleteferee', // เปลี่ยนเป็นชื่อ Controller ของคุณ
+            type: 'POST',
+            data: { id: refereeId },
+            success: function (response) {
+                if (response.success) {
+                    // ลบแถวจาก DOM
+                    $(button).closest('tr').remove();
+                    alert("Referee deleted successfully.");
+                } else {
+                    alert("Failed to delete referee.");
+                }
+            },
+            error: function () {
+                alert("An error occurred while deleting referee.");
+            }
+        });
+    }
+}
+
+    function editTeacherRowData(button) {
+        const row = button.closest("tr");
+        const name = row.cells[1].innerText;
+        const role = row.cells[2].innerText;
+        const position = row.cells[3].innerText;
+
+        document.getElementById("name").value = name;
+        document.getElementById("role").value = role;
+        document.getElementById("position").value = position;
+
+        document.getElementById("saveEdit").style.display = "block";
+        document.getElementById("addRow").style.display = "none";
+
+        document.getElementById("saveEdit").onclick = function () {
+            row.cells[1].innerText = document.getElementById("name").value;
+            row.cells[2].innerText = document.getElementById("role").value;
+            row.cells[3].innerText = document.getElementById("position").value;
+
+            document.getElementById("name").value = "";
+            document.getElementById("role").value = "";
+            document.getElementById("position").value = "";
+
+            document.getElementById("saveEdit").style.display = "none";
+            document.getElementById("addRow").style.display = "block";
+        };
+    }
+
+    function updateRowNumbers() {
+        const rows = document.querySelectorAll("#teacherTable tbody tr");
+        rows.forEach((row, index) => {
+            row.cells[0].innerText = index + 1;
+        });
+    }
+document.getElementById("saveData").addEventListener("click", function ()
+{
+const c_id = document.getElementById("c_id").value; // รับค่าจาก ViewBag.c_id
+const m_id = document.getElementById("m_id").value; // รับค่าจาก ViewBag.c_id
+const rows = document.querySelectorAll("#teacherTable tbody tr");
+    const teachers = Array.from(rows).map(row => {
+        const id = row.querySelector("input[name='Id']") ? row.querySelector("input[name='Id']").value : 0;
+        const imageUrlInput = row.querySelector("input[name='ImageUrl']");
+        const imageUrl = imageUrlInput ? imageUrlInput.value : null;
+
+        return {
+            id: parseInt(id), // รับค่า id จากฟิลด์ (หรือใช้ 0 ถ้าเป็นรายการใหม่)
+            name: row.cells[1].innerText, // รับชื่อ
+            role: row.cells[2].innerText, // รับบทบาท
+            position: row.cells[3].innerText, // รับตำแหน่ง
+            imageUrl: imageUrl,
+            u_id: "user123", // ตัวอย่าง u_id
+            m_id: parseInt(m_id), // ตัวอย่าง m_id
+            g_id:0,
+            status: "1",
+            c_id: parseInt(c_id), // ตัวอย่าง c_id
+            lastupdate: new Date().toISOString() // กำหนดเป็นวันที่ปัจจุบัน
+        };
+    });
+
+    fetch("/Manager/Savereferees", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(teachers)
+    })
+    .then(response => response.json())
+    .then(data => {
+                if (data.success) {
+                    alert("บันทึกข้อมูลสำเร็จ!"); // Show success message
+                    setTimeout(function() {
+                        window.location.href = data.redirectUrl; // Redirect to the URL from the response
+                    }, 2000); // Wait for 2 seconds before redirecting
+                } else {
+                    alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล: " + data.message); // Show error message
+                }
+            })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+    });
+});
+</script>

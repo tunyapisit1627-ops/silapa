@@ -1,0 +1,131 @@
+@model IEnumerable<RegisterViewModel>
+@{
+    ViewData["Title"] = "ข้อมูลผู้ใช้งานระบบ";
+    var i=1;
+    IList<RegisterViewModel> models=ViewBag.data;
+}
+<div class="card">
+ <div class="card-header">
+        <h2 class="card-title">ข้อมูลผู้ใช้งานระบบ</h2>
+    </div>
+ <div>
+    <form asp-controller="Home" asp-action="studentList">
+            <div class="card-body">
+                <!-- Main content -->
+                <section class="content">
+                    <div class="container-fluid">
+                        <!-- SELECT2 EXAMPLE -->
+                        <div class="card card-default">
+                            <div class="card-header">
+                                <h3 class="card-title">เงื่อนไขการค้นหา</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- /.card-header -->
+
+                               
+                            
+                        </div>
+                    </div>
+                    <!-- /.container-fluid -->
+                </section>
+                <!-- /.content -->
+                <!-- /.card-body -->
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-info">ค้นหา</button>
+                    <button type="submit" class="btn btn-default float-right">Cancel</button>
+                </div>
+                <!-- /.card-footer -->
+            </div>
+        </form>
+ </div>
+  <div class="card-body">
+     <table id="example1" class="table table-bordered table-striped">
+        <thead>
+                <tr>
+                    <th>
+                        #
+                    </th>
+                    <th>
+                        คำนำหน้า
+                    </th>
+                    <th>
+                        ชื่อ
+                    </th>
+                    <th>
+                        นามสกุล
+                    </th>
+                    <th>
+                        username
+                    </th>
+                    <th>
+                        email
+                    </th>
+                    <th>กลุ่ม</th>
+                    <th>
+                        <a asp-action="Register" asp-controller="Account" class="btn btn-outline-success"><i class="fa fa-plus-square"></i>Create New</a>
+                    </th>
+                </tr>
+            </thead>
+             <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @i
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.titlename)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.FirstName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.LastName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UserName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Email)
+                        </td>
+                         <td>
+                            @Html.DisplayFor(modelItem => item.Roles)
+                        </td>
+                        <td>
+                            <a asp-action="RegisterEdit" asp-route-id="@item.Id"><i class="fa fa-edit fa-lg"></i></a> |
+                            <a asp-action="Deletestudent" asp-route-id="@item.Id" class="text-danger ml-1" onclick="return confirm('Are you sure to delete this record?')"><i class="fa fa-trash fa-lg"></i></a>
+                        </td>
+                    </tr>
+                    i+=1;
+                }
+            </tbody>
+     </table>
+  </div>
+</div>
+<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script>$(function () {
+        $("#example1").DataTable({
+            "responsive": true, "lengthChange": false, "autoWidth": false, "ordering": true, "pageLength": 20, "orderMulti":true,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+        });
+    });</script>

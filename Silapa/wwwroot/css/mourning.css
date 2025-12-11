@@ -1,0 +1,36 @@
+/* wwwroot/css/mourning.css */
+
+/* ใช้ !important เพื่อบังคับให้สไตล์นี้ชนะสไตล์เดิม 
+  (เช่น ที่มาจาก Bootstrap หรือ site.css)
+*/
+
+html, body {
+    filter: grayscale(100%) !important;
+    -webkit-filter: grayscale(100%) !important;
+}
+
+/* ตัวอย่างการแก้ Navbar (ถ้าใช้ Bootstrap) */
+.navbar {
+    background-color: #111 !important;
+    border-color: #333 !important;
+}
+
+.navbar .nav-link, .navbar .navbar-brand {
+    color: #eee !important;
+}
+
+.navbar .nav-link:hover {
+    color: #fff !important;
+}
+
+/* ตัวอย่างการแก้ Footer */
+footer {
+    background-color: #111 !important;
+    color: #ccc !important;
+}
+
+/* ทำให้รูปภาพเป็นสีเทา (แต่ส่วนอื่นไม่เป็น) */
+img {
+    filter: grayscale(100%);
+    -webkit-filter: grayscale(100%);
+}

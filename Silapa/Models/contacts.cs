@@ -9,8 +9,9 @@ namespace Silapa.Models
         public string Location { get; set; }
         public string tel { get; set; }
         public string? ImageUrl { get; set; }
-        public string u_id { get; set; }
-        public string status { get; set; }
-        public DateTime lastupdate { get; set; }
+        public string? u_id { get; set; }
+        public string status { get; set; } = "1"; // กำหนดค่าเริ่มต้นไปเลย
+        public DateTime? lastupdate { get; set; } // ทำให้เป็น nullable
+        public int DisplayOrder { get; set; } // สำหรับเก็บลำดับการแสดงผล
     }
 }

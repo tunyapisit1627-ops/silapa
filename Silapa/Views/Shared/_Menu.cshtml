@@ -1,10 +1,12 @@
 @using Microsoft.AspNetCore.Identity
 @using System.Security.Claims
 @inject UserManager<ApplicationUser> UserManager
+@inject ApplicationDbContext _db_layout
 @{
     var user = await UserManager.GetUserAsync(User);
+    var activeSystem = _db_layout.setupsystem.FirstOrDefault(s => s.status == "1");
 }
-<div class="collapse navbar-collapse order-md-3" id="navbarCollapse" >
+<div class="collapse navbar-collapse order-md-3" id="navbarCollapse">
     <!-- Left navbar links -->
     <ul class="navbar-nav">
         <li class="nav-item">
@@ -24,28 +26,91 @@
                     <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         class="nav-link dropdown-toggle">จัดการระบบ</a>
                     <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
-                        <li><a asp-controller="Admin" asp-action="frmsetupsystem" asp-route-id="1"
-                                class="dropdown-item">ตั้งค่าระบบ</a></li>
-                        <li><a asp-controller="Admin" asp-action="frmList" class="dropdown-item">รายการแข่งขัน
-                            </a></li>
-                        <li><a asp-controller="Admin" asp-action="frmfileList" class="dropdown-item">ไฟล์เอกสาร
-                            </a></li>
-                        <li><a asp-controller="Account" asp-action="ListRegister" class="dropdown-item">ข้อมูลผู้ใช้งานระบบ </a>
+                        <li>
+                            <a asp-controller="Admin" asp-action="Dashboard" class="dropdown-item">
+                                <i class="fas fa-tachometer-alt nav-icon text-primary mr-2"></i> แดชบอร์ด (หน้าหลัก)
+                            </a>
                         </li>
-                        <li><a asp-controller="Admin" asp-action="frmschoolList" class="dropdown-item">ข้อมูลโรงเรียน </a></li>
-                        <li><a asp-controller="News" asp-action="frmnewslist" class="dropdown-item">ข่าวประชาสัมพันธ์</a></li>
-                        <li class="dropdown-divider"></li>
-                        <li><a asp-controller="Admin" asp-action="frmcontacts" class="dropdown-item">ข้อมูลผู้ประสานงาน</a></li>
-                        <li class="dropdown-divider"></li>
-                        <li><a asp-controller="Admin" asp-action="frmlistregisterAll"
-                                class="dropdown-item">สรุปทีมที่ลงทะเบียน</a>
+                        <li>
+                            <a asp-controller="Admin" asp-action="frmsetupsystem" asp-route-id="@activeSystem.id"
+                                class="dropdown-item">
+                                <i class="fas fa-cogs nav-icon text-info mr-2"></i> ตั้งค่าระบบ
+                            </a>
                         </li>
-                        <li class="dropdown-divider"></li>
-                        <li><a asp-controller="Pdf" asp-action="printreferee" class="dropdown-item">ปริ้นคำสั่งกรรมการ</a></li>
-                        <li class="dropdown-divider"></li>
-                        <!-- Level two dropdown-->
 
-                        <!-- End Level two -->
+                        <li>
+                            <a asp-action="CategoryList" asp-controller="Admin" class="dropdown-item">
+                                <i class="fas fa-tags nav-icon text-warning mr-2"></i> จัดการหมวดหมู่ (Category)
+                            </a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="Admin" asp-action="frmList" class="dropdown-item">
+                                <i class="fas fa-trophy nav-icon text-success mr-2"></i> รายการแข่งขัน
+                            </a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="Admin" asp-action="frmfileList" class="dropdown-item">
+                                <i class="fas fa-file-alt nav-icon text-secondary mr-2"></i> ไฟล์เอกสาร
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-controller="Admin" asp-action="frmCompetitionSchedule" class="dropdown-item">
+                                <i class="fas fa-calendar-day nav-icon text-purple mr-2"></i> ตารางสรุปสถานที่และเวลา
+                            </a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="Account" asp-action="ListRegister" class="dropdown-item">
+                                <i class="fas fa-users nav-icon text-primary mr-2"></i> ข้อมูลผู้ใช้งานระบบ
+                            </a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="Admin" asp-action="frmschoolList" class="dropdown-item">
+                                <i class="fas fa-school nav-icon text-dark mr-2"></i> ข้อมูลโรงเรียน
+                            </a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="News" asp-action="frmnewslist" class="dropdown-item">
+                                <i class="fas fa-bullhorn nav-icon text-danger mr-2"></i> ข่าวประชาสัมพันธ์
+                            </a>
+                        </li>
+
+                        <li class="dropdown-divider"></li>
+
+                        <li>
+                            <a asp-controller="Admin" asp-action="frmcontacts" class="dropdown-item">
+                                <i class="fas fa-address-book nav-icon text-muted mr-2"></i> ข้อมูลผู้ประสานงาน
+                            </a>
+                        </li>
+
+                        <li class="dropdown-divider"></li>
+
+                        <li>
+                            <a asp-controller="Admin" asp-action="frmlistregisterAll" class="dropdown-item">
+                                <i class="fas fa-clipboard-list nav-icon text-info mr-2"></i> สรุปทีมที่ลงทะเบียน
+                            </a>
+                        </li>
+
+                        <li class="dropdown-divider"></li>
+
+                        <li>
+                            <a asp-controller="Pdf" asp-action="printreferee" class="dropdown-item">
+                                <i class="fas fa-print nav-icon text-secondary mr-2"></i> ปริ้นคำสั่งกรรมการ
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="SchoolRegistrationReport" asp-controller="Admin" class="dropdown-item">
+                                <i class="fas fa-chart-bar nav-icon text-primary mr-2"></i> รายงาน (รายโรงเรียน)
+                            </a>
+                        </li>
+                        
+
+                        <li class="dropdown-divider"></li>
+
                     </ul>
 
                 </li>
@@ -56,24 +121,64 @@
                     <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         class="nav-link dropdown-toggle">จัดการระบบ</a>
                     <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
-                        <li><a asp-controller="Manager" asp-action="frmmanagerRegister"
-                                class="dropdown-item">รายการที่ทะเบียนแข่งขัน</a></li>
-                        <li><a asp-controller="Manager" asp-action="frmracedetails"
-                                class="dropdown-item">วันที่และสถานที่จัดการแข่งขัน</a></li>
-                        <li><a asp-controller="Manager" asp-action="frmrefereeprintpic"
-                                class="dropdown-item">จัดการรูปและปริ้นบัตรกรรมการ</a></li>
-                        <li><a asp-controller="Manager" asp-action="frmgroupreferee" class="dropdown-item">คณะดำเนินการ</a></li>
-                        <li><a asp-controller="Manager" asp-action="frmapprovedirector"
-                                class="dropdown-item">รายชื่อที่สมัครเข้ามาเป็นกรรมการ</a></li>
-                        <li><a asp-controller="Manager" asp-action="frmlistreferee"
-                                class="dropdown-item">รายชื่อกรรมการทั้งหมด</a></li>
-                        <li><a asp-controller="Manager" asp-action="frmprintAll" class="dropdown-item">ปริ้นเอกสารการแข่งขัน</a>
+                        <li>
+                            <a asp-controller="Manager" asp-action="frmmanagerRegister" class="dropdown-item">
+                                <i class="fas fa-list-alt nav-icon text-primary mr-2"></i> รายการที่ทะเบียนแข่งขัน
+                            </a>
                         </li>
-                        <li><a asp-controller="Manager" asp-action="frmprintresult" class="dropdown-item">ปริ้นผลการแข่งขัน</a>
+                        <li>
+                            <a asp-controller="Manager" asp-action="frmracedetails" class="dropdown-item">
+                                <i class="fas fa-calendar-alt nav-icon text-info mr-2"></i> วันที่และสถานที่แข่งขัน
+                            </a>
                         </li>
-                        <li><a asp-controller="News" asp-action="frmnewslist" class="dropdown-item">ข่าวประชาสัมพันธ์</a></li>
-                        <li><a asp-controller="Manager" asp-action="frmcharts" class="dropdown-item">สรุปการลงทะเบียน</a></li>
 
+                        <li>
+                            <a asp-controller="Manager" asp-action="frmrefereeprintpic" class="dropdown-item">
+                                <i class="fas fa-id-card nav-icon text-warning mr-2"></i> จัดการรูป/ปริ้นบัตรกรรมการ
+                            </a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="Manager" asp-action="frmgroupreferee" class="dropdown-item">
+                                <i class="fas fa-users-cog nav-icon text-secondary mr-2"></i> คณะดำเนินการ
+                            </a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="Manager" asp-action="frmapprovedirector" class="dropdown-item">
+                                <i class="fas fa-user-check nav-icon text-success mr-2"></i> รายชื่อที่สมัครเป็นกรรมการ
+                            </a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="Manager" asp-action="frmlistreferee" class="dropdown-item">
+                                <i class="fas fa-users nav-icon text-dark mr-2"></i> รายชื่อกรรมการทั้งหมด
+                            </a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="Manager" asp-action="frmprintAll" class="dropdown-item">
+                                <i class="fas fa-print nav-icon text-muted mr-2"></i> ปริ้นเอกสารการแข่งขัน
+                            </a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="Manager" asp-action="frmprintresult" class="dropdown-item">
+                                <i class="fas fa-poll nav-icon text-info mr-2"></i> ปริ้นผลการแข่งขัน
+                            </a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="News" asp-action="frmnewslist" class="dropdown-item">
+                                <i class="fas fa-bullhorn nav-icon text-danger mr-2"></i> ข่าวประชาสัมพันธ์
+                            </a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="Manager" asp-action="frmcharts" class="dropdown-item">
+                                <i class="fas fa-chart-pie nav-icon text-success mr-2"></i> สรุปการลงทะเบียน
+                            </a>
+                        </li>
                     </ul>
                 </li>
             }
@@ -83,19 +188,37 @@
                     <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         class="nav-link dropdown-toggle">จัดการระบบ</a>
                     <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
-                        <li><a asp-controller="Admin" asp-action="frmschoolAdd" asp-route-id="@user.s_id"
-                                class="dropdown-item">ข้อมูลโรงเรียน</a></li>
-                        <li><a asp-controller="Member" asp-action="frmRegister" class="dropdown-item">ลงทะเบียนแข่งขัน</a></li>
-                        <li><a asp-controller="Member" asp-action="frmschoolregister" class="dropdown-item">สรุปการลงทะเบียน
+
+                        <li>
+                            <a asp-controller="Admin" asp-action="frmschoolAdd" asp-route-id="@user.s_id" class="dropdown-item">
+                                <i class="fas fa-school nav-icon text-info mr-2"></i> ข้อมูลโรงเรียน
                             </a>
                         </li>
-                        <li><a asp-controller="Member" asp-action="frmSummaryresult" class="dropdown-item">สรุปผลการแข่งขัน
+
+                        <li>
+                            <a asp-controller="Member" asp-action="frmRegister" class="dropdown-item">
+                                <i class="fas fa-edit nav-icon text-primary mr-2"></i> ลงทะเบียนแข่งขัน
                             </a>
                         </li>
-                        <li><a asp-controller="Member" asp-action="frmprintregister"
-                                class="dropdown-item">ปริ้นเอกสารการลงทะเบียน
+
+                        <li>
+                            <a asp-controller="Member" asp-action="frmschoolregister" class="dropdown-item">
+                                <i class="fas fa-clipboard-list nav-icon text-success mr-2"></i> สรุปการลงทะเบียน
                             </a>
                         </li>
+
+                        <li>
+                            <a asp-controller="Member" asp-action="frmSummaryresult" class="dropdown-item">
+                                <i class="fas fa-poll nav-icon text-warning mr-2"></i> สรุปผลการแข่งขัน
+                            </a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="Member" asp-action="frmprintregister" class="dropdown-item">
+                                <i class="fas fa-print nav-icon text-secondary mr-2"></i> ปริ้นเอกสารการลงทะเบียน
+                            </a>
+                        </li>
+
                     </ul>
                 </li>
             }
@@ -104,10 +227,10 @@
 
     </ul>
     <!-- SEARCH FORM -->
-    <form class="form-inline ml-0 ml-md-3" asp-action="frmsearch"asp-controller="Home">
+    <form class="form-inline ml-0 ml-md-3" asp-action="frmsearch" asp-controller="Home">
         <div class="input-group input-group-sm">
-            <input class="form-control form-control-navbar" name="searchInput" id="searchInput" type="search" placeholder="Search"
-                aria-label="Search">
+            <input class="form-control form-control-navbar" name="searchInput" id="searchInput" type="search"
+                placeholder="Search" aria-label="Search">
             <div class="input-group-append">
                 <button class="btn btn-navbar" type="submit">
                     <i class="fas fa-search"></i>

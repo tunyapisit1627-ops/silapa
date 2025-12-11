@@ -1,0 +1,59 @@
+@model IEnumerable<Registerhead>
+
+<div class="table-responsive">
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-warning text-center">ไม่พบโรงเรียนที่ลงทะเบียนสำหรับรายการแข่งขันนี้</div>
+}
+else
+{
+    <div class="row mb-3">
+        <div class="col-12">
+            <input type="text" id="searchRegistered" class="form-control" placeholder="ค้นหาชื่อโรงเรียน หรือชื่อนักเรียน/ครู...">
+        </div>
+    </div>
+    @* จัดกลุ่มตามโรงเรียนเพื่อแสดงผล *@
+    @foreach (var schoolGroup in Model.GroupBy(h => h.School.Name).OrderBy(g => g.Key))
+    {
+        <h5 class="mt-3 mb-2 school-header" data-school-name="@schoolGroup.Key">🏫 @schoolGroup.Key</h5>
+        <table class="table table-bordered table-striped table-sm mb-4 registered-table">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">ลำดับ</th>
+                    <th style="width: 15%;">ประเภท</th>
+                    <th style="width: 45%;">ชื่อ - นามสกุล</th>
+                    <th style="width: 35%;">ตำแหน่ง/ชั้น</th>
+                </tr>
+            </thead>
+            <tbody class="registered-tbody">
+                @{
+                    int counter = 1;
+                    // รวมรายละเอียดทั้งหมดจากหัวลงทะเบียนของโรงเรียนนี้
+                    // และจัดเรียง ครู (teacher) ขึ้นก่อน นักเรียน (student)
+                    var allDetails = schoolGroup.SelectMany(h => h.Registerdetail)
+                                                .OrderBy(rd => rd.Type) 
+                                                .ToList();
+                }
+                @foreach (var detail in allDetails)
+                {
+                    <tr>
+                        <td class="text-center">@(counter++)</td>
+                        <td>
+                            @if (detail.Type == "teacher")
+                            {
+                                <span class="badge bg-success">ครูฝึกซ้อม</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-primary">นักเรียน</span>
+                            }
+                        </td>
+                        <td>@detail.Prefix@detail.FirstName @detail.LastName</td>
+                        <td>@detail.Type</td> 
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+</div>

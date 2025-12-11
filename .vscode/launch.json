@@ -1,14 +1,32 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
+            "name": ".NET Core Launch (web)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            // แก้ไขพาธ: ชี้ไปที่ Silapa/bin/Debug/.../Silapa.dll
+            "program": "${workspaceFolder}/Silapa/bin/Debug/net9.0/Silapa.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Silapa", // <--- อาจต้องกำหนด CWD ไปที่โฟลเดอร์โครงการย่อย
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                // ...
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Silapa/Views" // <--- แก้ไขพาธ Views ด้วย
+            }
+        },
+        {
+            // 2. Configuration สำหรับแนบ Chrome (ที่คุณใช้อยู่)
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome against localhost",
-            "url": "http://localhost:8080",
+            "url": "http://localhost:5053", // ตรวจสอบ Port 5053 อีกครั้ง
             "webRoot": "${workspaceFolder}"
         }
     ]

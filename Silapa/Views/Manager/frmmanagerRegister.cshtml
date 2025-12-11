@@ -1,6 +1,8 @@
 @model IEnumerable<CompetitionViewModel1>
 @{
     ViewData["Title"] = "ข้อมูลรายการแข่งขันที่ลงทะเบียน";
+    int? currentLevelNullable = ViewBag.currentTypelevel;
+    int myLevel = currentLevelNullable ?? 0; // ถ้าเป็น null ให้ใช้ 0 แทน
     int i=1;
     //IList<Registerhead> models=ViewBag.data;
 }
@@ -36,7 +38,7 @@
                                 <div class="form-group row">
                                     <label for="inputEmail3" class="col-sm-2 col-form-label">หมวดหมู่</label>
                                     <div class="col-sm-10">
-                                        @Html.DropDownList("c_id", (IEnumerable<SelectListItem>)TempData["LevelData"], "ทั้งหมด", new { @name = "", @class = "form-control select2", @style = "width: 100%;", @selected = (int)ViewBag.currentTypelevel })
+                                        @Html.DropDownList("c_id", (IEnumerable<SelectListItem>)TempData["LevelData"], "ทั้งหมด", new { @class = "form-control select2", @style = "width: 100%;" })
                                     </div>
                                 </div>
                             </div>  

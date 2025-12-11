@@ -7,6 +7,11 @@
 <div class="card">
     <div class="card-header">
         <h2 class="card-title">ข้อมูลกรรมการดำเนินการ</h2>
+        <div class="card-tools">
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#createNewModal">
+                <i class="fas fa-plus"></i> สร้างหัวข้อใหม่
+            </button>
+        </div>
     </div>
     <div>
         <form asp-controller="Manager" asp-action="frmgroupreferee">
@@ -51,6 +56,31 @@
             </div>
         </form>
     </div>
+    @if (ViewBag.ShowCopyButton == true)
+    {
+        <div class="card card-warning card-outline mx-3">
+            <div class="card-header">
+                <h3 class="card-title">ไม่พบข้อมูลกรรมการดำเนินการ</h3>
+            </div>
+            <div class="card-body">
+                <p>ไม่พบข้อมูลกรรมการดำเนินการสำหรับงานปัจจุบันของคุณ</p>
+                <p>คุณสามารถ "สร้างใหม่" (ปุ่มมุมบนขวา) หรือ "คัดลอกจากงานปีที่แล้ว" (ด้านล่าง)</p>
+
+                <form asp-action="CopyGroupReferees" asp-controller="Manager" method="post" id="copyForm">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group">
+                        <label>เลือกงาน (ปี) ที่ต้องการคัดลอกข้อมูล:</label>
+                        <select name="sourceSettingId" class="form-control select2" asp-items="ViewBag.PreviousSettings">
+                            <option value="">-- เลือกงาน --</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-copy"></i> เริ่มการคัดลอก
+                    </button>
+                </form>
+            </div>
+        </div>
+    }
     <div class="card-body">
         <table id="example1" class="table table-bordered table-striped">
             <thead>
@@ -68,7 +98,7 @@
                         หมวดหมู่
                     </th>
                     <th>
-                       <!-- <a href="javascript:void(0)" class="btn btn-outline-success" data-toggle="modal"
+                        <!-- <a href="javascript:void(0)" class="btn btn-outline-success" data-toggle="modal"
                             data-target="#createNewModal">
                             <i class="fa fa-plus-square"></i> Create New
                         </a>col-->
@@ -90,13 +120,13 @@
                             @Html.DisplayFor(modelItem => item.duty)
                         </td>
                         <td align="center">
-                            @Html.DisplayFor(modelItem =>  item.Category.Name)
+                            @Html.DisplayFor(modelItem => item.Category.Name)
                         </td>
                         <td>
-                           <!-- <button class="btn btn-primary btn-sm edit-button" data-id="@item.id">แก้ไข</button>
-                            <button class="btn btn-danger btn-sm delete-button" data-id="@item.id">ลบ</button>-->
+                            <!-- <button class="btn btn-primary btn-sm edit-button" data-id="@item.id">แก้ไข</button>
+                                <button class="btn btn-danger btn-sm delete-button" data-id="@item.id">ลบ</button>-->
                             <button class="btn btn-success btn-sm">
-                                <a href="@Url.Action("frmdirectoradd1", "Manager", new { id = item.Category.Id,g_id=item.id,c_name=item.Category.Name,r_name=item.name,duty=item.duty })"
+                                <a href="@Url.Action("frmdirectoradd1", "Manager", new { id = item.Category.Id, g_id = item.id, c_name = item.Category.Name, r_name = item.name, duty = item.duty })"
                                     class="text-white">เพิ่มกรรมการ</a>
                             </button>
                         </td>

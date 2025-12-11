@@ -32,6 +32,9 @@
                 <h3 class="card-title">รายชื่อที่สมัครเข้ามาเป็นกรรมการ</h3>
 
                 <div class="card-tools">
+                    <a asp-action="frmregisterdirector" class="btn btn-primary btn-sm" style="margin-right: 5px;">
+                        <i class="fas fa-plus"></i> สมัครเป็นกรรมการ
+                    </a>
                     <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
                         <i class="fas fa-minus"></i>
                     </button>
@@ -75,13 +78,27 @@
                                                 <li class="list-inline-item">
                                                     <img alt="Avatar" class="table-avatar" src="@dr.ProfileImageUrl">
                                                     <div>
-                                                        @if(dr.status=="1"){
-                                                        <small>รอพิจารณา</small>
-                                                        }else{
-                                                        <small>ผ่านการพิจารณา</small>
+                                                        @if (dr.status == "1")
+                                                        {
+                                                            <small>รอพิจารณา</small>
                                                         }
-                                                    
+                                                        else
+                                                        {
+                                                            <small>ผ่านการพิจารณา</small>
+                                                        }
                                                     </div>
+                                                    @if (dr.status == "1" && User.IsInRole("Admin"))
+                                                    {
+                                                        <form asp-action="RejectDirector" asp-controller="Home" asp-route-id="@dr.id"
+                                                            method="post" style="display:inline;" class="form-reject">
+
+                                                            @Html.AntiForgeryToken()
+
+                                                            <button type="submit" class="btn btn-danger btn-xs" title="ปฏิเสธ/ลบ">
+                                                                <i class="fas fa-trash"></i> ปฏิเสธ
+                                                            </button>
+                                                        </form>
+                                                    }
                                                 </li>
                                             }
                                         </ul>
@@ -99,3 +116,45 @@
     </section>
     <!-- /.content -->
 </div>
+@section Scripts {
+    <script>
+        $(document).on('submit', '.form-reject', function (e) {
+            e.preventDefault(); // 1. หยุดฟอร์ม
+            var form = $(this);
+
+            Swal.fire({
+                title: 'คุณแน่ใจหรือไม่?',
+                text: "คุณต้องการ 'ปฏิเสธ' ใบสมัครนี้ใช่ไหม?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'ใช่, ปฏิเสธ',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // 2. ถ้ายืนยัน, ส่ง AJAX
+                    $.ajax({
+                        url: form.attr('action'),
+                        type: 'POST',
+                        data: form.serialize(), // (serialize จะส่ง Token ไปด้วย)
+                        success: function (response) {
+                            if (response.success) {
+                                // 3. (แนะนำ) ซ่อนแถวที่ถูกลบ แทนการ Reload
+                                form.closest('li.list-inline-item').fadeOut(500, function() {
+                                    $(this).remove(); 
+                                });
+                                Swal.fire('สำเร็จ', 'ปฏิเสธใบสมัครแล้ว', 'success');
+                            } else {
+                                Swal.fire('ล้มเหลว', response.message, 'error');
+                            }
+                        },
+                        error: function () {
+                            Swal.fire('ล้มเหลว', 'ไม่สามารถเชื่อมต่อได้', 'error');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

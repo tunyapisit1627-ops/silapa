@@ -1,0 +1,90 @@
+@model IEnumerable<SchoolReportViewModel>
+@{
+    ViewData["Title"] = "รายงานการลงทะเบียน (รายโรงเรียน)";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">@ViewData["Title"]</h2>
+    </div>
+
+    <div>
+        <form asp-controller="Admin" asp-action="SchoolRegistrationReport" method="get">
+            <div class="card-body">
+                <section class="content">
+                    <div class="container-fluid">
+                        <div class="card card-default">
+                            <div class="card-header">
+                                <h3 class="card-title">เงื่อนไขการค้นหา</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">กลุ่ม</label>
+                                    <div class="col-sm-10">
+                                        @Html.DropDownList("g_id", (IEnumerable<SelectListItem>)ViewBag.levelData, "ทั้งหมด", new { @class = "form-control select2", @style = "width: 100%;" })
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">สังกัด</label>
+                                    <div class="col-sm-10">
+                                        @Html.DropDownList("a_id", (IEnumerable<SelectListItem>)ViewBag.affiliationData, "ทั้งหมด", new { @class = "form-control select2", @style = "width: 100%;" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-info">ค้นหา</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="card-body">
+        <table id="reportTable" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th style="width: 40px;">#</th>
+                    <th>ชื่อโรงเรียน</th>
+                    <th>สังกัด</th>
+                    <th>กลุ่ม</th>
+                    <th class="text-center">จำนวนทีม</th>
+                    <th class="text-center">จำนวนนักเรียน</th>
+                    <th class="text-center">จำนวนครู</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int i = 1; }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@(i++)</td>
+                        <td>@item.SchoolName</td>
+                        <td>@item.AffiliationName</td>
+                        <td>@item.GroupName</td>
+                        <td class="text-center">@item.TeamCount</td>
+                        <td class="text-center">@item.StudentCount</td>
+                        <td class="text-center">@item.TeacherCount</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            // 1. เปิดใช้งาน Select2
+            $('.select2').select2();
+            
+            // 2. เปิดใช้งาน DataTable (เปลี่ยน ID เป็น reportTable)
+            $("#reportTable").DataTable({
+                "responsive": true, "lengthChange": false, "autoWidth": false,
+                "buttons": ["copy", "csv", "excel", "pdf", "print"],
+                "order": [[ 1, "asc" ]] // เรียงตามชื่อโรงเรียน
+            }).buttons().container().appendTo('#reportTable_wrapper .col-md-6:eq(0)');
+        });
+    </script>
+}

@@ -38,29 +38,104 @@ namespace Silapa.Controllers
         //[HttpGet]
         public async Task<IActionResult> GenePdfregister(int s_id, int c_id, string dateCheckboxes)
         {
-            var dates = dateCheckboxes?.Split(',') ?? Array.Empty<string>();
-            System.Globalization.CultureInfo thaiCulture = new System.Globalization.CultureInfo("th-TH");
+            // ---------------------------------------------------------
+            // 1. เตรียมและแปลงวันที่ (จาก พ.ศ. หน้าเว็บ -> ค.ศ. เพื่อค้นหา)
+            // ---------------------------------------------------------
+            var searchDates = new List<string>();
+
+            if (!string.IsNullOrEmpty(dateCheckboxes))
+            {
+                // สมมติ dateCheckboxes = "12/10/2568,13/10/2568"
+                var rawDates = dateCheckboxes.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var dateStr in rawDates)
+                {
+                    // แปลงจาก string พ.ศ. เป็น DateTime
+                    // (ใช้ Culture "th-TH" เพื่อให้รู้ว่าเป็นปี พ.ศ.)
+                    if (DateTime.TryParseExact(dateStr.Trim(), "dd/MM/yyyy", new System.Globalization.CultureInfo("th-TH"), System.Globalization.DateTimeStyles.None, out DateTime dt))
+                    {
+                        // แปลงกลับเป็น string ค.ศ. (Format ต้องตรงกับใน Database เป๊ะๆ)
+                        // เช่น "12/10/2025"
+                        string gregorianDate = dt.ToString("dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                        searchDates.Add(gregorianDate);
+                    }
+                }
+            }
+
+            // ---------------------------------------------------------
+            // 2. ดึงข้อมูลดิบ (Raw Data) จาก Database
+            // ---------------------------------------------------------
             var datasetting = await _context.setupsystem.Where(s => s.status == "1").FirstOrDefaultAsync();
-            var datasql = await _context.school
-     .Where(x => x.Id == s_id)
-     .Include(x => x.registerheads
-         .Where(rh =>
-             (!dates.Any() || // กรณี dates ว่าง (ไม่มีเงื่อนไข)
-             rh.Competitionlist.racedetails
-                 .Any(rd => dates.Contains(rd.daterace))) &&
-             (c_id == 0 || rh.Competitionlist.c_id == c_id) &&
-             (rh.status == "1" || rh.status == "2") &&
-             rh.SettingID == datasetting.id
-             )) // กรณี c_id เป็น null หรือมีค่า
-     .ThenInclude(rh => rh.Registerdetail) // โหลด Registerdetail
-     .FirstOrDefaultAsync();
-            int countteam = datasql.registerheads.Count();
-            // ตรวจสอบว่า datasql และ registerheads ไม่เป็น null
-            int countStudents = datasql?.registerheads?.Sum(rh => rh.Registerdetail.Count(x => x.Type == "student")) ?? 0;
-            int countTeachers = datasql?.registerheads?.Sum(rh => rh.Registerdetail.Count(x => x.Type == "teacher")) ?? 0;
+            if (datasetting == null) return NotFound("ไม่พบข้อมูลการตั้งค่าระบบ");
+
+            // สร้าง Query เบื้องต้น
+            var query = _context.Registerhead
+                .AsNoTracking()
+                .Where(rh =>
+                    rh.s_id == s_id &&
+                    rh.SettingID == datasetting.id &&
+                    (rh.status == "1" || rh.status == "2") // เฉพาะที่อนุมัติแล้ว
+                )
+                .Include(rh => rh.Registerdetail)
+                .Include(rh => rh.Competitionlist)
+                    .ThenInclude(cl => cl.racedetails) // จำเป็นต้องโหลดเพื่อเช็ควันที่
+                .AsQueryable();
+
+            // กรองหมวดหมู่ (c_id) ถ้ามีการเลือกมา
+            if (c_id != 0)
+            {
+                query = query.Where(rh => rh.Competitionlist.c_id == c_id);
+            }
+
+            // ⚡️ ดึงข้อมูลทั้งหมดเข้าสู่ Memory (List) ก่อนทำการกรองวันที่ซับซ้อน
+            var allRegistrations = await query.ToListAsync();
+
+
+            // ---------------------------------------------------------
+            // 3. กรองวันที่ใน Memory (C# Logic)
+            // ---------------------------------------------------------
+            if (searchDates.Any())
+            {
+                // กรอง allRegistrations ให้เหลือเฉพาะรายการที่วันแข่งตรงกับที่เลือก
+                allRegistrations = allRegistrations.Where(rh =>
+                    // เข้าไปดูในตารางแข่งของรายการนี้
+                    rh.Competitionlist.racedetails.Any(rd =>
+                    {
+                        if (string.IsNullOrEmpty(rd.daterace)) return false;
+
+                        // rd.daterace ใน DB อาจเป็น "12/10/2025 - 14/10/2025"
+                        // searchDates คือ ["12/10/2025", "13/10/2025"] (ค.ศ.)
+
+                        // ตรวจสอบว่า daterace "มีข้อความ" ที่ตรงกับวันที่เราเลือกหรือไม่
+                        // (เช่น "12/10/2025..." มีคำว่า "12/10/2025" อยู่ไหม)
+                        return searchDates.Any(searchDate => rd.daterace.Contains(searchDate));
+                    })
+                ).ToList();
+            }
+
+
+            // ---------------------------------------------------------
+            // 4. เตรียมข้อมูลสำหรับ PDF (ใช้ข้อมูลที่กรองแล้ว)
+            // ---------------------------------------------------------
+
+            // ดึงข้อมูลโรงเรียน (เพื่อเอาชื่อโรงเรียน)
+            var datasql = await _context.school.AsNoTracking().FirstOrDefaultAsync(x => x.Id == s_id);
+            if (datasql == null) return NotFound("ไม่พบข้อมูลโรงเรียน");
+
+            // ดึงรายละเอียดการแข่ง (เพื่อเอาสถานที่/เวลา)
+            var dataracedetails = await _context.racedetails
+                .Where(x => x.SettingID == datasetting.id && x.status == "1")
+                .Include(x => x.Racelocation)
+                .AsNoTracking()
+                .ToListAsync();
+
+            // คำนวณยอด (จาก List ที่กรองแล้ว)
+            int countteam = allRegistrations.Count;
+            int countStudents = allRegistrations.Sum(rh => rh.Registerdetail.Count(x => x.Type == "student"));
+            int countTeachers = allRegistrations.Sum(rh => rh.Registerdetail.Count(x => x.Type == "teacher"));
 
             var dataCompetitionlist = await _context.Competitionlist.Where(x => x.status == "1").ToListAsync();
-            var dataracedetails = await _context.racedetails.Include(x => x.Racelocation).ToListAsync();
+            // var dataracedetails = await _context.racedetails.Where(x => x.SettingID == datasetting.id).Include(x => x.Racelocation).ToListAsync();
             using (PdfDocument document = new PdfDocument())
             {
                 var pathFont = _env.WebRootPath + "/Font/THSarabun.ttf";
@@ -120,7 +195,7 @@ namespace Silapa.Controllers
                 pdfGrid.Columns[0].Width = 150;
                 pdfGrid.Columns[1].Width = 150;
                 int no = 1;
-                foreach (var dr in datasql.registerheads.OrderBy(x => x.c_id))
+                foreach (var dr in allRegistrations.OrderBy(x => x.c_id))
                 {
                     //var data=dataCompetitionlist.Where(x=>x.c_id==dr.c_id).FirstOrDefault();
                     PdfGridRow headerRow = pdfGrid.Rows.Add();
@@ -170,7 +245,7 @@ namespace Silapa.Controllers
                     string tname = "";
                     int tcount = 1;
                     string date = "";
-                    var datar = dataracedetails.Where(x => x.c_id == dr.c_id)?.FirstOrDefault();
+                    var datar = dataracedetails.FirstOrDefault(x => x.c_id == dr.c_id);
                     string location = datar?.Racelocation?.name ?? "ไม่มีข้อมูล";
                     location += $"\nอาคาร {datar?.building ?? ""}\n ห้อง {datar?.room ?? ""}";
                     foreach (var drr in dr.Registerdetail.Where(x => x.h_id == dr.id && x.Type == "student").OrderBy(x => x.no))
@@ -225,7 +300,8 @@ namespace Silapa.Controllers
         }
         public string GetCompetitionDetails(int c_id, CultureInfo thaiCulture)
         {
-            var datadd = _context.racedetails.Where(x => x.c_id == c_id).FirstOrDefault();
+            var datasetting = _context.setupsystem.Where(x => x.status == "1").FirstOrDefault();
+            var datadd = _context.racedetails.Where(x => x.c_id == c_id && x.SettingID == datasetting.id).FirstOrDefault();
             if (datadd == null)
             {
                 return "ไม่มีข้อมูล"; // กรณีไม่มีข้อมูล
@@ -298,7 +374,7 @@ namespace Silapa.Controllers
         }
         public async Task<IActionResult> GenePdfprintScoreDocument(int h_id)
         {
-            var setupsystem = await _context.setupsystem.FirstOrDefaultAsync();
+            var setupsystem = await _context.setupsystem.Where(x=>x.status=="1").FirstOrDefaultAsync();
 
 
             string name = "";
@@ -310,10 +386,11 @@ namespace Silapa.Controllers
                 PdfTrueTypeFont bFont16 = new PdfTrueTypeFont(fontStream, 16, PdfFontStyle.Regular);
                 PdfPage page = document.Pages.Add();
 
-                var registrationData = await _context.Registerhead.Where(x => x.c_id == h_id)
+                var registrationData = await _context.Registerhead.Where(x => x.c_id == h_id&&x.SettingID==setupsystem.id)
                 .AsNoTracking()
                 .Include(x => x.Competitionlist)
                 .Include(x => x.School)
+                .OrderBy(x=>x.School.Name)
                 .ToListAsync();
                 PdfGraphics graphics = page.Graphics;
                 using (FileStream logoStream = new FileStream($"wwwroot{setupsystem.LogoPath}", FileMode.Open, FileAccess.Read))
@@ -343,7 +420,7 @@ namespace Silapa.Controllers
 
 
                 int index = 1;
-                foreach (var item in registrationData)
+                foreach (var item in registrationData.OrderBy(x=>x.School.Name))
                 {
                     dataTable.Rows.Add(index, item.School.Name, item.score);
                     index++;
@@ -401,7 +478,7 @@ namespace Silapa.Controllers
         }
         public async Task<IActionResult> GenePdfprintScoreDocument1(int h_id)
         {
-            var setupsystem = await _context.setupsystem.FirstOrDefaultAsync();
+            var setupsystem = await _context.setupsystem.Where(x=>x.status=="1").FirstOrDefaultAsync();
 
 
             string name = "";
@@ -414,7 +491,7 @@ namespace Silapa.Controllers
                 PdfTrueTypeFont bFont12 = new PdfTrueTypeFont(fontStream, 12, PdfFontStyle.Regular);
                 PdfPage page = document.Pages.Add();
 
-                var registrationData = await _context.Registerhead.Where(x => x.c_id == h_id)
+                var registrationData = await _context.Registerhead.Where(x => x.c_id == h_id&&x.SettingID==setupsystem.id)
                 .AsNoTracking()
                 .Include(x => x.Competitionlist)
                 .Include(x => x.School)
@@ -512,6 +589,10 @@ namespace Silapa.Controllers
         }
         public async Task<IActionResult> GenePdfresult(int c_id)
         {
+            var activeSettingIds = await _context.setupsystem
+.Where(s => s.status == "1")
+.Select(s => s.id)
+.ToListAsync();
             var setupsystem = await _context.setupsystem.FirstOrDefaultAsync();
             var user = await _userManager.GetUserAsync(User);
             List<int> m_idList = user.m_id.Split(',')
@@ -541,6 +622,7 @@ namespace Silapa.Controllers
                 }
                 var datacom = await competitionDetails.ToListAsync();
                 var query = _context.Registerhead
+                .Where(x => activeSettingIds.Contains(x.SettingID))
      .AsNoTracking()
      .Include(x => x.Registerdetail)
      .Include(x => x.Competitionlist)

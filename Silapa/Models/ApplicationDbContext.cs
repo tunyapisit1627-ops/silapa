@@ -13,6 +13,13 @@ namespace Silapa.Models
             .HasKey(rd => new { rd.no, rd.h_id, rd.Type }); // กำหนด composite key
             builder.Entity<dCompetitionlist>()
             .HasKey(rd => new { rd.id, rd.h_id });
+
+            // 🚨 3. กำหนดความสัมพันธ์ (One-to-Many)
+            builder.Entity<NewsImage>()
+                .HasOne(ni => ni.News)
+                .WithMany(n => n.GalleryImages) // GalleryImages คือ ICollection ใน Model news
+                .HasForeignKey(ni => ni.NewsId)
+                .OnDelete(DeleteBehavior.Cascade); // เมื่อลบข่าว รูปภาพที่เกี่ยวข้องจะถูกลบตามไปด้วย
         }
 
         internal string? Find(int id)
@@ -42,13 +49,16 @@ namespace Silapa.Models
         public DbSet<setupsystem> setupsystem { get; set; }
         public DbSet<dCompetitionlist> dCompetitionlist { get; set; }
         public DbSet<contacts> contacts { get; set; }
-        public DbSet<registerdirector>registerdirector{ get; set; }
-        public DbSet<VisitorCounts>VisitorCounts{ get; set; }
-        public DbSet<uploadfilepdf>uploadfilepdf{ get; set; }
-        public DbSet<groupreferee>groupreferee{ get; set;}
-        public DbSet<criterion>criterion{ get; set; }
-        public DbSet<deleteregister>deleteregister  { get; set; }
-        public DbSet<filelist>filelist { get; set; }
-        public DbSet<Certificate>Certificate{get;set;}
+        public DbSet<registerdirector> registerdirector { get; set; }
+        public DbSet<VisitorCounts> VisitorCounts { get; set; }
+        public DbSet<uploadfilepdf> uploadfilepdf { get; set; }
+        public DbSet<groupreferee> groupreferee { get; set; }
+        public DbSet<criterion> criterion { get; set; }
+        public DbSet<deleteregister> deleteregister { get; set; }
+        public DbSet<filelist> filelist { get; set; }
+        public DbSet<Certificate> Certificate { get; set; }
+        public DbSet<NewsImage> NewsImages { get; set; }
+        public DbSet<TimelineItem>TimelineItem{ get; set; }
+        public DbSet<AuditLog>AuditLog{get;set;}
     }
 }

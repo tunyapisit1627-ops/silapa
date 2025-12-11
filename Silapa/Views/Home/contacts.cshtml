@@ -10,29 +10,26 @@
             <div class="row">
                 @foreach (var dr in Model)
                 {
-                    <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                   <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                         <div class="card bg-light d-flex flex-fill">
                             <div class="card-header text-muted border-bottom-0">
                                 @dr.title
                             </div>
                             <div class="card-body pt-0">
-                                <div class="row">
-                                    <div class="col-7">
-                                        <h2 class="lead"><b>@dr.name</b></h2>
-                                        <p class="text-muted text-sm"><b>About: </b> @dr.position </p>
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col name-container">
+                                        <h2 class="lead contact-name"><b>@dr.name</b></h2>
+                                        <p class="text-muted text-sm mb-0"><b>About: </b> @dr.position </p>
                                         <ul class="ml-4 mb-0 fa-ul text-muted">
-                                            <li class="small"><span class="fa-li"><i
-                                                        class="fas fa-lg fa-building"></i></span>
-                                                @dr.Location</li>
-                                            <li class="small"><span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>
-                                                Phone #: @dr.tel</li>
+                                            <li class="small"><span class="fa-li"><i class="fas fa-lg fa-building"></i></span> @dr.Location</li>
+                                            <li class="small"><span class="fa-li"><i class="fas fa-lg fa-phone"></i></span> Phone #: @dr.tel</li>
                                         </ul>
                                     </div>
-                                    <div class="col-5 text-center">
-                                        <img src="@dr.ImageUrl" alt="user-avatar" class="img-circle img-fluid">
+                                    <div class="col-auto">
+                                        <img src="@dr.ImageUrl" alt="user-avatar" class="img-circle" style="width: 100px; height: 100px; object-fit: cover;">
                                     </div>
                                 </div>
-                            </div>
+                                </div>
                             <div class="card-footer">
                                 <div class="text-right">
                                     <a href="#" class="btn btn-sm bg-teal">
@@ -50,3 +47,75 @@
         </div>
     </div>
 </section>
+<style>
+    /* ทำให้ CSS ของเรา "แข็งแกร่ง" และเจาะจงกว่า Bootstrap 
+      โดยระบุว่าให้ใช้กับ element ที่มีทั้งคลาส .lead และ .contact-name
+    */
+    .lead.contact-name {
+        white-space: nowrap;
+        overflow: hidden;
+        /* ซ่อนส่วนที่เกินไว้ก่อนที่ JS จะทำงาน */
+         font-size: 1rem !important;
+    }
+
+    /* (สำคัญ) เพิ่ม CSS สำหรับ container ของชื่อ */
+    .name-container {
+        /* นี่คือ "เคล็ดลับ" ของ Flexbox ที่จะป้องกันการทับกัน */
+        /* มันจะอนุญาตให้ container หดตัวได้ตามต้องการ */
+        min-width: 0;
+    }
+
+    /* 3. สำหรับจอแท็บเล็ต (ความกว้างน้อยกว่า 992px) */
+    @@media (max-width: 992px) {
+        .lead.contact-name {
+            font-size: 1.1rem !important;
+        }
+    }
+
+    /* 4. สำหรับจอมือถือ (ความกว้างน้อยกว่า 768px) */
+    @@media (max-width: 768px) {
+        .lead.contact-name {
+            font-size: 1rem !important;
+        }
+    }
+</style>
+<script>
+    // รอให้หน้าเว็บโหลดเสร็จสมบูรณ์ก่อน ค่อยเริ่มทำงาน
+    $(function () {
+
+        // ฟังก์ชันสำหรับปรับขนาดฟอนต์ให้พอดีกับพื้นที่
+        function adjustFontSizes() {
+            // วนลูปทำกับทุกชื่อที่มีคลาส .contact-name
+            $('.contact-name').each(function() {
+                var $this = $(this);
+                // รีเซ็ตขนาดฟอนต์กลับไปเป็นค่าเริ่มต้นก่อนทุกครั้ง
+                // เพื่อให้ทำงานถูกต้องตอนขยายหน้าจอ
+                $this.css('font-size', ''); 
+
+                var parentWidth = $this.parent().innerWidth(); // ความกว้างของพื้นที่ที่มีให้ (รวม padding)
+                var textWidth = $this[0].scrollWidth; // ความกว้างจริงๆ ของข้อความทั้งหมด
+                var currentFontSize = parseFloat($this.css('font-size')); // ขนาดฟอนต์ปัจจุบัน (หน่วยเป็น px)
+                var minFontSize = 12; // ขนาดเล็กสุดที่ยอมรับได้ (หน่วยเป็น px)
+
+                // ถ้าข้อความยาวเกินพื้นที่ ให้เริ่มลดขนาดฟอนต์
+                while (textWidth > parentWidth && currentFontSize > minFontSize) {
+                    currentFontSize -= 0.5; // ลดขนาดลงทีละ 0.5px เพื่อความเนียน
+                    $this.css('font-size', currentFontSize + 'px');
+                    // วัดความกว้างของข้อความใหม่อีกครั้ง
+                    textWidth = $this[0].scrollWidth;
+                }
+            });
+        }
+
+        // 1. เรียกใช้ฟังก์ชันทันทีเมื่อหน้าเว็บโหลดเสร็จ
+        adjustFontSizes();
+
+        // 2. เรียกใช้ฟังก์ชันอีกครั้งเมื่อมีการปรับขนาดหน้าจอ (รองรับ Responsive)
+        var resizeTimer;
+        $(window).on('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(adjustFontSizes, 150);
+        });
+
+    });
+</script>

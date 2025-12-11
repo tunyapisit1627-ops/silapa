@@ -1,7 +1,6 @@
 ﻿/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
 
-
 a.navbar-brand {
   white-space: normal;
   text-align: center;
@@ -18,7 +17,8 @@ a {
   border-color: #1861ac;
 }
 
-.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+.nav-pills .nav-link.active,
+.nav-pills .show>.nav-link {
   color: #fff;
   background-color: #1b6ec2;
   border-color: #1861ac;
@@ -27,6 +27,7 @@ a {
 .border-top {
   border-top: 1px solid #e5e5e5;
 }
+
 .border-bottom {
   border-bottom: 1px solid #e5e5e5;
 }
@@ -41,9 +42,1312 @@ button.accept-policy {
 }
 
 .footer {
-  position: absolute;
-  bottom: 0;
+  position: relative;
+  bottom: auto;
   width: 100%;
   white-space: nowrap;
   line-height: 60px;
+}
+
+/* Hero Section */
+.hero {
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  /* ปรับ Padding สำหรับ Mobile */
+  padding: 0 1rem;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><circle cx="100" cy="100" r="50" fill="%23ffffff10"/><circle cx="900" cy="200" r="30" fill="%23ffffff15"/><circle cx="300" cy="800" r="40" fill="%23ffffff08"/><circle cx="700" cy="600" r="25" fill="%23ffffff20"/></svg>');
+  animation: float 20s ease-in-out infinite;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-20px) rotate(2deg);
+  }
+}
+
+.hero-content {
+  max-width: 800px;
+  padding: 0 2rem;
+  z-index: 2;
+}
+
+.hero h1 {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  opacity: 0;
+  animation: fadeInUp 1s ease-out 0.5s forwards;
+}
+
+.hero .subtitle {
+  font-size: 1.3rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+  opacity: 0;
+  animation: fadeInUp 1s ease-out 1s forwards;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeInUp 1s ease-out 1.5s forwards;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 15px 30px;
+  background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+  color: white;
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+}
+
+.cta-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(255, 107, 107, 0.4);
+}
+
+.cta-button.secondary {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  animation: bounce 2s infinite;
+  text-align: center;
+}
+
+@keyframes bounce {
+
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  40% {
+    transform: translateX(-50%) translateY(-10px);
+  }
+
+  60% {
+    transform: translateX(-50%) translateY(-5px);
+  }
+}
+
+/* Feature Cards */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.feature-card {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  border-color: #667eea;
+}
+
+.feature-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  font-size: 2rem;
+}
+
+.feature-card h3 {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.feature-card p {
+  color: #7f8c8d;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.feature-card .btn {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  text-decoration: none;
+  border-radius: 25px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.feature-card .btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Stats Section */
+.stats {
+  background: white;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.stat-item {
+  padding: 2rem;
+}
+
+.stat-number {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #667eea;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 1.1rem;
+  color: #666;
+}
+
+/* About Section */
+.about {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 6rem 2rem;
+  text-align: center;
+}
+
+.about-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.about h2 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.about p {
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+/* Services Section */
+.services {
+  padding: 6rem 2rem;
+  background: white;
+}
+
+.services h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 3rem;
+  color: #333;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.service-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 3rem;
+  border-radius: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.service-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.service-card:hover::before {
+  left: 100%;
+}
+
+.service-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+}
+
+.service-icon {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  display: block;
+}
+
+.service-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.service-card p {
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+.service-card ul {
+  list-style: none;
+  margin-top: 1rem;
+}
+
+.service-card li {
+  padding: 0.3rem 0;
+  opacity: 0.9;
+}
+
+.service-card li::before {
+  content: '✓';
+  color: #4ade80;
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+/* Team Section */
+.team {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  padding: 6rem 2rem;
+  color: white;
+  text-align: center;
+}
+
+.team h2 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+}
+
+.team-description {
+  max-width: 600px;
+  margin: 0 auto 3rem;
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.team-categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.team-category {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 2rem;
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.team-category h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #4ade80;
+}
+
+.team-category p {
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+.team-section {
+  /* 🚨 นี่คือสไตล์ที่ย้ายมาจาก HTML/cshtml */
+  background-image: url('images/team-photo.jpg');
+  background-size: cover;
+  background-position: center;
+
+  /* คงความสูง 100vh สำหรับ Desktop */
+  min-height: 100vh;
+
+  /* สไตล์การจัดวาง */
+  padding: 50px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background-attachment: fixed;
+  /* << หัวใจของ Parallax Effect */
+  /* จัดเนื้อหาไว้ด้านล่าง */
+  position: relative;
+  /* สำคัญสำหรับ overlay */
+  padding: 100px 0;
+  /* เพิ่ม padding ให้ section ดูไม่แน่น */
+}
+
+/* Features Section */
+.features {
+  padding: 6rem 2rem;
+  background: white;
+}
+
+.features h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 3rem;
+  color: #333;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.feature-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid #f0f0f0;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #667eea;
+}
+
+.feature-card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.feature-card p {
+  color: #666;
+  line-height: 1.6;
+}
+
+/* Testimonials Section */
+.testimonials {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 6rem 2rem;
+  text-align: center;
+}
+
+.testimonials h2 {
+  font-size: 2.5rem;
+  margin-bottom: 3rem;
+  color: #333;
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.testimonial-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.testimonial-quote {
+  font-size: 1.2rem;
+  font-style: italic;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  color: #555;
+}
+
+.testimonial-author {
+  font-weight: 600;
+  color: #667eea;
+}
+
+.testimonial-company {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.5rem;
+}
+
+/* Contact Section */
+.contact {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 6rem 2rem;
+  text-align: center;
+  color: white;
+}
+
+.contact h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.contact p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.contact-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.contact-button {
+  display: inline-block;
+  padding: 15px 30px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  color: white;
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.contact-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-3px);
+}
+
+.contact-button.primary {
+  background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+  border: none;
+}
+
+/* Reveal Animation */
+.reveal {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.6s ease-out;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/*ที่เพิ่มใหม่*/
+.containerlayout {
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 4rem 2rem !important;
+}
+
+/* Section Title */
+.section-title {
+  text-align: center !important;
+  margin-bottom: 3rem !important;
+}
+
+.section-title h2 {
+  font-size: 2.5rem !important;
+  font-weight: 700 !important;
+  color: #2c3e50;
+  margin-bottom: 0.5rem !important;
+}
+
+.section-title p {
+  font-size: 1.2rem !important;
+  color: #7f8c8d;
+}
+
+/* Timeline */
+/* Timeline (Silapa Namespace) */
+.s-timeline {
+  position: relative;
+  padding: 2rem 0;
+}
+
+.s-timeline::before {
+  content: '';
+  position: absolute;
+  /* 🚨 แนะนำ: ลองใช้ left: calc(50% - 2px); หรือ 50% ตามด้วยการปรับ Margin ของกล่อง */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #667eea, #764ba2);
+}
+
+.s-timeline-item {
+  display: flex;
+  justify-content: space-between;
+  /* 🚨 แนะนำ: ใช้ align-items: flex-start; แทน center เพื่อป้องกันการทับซ้อนในแนวตั้ง */
+  align-items: flex-start;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.s-timeline-item:nth-child(even) {
+  flex-direction: row-reverse;
+}
+
+/* 🚨 สำคัญ: ลองใช้ 44% ก่อน เพื่อให้มี Gap เพียงพอ */
+.s-timeline-content {
+  width: 44%;
+  /* เปลี่ยนจาก 45% เป็น 44% */
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.s-timeline-content:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.s-timeline-item:nth-child(even) .s-timeline-content {
+  /* 🚨 เพิ่ม: จัดข้อความแถวคู่ให้ชิดขวา (เข้าหาเส้นกลาง) */
+  text-align: right;
+}
+
+.s-timeline-icon {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+  z-index: 10;
+  /* เพิ่ม z-index เพื่อให้ไอคอนอยู่บนสุด */
+}
+
+.s-timeline-date {
+  font-size: 1rem;
+  color: #667eea;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.s-timeline-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.s-timeline-desc {
+  color: #7f8c8d;
+  line-height: 1.6;
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-block;
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+/* คลาสสถานะยังคงเดิม */
+.status-upcoming {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-open {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-closed {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* News Section */
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.news-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.news-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.news-card.featured {
+  grid-column: span 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.news-image {
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.news-card.featured .news-image {
+  height: 100%;
+}
+
+.news-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: white;
+  color: #667eea;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+.news-badge.breaking {
+  background: linear-gradient(45deg, #ff6b6b, #ee5a6f);
+  color: white;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes wave {
+  0% {
+    background-position: 0 bottom;
+  }
+
+  100% {
+    background-position: 1440px bottom;
+  }
+}
+
+/* สไตล์สำหรับ VIDEO Background (ใช้สำหรับทั้ง Desktop และ Mobile) */
+.video-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* สำคัญ: ทำให้วิดีโอเต็มพื้นที่โดยรักษาสัดส่วน */
+  z-index: 1;
+}
+
+/*ติดต่อสื่อสาร*/
+/* =========================================== */
+/* CSS สำหรับ Section การติดต่อ LINE       */
+/* =========================================== */
+.contact-line-section {
+  padding: 80px 20px;
+  text-align: center;
+  background-color: #f8f9fa;
+  /* สีพื้นหลังอ่อนๆ */
+  border-top: 1px solid #e9ecef;
+}
+
+.contact-line-section h2 {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+
+.contact-line-section .subtitle {
+  font-size: 1.1rem;
+  color: #6c757d;
+  max-width: 600px;
+  margin: 0 auto 40px auto;
+}
+
+.contact-desktop img {
+  max-width: 220px;
+  border: 6px solid white;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.contact-desktop .line-id {
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.line-add-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #06C755;
+  color: white !important;
+  /* !important เพื่อ override style อื่น */
+  padding: 18px 35px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-size: 1.25rem;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(6, 199, 85, 0.3);
+  transition: all 0.3s ease;
+}
+
+.line-add-button i {
+  font-size: 1.5rem;
+  margin-right: 12px;
+}
+
+.line-add-button:hover {
+  background-color: #05a546;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(6, 199, 85, 0.4);
+}
+
+
+/* =========================================== */
+/* CSS สำหรับปุ่มลอย (FAB)           */
+/* =========================================== */
+.line-fab {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 60px;
+  height: 60px;
+  background-color: #06C755;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  transition: transform 0.2s ease-in-out;
+}
+
+.line-fab:hover {
+  transform: scale(1.1);
+}
+
+
+/* =========================================== */
+/* ส่วนสลับการแสดงผล (Responsive Magic)   */
+/* =========================================== */
+
+/* ค่าเริ่มต้น (Desktop): ซ่อนปุ่มมือถือ, แสดง QR Code */
+.contact-mobile {
+  display: none;
+}
+
+.contact-desktop {
+  display: block;
+}
+
+/* เมื่อหน้าจอมีความกว้างน้อยกว่า 768px (Mobile) */
+@media (max-width: 768px) {
+  .contact-desktop {
+    display: none;
+    /* ซ่อน QR Code */
+  }
+
+  .contact-mobile {
+    display: block;
+    /* แสดงปุ่มเพิ่มเพื่อน */
+  }
+}
+
+/*จบการติดต่อสื่อสาร*/
+/* 🚨 MOBILE MEDIA QUERY (สำหรับหน้าจอ 768px ลงไป) */
+@media (max-width: 768px) {
+  /* =================================================== */
+  /* 1. TIMELINE (s-timeline) */
+  /* =================================================== */
+
+  /* ซ่อนเส้น Timeline กลาง */
+  .s-timeline::before {
+    content: none;
+  }
+
+  /* จัดเรียงทุกรายการให้อยู่ในทิศทางปกติ (บนลงล่าง) */
+  .s-timeline-item,
+  .s-timeline-item:nth-child(even) {
+    flex-direction: column;
+    align-items: center;
+    /* จัดให้อยู่ตรงกลาง (ถ้าต้องการ) */
+    margin-bottom: 2rem;
+  }
+
+  /* ทำให้เนื้อหา Timeline เต็มความกว้าง */
+  .s-timeline-content {
+    width: 100%;
+    /* เต็มความกว้างของคอนเทนเนอร์ */
+    text-align: left !important;
+    /* จัดข้อความให้ชิดซ้ายเสมอ */
+    padding: 1.5rem;
+    /* ลด Padding ลงเล็กน้อย */
+  }
+
+  /* ซ่อนไอคอนกลาง แต่ถ้าต้องการให้แสดงด้านบนเนื้อหาให้ปรับตำแหน่งใหม่ */
+  .s-timeline-icon {
+    position: relative;
+    left: auto;
+    transform: none;
+    margin-bottom: 1rem;
+  }
+}
+
+/* 🚨 MOBILE MEDIA QUERY (สำหรับหน้าจอ 768px ลงไป) */
+@media (max-width: 768px) {
+  /* ... โค้ด Timeline ที่เพิ่งแก้ไขไป ... */
+
+  /* =================================================== */
+  /* 2. NEWS GRID (news-grid) */
+  /* =================================================== */
+
+  /* บังคับให้ Featured Card กลับไปเป็นคอลัมน์เดียว */
+  .news-card.featured {
+    grid-column: span 1;
+    /* ไม่กินพื้นที่สองคอลัมน์แล้ว */
+    grid-template-columns: 1fr;
+    /* บังคับให้เป็นคอลัมน์เดียว */
+  }
+
+  /* ปรับความสูงรูปภาพ Featured */
+  .news-card.featured .news-image {
+    height: 250px;
+    /* กำหนดความสูงที่เหมาะสมบนมือถือ */
+  }
+}
+
+/* 🚨 MOBILE MEDIA QUERY (สำหรับหน้าจอ 768px ลงไป) */
+@media (max-width: 768px) {
+  /* ... โค้ด Timeline และ News Grid ที่เพิ่งแก้ไขไป ... */
+
+  /* =================================================== */
+  /* 3. HERO Section (hero) */
+  /* =================================================== */
+  .hero h1 {
+    font-size: 2.5rem;
+    /* ลดขนาดฟอนต์หัวข้อหลัก */
+  }
+
+  .hero .subtitle {
+    font-size: 1.1rem;
+    /* ลดขนาดฟอนต์หัวข้อย่อย */
+  }
+
+  /* ให้ปุ่ม CTA แสดงในแนวตั้งถ้าไม่พอ */
+  .cta-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0 1rem;
+  }
+
+  .cta-button {
+    width: 100%;
+    /* ทำให้ปุ่มเต็มความกว้าง */
+  }
+
+  .team-description {
+    /* บังคับให้ใช้ความกว้างเต็มที่บนมือถือ (แต่มี Padding) */
+    max-width: 100% !important;
+    padding: 0 1rem;
+    /* เพิ่ม Padding ด้านข้าง */
+  }
+
+  .team-description p {
+    /* ลดขนาดข้อความหลักลง */
+    font-size: 1em !important;
+    line-height: 1.5;
+  }
+
+  .team h2 {
+    /* ลดขนาดฟอนต์หัวข้อหลักลง */
+    font-size: 2em !important;
+  }
+
+  .team-section {
+    /* 🚨 สำคัญที่สุด: Override min-height เพื่อให้ยืดหยุ่นตามเนื้อหา */
+    min-height: auto;
+    /* หรือ auto !important; ถ้าไม่ทำงาน */
+    height: auto;
+
+    /* ปรับการจัดเรียงเนื้อหาให้อยู่ด้านบนหรือตรงกลางก็ได้ */
+    justify-content: center;
+
+    /* เพิ่ม padding เพื่อให้มีระยะห่างด้านบนและล่าง */
+    padding-top: 40px;
+    padding-bottom: 40px;
+
+    /* 💡 การปรับ Background Size สำหรับมือถือ */
+    /*
+        * 'cover' (ดีที่สุด): ครอบคลุมพื้นที่ แต่รูปภาพอาจถูกตัด
+        * 'contain': แสดงรูปภาพเต็ม แต่จะมีพื้นที่ว่างเหลือถ้าสัดส่วนไม่ตรง
+        */
+    background-size: contain;
+    background-repeat: no-repeat;
+    /* สำคัญ: ไม่ให้รูปซ้ำเมื่อใช้ contain */
+    background-position: top center;
+
+    /* ให้รูปภาพเริ่มจากด้านบน */
+    .logo-svg {
+      width: 90px;
+      /* 3. ปรับขนาดให้เล็กลง */
+    }
+  }
+
+  /* ปรับ Layout Grid ของ Category ให้เป็นคอลัมน์เดียว */
+  team-categories {
+    grid-template-columns: 1fr;
+    padding: 0 1rem;
+    /* เพิ่ม Padding ด้านข้างให้คอนเทนเนอร์ Grid */
+    gap: 1.5rem;
+    /* ลดระยะห่างระหว่างกล่องลงเล็กน้อย */
+  }
+
+  .team-category {
+    /* 🚨 สำคัญ: เอาความกว้างคงที่ (Fixed Width) ออก */
+    width: 100% !important;
+    padding: 1.5rem;
+    /* ลด Padding ในกล่องลงเล็กน้อย */
+
+    /* ปรับขนาดข้อความในกล่อง */
+    text-align: left !important;
+    /* จัดชิดซ้ายเพื่อให้อ่านง่ายขึ้น */
+  }
+
+  .team-category h3 {
+    /* ลดขนาดฟอนต์หัวข้อในกล่อง */
+    font-size: 1.3rem !important;
+    text-align: left !important;
+  }
+
+  .team-category p {
+    /* ลดขนาดข้อความย่อยในกล่อง */
+    font-size: 0.9em !important;
+    line-height: 1.4;
+  }
+
+  /* ปรับระยะห่างของ Overlay ที่คุณตั้งค่าไว้ใน HTML ด้วย */
+  .team-section .overlay {
+    min-height: 100%;
+    /* ให้ Overlay คลุมความสูงใหม่ของ Section */
+  }
+
+
+  .about {
+    /* 🚨 ยกเลิกความสูงคงที่: ทำให้ Section ยืดหยุ่นตามเนื้อหาภายใน */
+    min-height: auto !important;
+
+    /* เพิ่ม Padding เพื่อให้มีช่องว่างด้านบน/ล่าง */
+    padding-top: 50px;
+    padding-bottom: 50px;
+
+    /* ปรับการจัดวางข้อความ */
+    align-items: flex-start !important;
+    /* จัดชิดด้านบน (ถ้าจำเป็น) */
+    justify-content: center !important;
+  }
+
+  /* ปรับขนาดฟอนต์ของข้อความบนมือถือ */
+  .about-content h2 {
+    font-size: 1.8em !important;
+  }
+
+  .about-content p {
+    font-size: 1em !important;
+  }
+}
+
+/* CTA Section */
+.cta-section {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+  padding: 4rem 2rem;
+  text-align: center;
+  color: white;
+}
+
+.cta-section h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.cta-section p {
+  font-size: 1.3rem;
+  margin-bottom: 2rem;
+  opacity: 0.95;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.cta-btn {
+  padding: 1.2rem 3rem;
+  background: white;
+  color: #ff6b6b;
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.cta-btn:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.animated-logo {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.logo-svg {
+  width: 120px;
+  height: auto;
+  /* การใช้ filter: drop-shadow จะดีกว่า box-shadow สำหรับ SVG ที่มีรูปร่างซับซ้อน */
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+  /* เงาเริ่มต้น */
+  animation: pulseGlow 3s ease-in-out infinite alternate;
+  /* ใช้ animation นี้ */
+}
+
+@keyframes pulseGlow {
+  0% {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8));
+    /* เงาสว่างขึ้น */
+  }
+
+  100% {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+  }
+}
+
+/* ---------------------------------- */
+/* 🚨 1. STYLE สำหรับแถบแจ้งเตือน (Urgent Banner) */
+/* ---------------------------------- */
+.urgent-banner {
+  background-color: #e53e3e;
+  /* สีแดงสะดุดตา */
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  /* ทำให้ติดอยู่ด้านบนเสมอ */
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.urgent-banner .icon {
+  font-size: 1.5rem;
+  animation: blink 1s infinite;
+  /* เพิ่มเอฟเฟกต์กระพริบ */
+}
+
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.banner-cta {
+  background-color: #ffcc00;
+  /* สีเหลืองทอง */
+  color: #333;
+  padding: 5px 15px;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.banner-cta:hover {
+  background-color: #ff9900;
+}
+
+/* ---------------------------------- */
+/* 🚨 2. STYLE สำหรับตัวนับถอยหลัง (Countdown Timer) */
+/* ---------------------------------- */
+.countdown-timer {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: rgba(255, 255, 255, 0.9);
+  /* พื้นหลังสีขาวโปร่งแสง */
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  color: #333;
+}
+
+.timer-display {
+  font-size: 2.5rem;
+  /* ตัวเลขใหญ่ */
+  font-weight: 900;
+  color: #c0392b;
+  /* สีแดงเข้ม */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.time-unit {
+  background-color: #333;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  display: inline-block;
+  min-width: 45px;
+  text-align: center;
+}
+
+.countdown-timer p {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }

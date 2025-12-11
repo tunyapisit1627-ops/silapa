@@ -31,7 +31,7 @@
                                             accept="image/png, image/jpeg">
                                         <span asp-validation-for="Logo" class="text-danger"></span>
 
-    
+
                                         @if (!string.IsNullOrEmpty(Model.LogoPath))
                                         {
                                             <div class="mt-3">
@@ -48,25 +48,32 @@
                                             <span asp-validation-for="name" class="text-danger"></span>
                                         </div>
                                     </div>
-                                     <div class="form-group row">
+                                    <div class="form-group row">
                                         <label for="inputEmail3">ชื่อหน่วยงาน</label>
                                         <div class="input-group">
                                             <input asp-for="nameagency" class="form-control" />
                                             <span asp-validation-for="nameagency" class="text-danger"></span>
                                         </div>
                                     </div>
-                                     <div class="form-group row">
+                                    <div class="form-group row">
                                         <label for="inputEmail3">ครั้งที่</label>
                                         <div class="input-group">
                                             <input asp-for="time" class="form-control" />
                                             <span asp-validation-for="time" class="text-danger"></span>
                                         </div>
                                     </div>
-                                     <div class="form-group row">
+                                    <div class="form-group row">
                                         <label for="inputEmail3">ปีการศึกษา</label>
                                         <div class="input-group">
                                             <input asp-for="yaer" class="form-control" />
                                             <span asp-validation-for="yaer" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label asp-for="ProvinceName"></label>
+                                        <div class="input-group">
+                                            <input asp-for="ProvinceName" class="form-control" />
+                                            <span asp-validation-for="ProvinceName" class="text-danger"></span>
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -137,9 +144,9 @@
                                                 <span class="input-group-text"><i
                                                         class="far fa-calendar-alt"></i></span>
                                             </div>
-                                            <input type="text" id="certificatedate" asp-for="certificatedate" class="form-control"
-                                                data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy"
-                                                data-mask>
+                                            <input type="text" id="certificatedate" asp-for="certificatedate"
+                                                class="form-control" data-inputmask-alias="datetime"
+                                                data-inputmask-inputformat="dd/mm/yyyy" data-mask>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -155,6 +162,69 @@
                                             <input asp-for="token" class="form-control" />
                                             <span asp-validation-for="token" class="text-danger"></span>
                                         </div>
+                                    </div>
+                                    <div class="card card-outline card-secondary mt-4">
+                                        <div class="card-header">
+                                            <h3 class="card-title">ข้อมูลเนื้อหาหน้าเว็บ (Hero & About)</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-group row">
+                                                <label asp-for="SloganThai"></label>
+                                                <div class="input-group">
+                                                    <input asp-for="SloganThai" class="form-control"
+                                                        placeholder="เช่น ศาสตร์ศิลป์ ถิ่นโคราช สร้างพลัง Soft Power" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label asp-for="SloganEnglish"></label>
+                                                <div class="input-group">
+                                                    <input asp-for="SloganEnglish" class="form-control"
+                                                        placeholder="เช่น The 73rd Excellent Student Competition Korat 2025" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label asp-for="HeroVideoPath"></label>
+                                                <div class="input-group">
+                                                    <input asp-for="HeroVideoPath" class="form-control"
+                                                        placeholder="เช่น ~/vdo/vdo.mp4" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label asp-for="AboutHeading"></label>
+                                                <div class="input-group">
+                                                    <input asp-for="AboutHeading" class="form-control"
+                                                        placeholder="เช่น ที่หนึ่งของความคิดสร้างสรรค์..." />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label asp-for="AboutText1"></label>
+                                                <div class="input-group">
+                                                    <textarea asp-for="AboutText1" class="form-control" rows="3"
+                                                        placeholder="ย่อหน้าที่ 1 ของ 'เกี่ยวกับ'"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label asp-for="AboutText2"></label>
+                                                <div class="input-group">
+                                                    <textarea asp-for="AboutText2" class="form-control" rows="3"
+                                                        placeholder="ย่อหน้าที่ 2 ของ 'เกี่ยวกับ'"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="DeclarationFile">อัปโหลดไฟล์ประกาศ (PDF)</label>
+                                        <input type="file" asp-for="DeclarationFile" class="form-control"
+                                            accept="application/pdf">
+                                        <span asp-validation-for="DeclarationFile" class="text-danger"></span>
+
+                                        @if (!string.IsNullOrEmpty(Model.DeclarationFilePath))
+                                        {
+                                            <button type="button" class="btn btn-link" data-toggle="modal"
+                                                data-target="#viewDeclarationFileModal">
+                                                ดูไฟล์ประกาศ
+                                            </button>
+                                        }
                                     </div>
                                     <div class="form-group">
                                         <label for="certificate">อัปโหลดใบประกาศ (PNG, JPG)</label>
@@ -238,6 +308,73 @@
                 </div>
             </div>
         </form>
+    </div>
+    <div class="modal fade" id="viewDeclarationFileModal" tabindex="-1" role="dialog"
+        aria-labelledby="viewDeclarationFileLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewDeclarationFileLabel">ไฟล์ประกาศ</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <iframe src="@Url.Content($"~/card/{Model.DeclarationFilePath}")" frameborder="0" width="100%"
+                        height="500px"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card card-outline card-success mt-4">
+        <div class="card-header">
+            <h3 class="card-title">🗓️ จัดการกำหนดการ (Timeline)</h3>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                @* ปุ่มสำหรับ "สร้าง" Timeline ใหม่ โดยส่ง ID ของงานปัจจุบันไปด้วย *@
+                <button type="button" id="btnAddTimeline" class="btn btn-success"
+                    data-url="@Url.Action("TimelineEvents_Create", "Admin", new { setupId = Model.id })">
+                    <i class="fas fa-plus-circle"></i> เพิ่มกำหนดการใหม่
+                </button>
+            </div>
+
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">หัวข้อ</th>
+                        <th>ช่วงวันที่</th>
+                        <th style="width: 10%;">ลำดับที่</th>
+                        <th style="width: 15%;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.TimelineEvents)
+                    {
+                        <tr>
+                            <td>@item.Title</td>
+                            <td>@item.StartDate.ToString("d MMM yyyy") - @item.EndDate.ToString("d MMM yyyy")</td>
+                            <td>@item.DisplayOrder</td>
+                            <td class="text-center">
+                                @* ปุ่มสำหรับ "แก้ไข" และ "ลบ" - เพิ่ม class และ data-url *@
+                                <button type="button" class="btn btn-sm btn-warning btn-timeline-action"
+                                    data-url="@Url.Action("EditTimeline", "Admin", new { id = item.EventID })">
+                                    แก้ไข
+                                </button>
+                                <button type="button" class="btn btn-sm btn-danger btn-timeline-action"
+                                    data-url="@Url.Action("DeleteTimeline", "Admin", new { id = item.EventID })">
+                                    ลบ
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (!Model.TimelineEvents.Any())
+            {
+                <p class="text-muted text-center mt-3">ยังไม่มีข้อมูลกำหนดการ</p>
+            }
+        </div>
     </div>
     <!-- Modal for Certificate -->
     <div class="modal fade" id="viewCertificateModal" tabindex="-1" role="dialog" aria-labelledby="viewCertificateLabel"
@@ -328,6 +465,14 @@
         </div>
     </div>
 
+    <div class="modal fade" id="timelineModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" id="modalContent">
+                @* เนื้อหาจาก Partial View จะถูกโหลดมาใส่ในนี้ *@
+            </div>
+        </div>
+    </div>
+
 </body>
 <link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
 <script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
@@ -351,6 +496,42 @@
         CodeMirror.fromTextArea(document.getElementById("codeMirrorDemo"), {
             mode: "htmlmixed",
             theme: "monokai"
+        });
+    });
+    // --- บล็อกที่ 2: โค้ดสำหรับจัดการ Modal ของเราโดยเฉพาะ (แยกออกมาเลย) ---
+    $(function () {
+        // ส่วนสำหรับ "เปิด" Modal และ "โหลด" เนื้อหา
+        $('#btnAddTimeline, .btn-timeline-action').on('click', function () {
+            var url = $(this).data('url');
+            if (url) {
+                $('#modalContent').load(url, function () {
+                    $('#timelineModal').modal('show');
+                });
+            }
+        });
+
+        // ดักจับการ Submit ฟอร์มใน Modal
+        // ดักจับการ Submit ฟอร์ม "เพิ่ม/แก้ไข" และ "ลบ"
+        $('#modalContent').on('submit', '#timelineForm, #deleteTimelineForm', function (e) {
+            e.preventDefault(); // บรรทัดนี้จะกลับมาทำงานได้อีกครั้ง
+            var form = $(this);
+
+            $.ajax({
+                url: form.attr('action'),
+                method: 'POST',
+                data: form.serialize(), // 👈 เอาส่วนที่ต่อท้ายออก เหลือแค่นี้พอ
+                success: function (response) {
+                    if (response.success) {
+                        $('#timelineModal').modal('hide');
+                        location.reload();
+                    } else {
+                        $('#modalContent').html(response);
+                    }
+                },
+                error: function () {
+                    alert('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์');
+                }
+            });
         });
     });
 </script>

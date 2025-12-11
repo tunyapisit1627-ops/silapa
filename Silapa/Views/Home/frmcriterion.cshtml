@@ -2,14 +2,27 @@
 @{
     ViewData["Title"] = "ข้อมูลเกณฑ์การแข่งขัน";
     int i = 1;
-    int j=1;
+    int j = 1;
     // IList<Registerhead> models=ViewBag.data;
     System.Globalization.CultureInfo thaiCulture = new System.Globalization.CultureInfo("th-TH");
 }
 <div class="card">
-   
+
     <div class="card-header">
         <h2 class="card-title">ข้อมูลเกณฑ์การแข่งขัน</h2>
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="card-tools">
+                <button type="button" class="btn btn-success btn-create"
+                    data-url="@Url.Action("CreateCriterionModal", "Admin", new { settingId = ViewBag.ActiveSettingID, g_id = 1 })">
+                    <i class="fas fa-plus"></i> เพิ่มเกณฑ์ (Soft Power)
+                </button>
+                <button type="button" class="btn btn-primary btn-create"
+                    data-url="@Url.Action("CreateCriterionModal", "Admin", new { settingId = ViewBag.ActiveSettingID, g_id = 2 })">
+                    <i class="fas fa-plus"></i> เพิ่มเกณฑ์ (จัดเพิ่มเติม)
+                </button>
+            </div>
+        }
     </div>
     <div class="card-body">
         <div class="card">
@@ -24,6 +37,10 @@
                             <th style="width: 10px">#</th>
                             <th>กิจกรรมหลักที่สอดคล้องกับ Soft Power</th>
                             <th style="width: 40px">ไฟล์</th>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <th style="width: 80px">จัดการ</th>
+                            }
                         </tr>
                     </thead>
                     <tbody>
@@ -34,8 +51,26 @@
                                 <td>@dr.name</td>
                                 <td><a href="~/pdf/@dr.file" target="_blank"><span
                                             class="badge bg-danger">ดาวน์โหลด</span></a></td>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-warning btn-edit"
+                                            data-url="@Url.Action("EditCriterionModal", "Admin", new { id = dr.id })">
+                                            แก้ไข
+                                        </button>
+                                        <form asp-action="DeleteCriterion" asp-controller="Admin" asp-route-id="@dr.id" method="post"
+                                            style="display:inline;" class="form-delete ml-1">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <button type="submit" class="btn btn-sm btn-danger" title="ลบ">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                }
                             </tr>
-                            i+=1;
+                            i += 1;
                         }
 
                     </tbody>
@@ -43,7 +78,7 @@
             </div>
             <!-- /.card-body -->
         </div>
-          <div class="card">
+        <div class="card">
             <div class="card-header">
                 <h3 class="card-title">เกณฑ์การแข่งขันในกลุ่มที่จัดเพิ่มเติม</h3>
             </div>
@@ -55,6 +90,10 @@
                             <th style="width: 10px">#</th>
                             <th>กลุ่ม/หมวดหมู่</th>
                             <th style="width: 40px">ไฟล์</th>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <th style="width: 80px">จัดการ</th>
+                            }
                         </tr>
                     </thead>
                     <tbody>
@@ -65,8 +104,26 @@
                                 <td>@dr.name</td>
                                 <td><a href="~/pdf/@dr.file" target="_blank"><span
                                             class="badge bg-danger">ดาวน์โหลด</span></a></td>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-warning btn-edit"
+                                            data-url="@Url.Action("EditCriterionModal", "Admin", new { id = dr.id })">
+                                            แก้ไข
+                                        </button>
+                                        <form asp-action="DeleteCriterion" asp-controller="Admin" asp-route-id="@dr.id" method="post"
+                                            style="display:inline;" class="form-delete ml-1">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <button type="submit" class="btn btn-sm btn-danger" title="ลบ">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                }
                             </tr>
-                            j+=1;
+                            j += 1;
                         }
 
                     </tbody>
@@ -76,3 +133,89 @@
         </div>
     </div>
 </div>
+@if (User.IsInRole("Admin"))
+{
+    <div class="modal fade" id="criterionModal" tabindex="-1" role="dialog" aria-labelledby="criterionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" id="modalContent">
+            </div>
+        </div>
+    </div>
+}
+@section Scripts {
+    <script>
+        $(function () {
+            // 1. เมื่อคลิกปุ่ม "แก้ไข" (class .btn-edit)
+            $('.btn-edit, .btn-create').on('click', function () {
+                var url = $(this).data('url');
+                $('#modalContent').load(url, function () {
+                    $('#criterionModal').modal('show');
+                });
+            });
+
+            // 4. ดักจับการ submit ฟอร์ม (id="editCriterionForm") ที่อยู่ใน Modal
+            //    (เราต้องใช้ .on(..., '#editCriterionForm', ...) เพราะฟอร์มนี้ถูกโหลดมาทีหลัง)
+            $(document).on('submit', '#editCriterionForm', function (e) {
+                e.preventDefault(); // 5. หยุดการ submit แบบปกติ
+
+                var form = $(this);
+
+                // 6. ⚡️ (สำคัญ) ใช้ FormData สำหรับการส่งไฟล์
+                var formData = new FormData(form[0]);
+
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'POST',
+                    data: formData,
+                    processData: false, // 👈 (จำเป็นสำหรับ FormData)
+                    contentType: false, // 👈 (จำเป็นสำหรับ FormData)
+                    success: function (response) {
+                        if (response.success) {
+                            // 7. ถ้าสำเร็จ: ปิด Modal และรีโหลดหน้า
+                            $('#criterionModal').modal('hide');
+                            location.reload();
+                        } else {
+                            // 8. ถ้าไม่สำเร็จ (Validation fail): 
+                            //    Server จะส่ง HTML ของฟอร์ม (พร้อม Error) กลับมา
+                            //    ให้เรายัด HTML นั้นกลับเข้าไปใน Modal
+                            $('#modalContent').html(response);
+                        }
+                    },
+                    error: function () {
+                        alert("เกิดข้อผิดพลาดไม่สามารถบันทึกได้");
+                    }
+                });
+            });
+            $('.form-delete').on('submit', function (e) {
+                var form = $(this);
+                e.preventDefault(); // 1. หยุดการ Submit ปกติ
+
+                // 2. แสดง SweetAlert ยืนยัน
+                Swal.fire({
+                    title: 'คุณแน่ใจหรือไม่?',
+                    text: "คุณต้องการลบข้อมูลนี้ใช่ไหม (จะไม่สามารถกู้คืนได้)",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'ใช่, ลบเลย!',
+                    cancelButtonText: 'ยกเลิก'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // 3. ถ้ายืนยัน, ค่อย Submit ฟอร์ม
+                        form.get(0).submit();
+                    }
+                });
+            });
+            var msgTitle = '@TempData["MessageTitle"]';
+            if (msgTitle) {
+                Swal.fire({
+                    title: msgTitle,
+                    text: '@Html.Raw(TempData["MessageText"])',
+                    icon: '@TempData["MessageIcon"]'
+                });
+            }
+        });
+    </script>
+}

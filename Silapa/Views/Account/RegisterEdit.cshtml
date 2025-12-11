@@ -1,4 +1,4 @@
-@model RegisterViewModel
+@model RegisterEditViewModel
 @{
     ViewData["Title"] = "แก้ไขข้อมูลผู้ใช้งานระบบ";
 }
@@ -91,6 +91,26 @@
                                             <span asp-validation-for="ConfirmNewPassword" class="text-danger"></span>
                                         </div>
                                     </div>
+                                    <div class="form-group row" id="competitionDropdown" 
+     style="@(Model.a_id == "Manager" ? "display:flex;" : "display:none;")">
+     
+    <label asp-for="m_id" class="col-sm-2 col-form-label"></label>
+    <div class="col-sm-10 select2-purple">
+        @if (User.IsInRole("Admin"))
+        {
+            @Html.ListBoxFor(m => m.m_id, ViewBag.CompetitionList as SelectList, 
+    new { @class = "select2", style="width: 100%;" })
+        }
+        else
+        {
+           
+            @Html.ListBoxFor(m => m.m_id, ViewBag.CompetitionList as SelectList, 
+    new { @class = "select2", style="width: 100%;", @disabled="disabled" })
+        }
+        
+        <span asp-validation-for="m_id" class="text-danger"></span>
+    </div>
+</div>
                                 </div>
                             </div>
                     </section>

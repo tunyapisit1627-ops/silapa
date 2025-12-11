@@ -10,6 +10,7 @@ namespace Silapa.Models
         public int c_id { get; set; }
         public int SettingID { get; set; }
         public string name { get; set; }
+        [Column(TypeName = "TEXT")]
         public string duty { get; set; }
         public int total { get; set; }
         public string type { get; set; }

@@ -1,5 +1,5 @@
 ﻿@{
-  ViewData["Title"] = "งานศิลปหัตถกรรมนักเรียนครั้งที่ 72 ปีการศึกษา 2567 จังหวัดนครราชสีมา";
+  ViewData["Title"] = "งานศิลปหัตถกรรมนักเรียนครั้งที่ 73 ปีการศึกษา 2568 จังหวัดนครราชสีมา";
   IList<news> news = ViewBag.news;
   IList<Competitionlist> competitionData = ViewBag.competitionData;
   IList<category> datacategory = ViewBag.datacategory;
@@ -9,521 +9,198 @@
   System.Globalization.CultureInfo thaiCulture = new System.Globalization.CultureInfo("th-TH");
   string[] pastelColors = { "card-pastel-pink", "card-pastel-blue", "card-pastel-green", "card-pastel-yellow" };
 }
-<div class="row">
-  <div class="col-lg-3 col-6">
-    <!-- small card -->
-    <div class="small-box bg-info">
-      <div class="inner">
-        <h3>@ViewBag.datalist</h3>
-
-        <p>จำนวนรายการ</p>
-      </div>
-      <div class="icon">
-        <i class="fas fa-shopping-cart"></i>
-      </div>
-      <a asp-controller="Home" asp-action="frmshowlist" class="small-box-footer">
-        More info <i class="fas fa-arrow-circle-right"></i>
-      </a>
-    </div>
-  </div>
-  <!-- ./col -->
-  <div class="col-lg-3 col-6">
-    <!-- small card -->
-    <div class="small-box bg-success">
-      <div class="inner">
-        <h3>@ViewBag.datacounts<sup style="font-size: 20px"></sup></h3>
-
-        <p>จำนวนนักเรียน</p>
-      </div>
-      <div class="icon">
-        <i class="ion ion-stats-bars"></i>
-      </div>
-      <a asp-controller="Home" asp-action="frmshowlist" class="small-box-footer">
-        More info <i class="fas fa-arrow-circle-right"></i>
-      </a>
-    </div>
-  </div>
-  <!-- ./col -->
-  <div class="col-lg-3 col-6">
-    <!-- small card -->
-    <div class="small-box bg-warning">
-      <div class="inner">
-        <h3>@ViewBag.datacountt</h3>
-
-        <p>จำนวนครู</p>
-      </div>
-      <div class="icon">
-        <i class="fas fa-user-plus"></i>
-      </div>
-      <a asp-controller="Home" asp-action="frmshowlist" class="small-box-footer">
-        More info <i class="fas fa-arrow-circle-right"></i>
-      </a>
-    </div>
-  </div>
-  <!-- ./col -->
-  <div class="col-lg-3 col-6">
-    <!-- small card -->
-    <div class="small-box bg-danger">
-      <div class="inner">
-        <h3>@ViewBag.refess</h3>
-
-        <p>คณะกรรมการ</p>
-      </div>
-      <div class="icon">
-        <i class="fas fa-chart-pie"></i>
-      </div>
-      <a href="javascript:void(0)" class="small-box-footer" data-toggle="modal" data-target="#modal-xl" id="openModal">
-        รายละเอียด <i class="fas fa-arrow-circle-right"></i>
-      </a>
-    </div>
-  </div>
-  <!-- ./col -->
-</div>
-<div class="row">
-  <div class="col-md-3 col-sm-6 col-12">
-    <div class="info-box">
-      <span class="info-box-icon bg-info"><i class="far fa-copy"></i></span>
-      <div class="info-box-content">
-        <a asp-action="frmcriterion" asp-controller="Home">
-          <span class="info-box-text">เกณฑ์การแข่งขัน</span></a>
-          <a asp-action="frmfilelistAll" asp-controller="Home">
-          <span class="info-box-number">คำสั่งและเอกสาร</span>
-        </a>
-      </div>
-      <!-- /.info-box-content -->
-    </div>
-  </div>
-  <div class="col-md-3 col-sm-6 col-12">
-    <div class="info-box">
-      <span class="info-box-icon bg-warning"><i class="far fa-copy"></i></span>
-      <div class="info-box-content">
-        <!-- <a asp-action="frmregisterdirector" asp-controller="Home">
-                <span class="info-box-text">สมัครกรรมการ</span></a>-->
-        <a asp-action="frmrefereeAll" asp-controller="Home">
-          <span class="info-box-text">รายชื่อกรรมการ</span>
-        </a>
-
-        <a asp-action="frmregisterdirectorAll" asp-controller="Home">
-          <span class="info-box-number">ยอดสมัคร : @ViewBag.registerdirector คน</span>
-        </a>
-      </div>
-      <!-- /.info-box-content -->
-    </div>
-  </div>
-  <div class="col-md-3 col-sm-6 col-12">
-    <div class="info-box">
-      <span class="info-box-icon bg-danger"><i class="far fa-copy"></i></span>
-      <div class="info-box-content">
-        <!-- <a asp-action="frmregisterdirector" asp-controller="Home">
-                <span class="info-box-text">สมัครกรรมการ</span></a>-->
-        <a asp-action="frmschoolAll" asp-controller="Home">
-          <span class="info-box-text">รายชื่อโรงเรียน</span>
-          <span class="info-box-number">จำนวน : @ViewBag.School </span>
-        </a>
-      </div>
-      <!-- /.info-box-content -->
-    </div>
-  </div>
- 
-   <div class="col-md-3 col-sm-6 col-12">
-    <div class="info-box">
-      <span class="info-box-icon bg-success"><i class="far fa-flag"></i></span>
-      <div class="info-box-content">
-        <!--
-        <a asp-action="frmregisterdirector" asp-controller="Home">
-                <span class="info-box-text">สมัครกรรมการ</span></a>
-                -->
-       
-          <span class="info-box-text"> <a asp-action="frmrsummarizeesults" asp-controller="Home">สรุปเหรียญ</a><a id="showResultsLink" href="javascript:void(0);"> ยังไม่ประกาศผล</a></span></a>
-         
-           <a asp-action="frmresults" asp-controller="Home">
-          <span class="info-box-number">ประกาศผล : @ViewBag.countresults รายการ </span>
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
-<button type="button" class="btn btn-info btn-lg btn-block" onclick="goToFrmExamine()">ค้นหา/ดาวน์โหลดเกียรติบัตร</button>
+<br/>
+<button type="button" class="btn btn-info btn-lg btn-block"
+  onclick="goToFrmExamine()">ค้นหา/ดาวน์โหลดเกียรติบัตร</button>
 <!-- xxxxx -->
 <div class="container">
-<div class="row">
-    <section class="news-section mt-5">
-        <div class="container">
-            <div class="alert alert-primary" role="alert">
- <h4 align="center">ข่าวประชาสัมพันธ์</h4> 
-</div>
-            <div class="row">
-                @foreach (var dn in news)
-                {
-                    <div class="col-md-6 col-lg-3 d-flex"> 
-                      <div class="card h-100">
-                            <img src="@dn.ImageUrl" class="card-img-top" alt="ข่าว @n">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">@dn.titlename</h5>
-                                <p class="card-text">ลงวันที่ : @dn.lastupdate</p>
-                                <a asp-action="frmnewsshow" asp-controller="Home" asp-route-id="@dn.id" class="btn btn-primary">อ่านเพิ่มเติม</a>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-            <button type="button" class="btn btn-info btn-lg btn-block" onclick="goToNewsAll()">
-    ทั้งหมด <i class="fas fa-arrow-circle-right"></i>
-</button>
-        </div>
-        <br><br>
-    </section>
-</div>
-</div>
-<div class="row">
-  <div class="col-md-9">
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">สไลด์ข่าวประชาสัมพันธ์</h3>
-      </div>
-      <!-- /.card-header -->
-      <div class="card-body">
-        <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
-          <ol class="carousel-indicators">
-            @for (int i = 0; i < news.Count; i++)
-            {
-              <li data-target="#carouselExampleIndicators" data-slide-to="@i" class="@((i == 0) ? "active" : "")"></li>
-            }
-          </ol>
-          <div class="carousel-inner">
-            @for (int i = 0; i < news.Count; i++)
-            {
-              var currentNews = news[i];
-              <div class="carousel-item @((i == 0) ? "active" : "")">
-                <a asp-action="frmnewsshow" asp-controller="Home" asp-route-id="@currentNews.id" class="btn btn-primary">
-                  <img class="d-block w-100" src="@currentNews.ImageUrl" alt="News slide @i">
-                </a>
-              </div>
-            }
-          </div>
-          <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
-            <span class="carousel-control-custom-icon" aria-hidden="true">
-              <i class="fas fa-chevron-left"></i>
-            </span>
-            <span class="sr-only">Previous</span>
-          </a>
-          <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
-            <span class="carousel-control-custom-icon" aria-hidden="true">
-              <i class="fas fa-chevron-right"></i>
-            </span>
-            <span class="sr-only">Next</span>
-          </a>
-        </div>
-      </div>
-      <!-- /.card-body -->
-    </div>
-    <!-- /.card -->
+  <div class="row">
   </div>
-  <div class="col-md-3">
-    <div class="card card-primary">
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-danger">
       <div class="card-header">
-        <h3 class="card-title">สถิติการเข้าชม</h3>
+        <h3 class="card-title">ยอดผู้เข้าแข่งขันในแต่ละศูนย์</h3>
 
         <div class="card-tools">
           <button type="button" class="btn btn-tool" data-card-widget="collapse">
             <i class="fas fa-minus"></i>
           </button>
+          <button type="button" class="btn btn-tool" data-card-widget="remove">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
-        <!-- /.card-tools -->
       </div>
-      <!-- /.card-header -->
       <div class="card-body">
-        <p>จำนวนผู้เข้าชมวันนี้: @ViewBag.DailyVisits ครั้ง</p>
-        <p>จำนวนผู้เข้าชมในสัปดาห์นี้: @ViewBag.WeeklyVisits ครั้ง</p>
-        <p>จำนวนผู้เข้าชมในเดือนนี้: @ViewBag.MonthlyVisits ครั้ง</p>
-        <p>จำนวนผู้เข้าชมในปีนี้: @ViewBag.YearlyVisits ครั้ง</p>
+        <canvas id="pieChart" style="min-height: 350px; height: 350px; max-height: 350px; max-width: 100%;"></canvas>
       </div>
       <!-- /.card-body -->
     </div>
-    <!-- /.card -->
   </div>
 </div>
-<h5 class="mt-4 mb-2">ตารางการแข่งขัน</h5>
-<div class="row">
-  <div class="col-md-12">
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">ตารางการแข่งขันงานศิลปหัตถกรรมนักเรียน</h3>
-      </div>
-      <!-- /.card-header -->
-      <div class="card-body">
-        <!-- we are adding the accordion ID so Bootstrap's collapse plugin detects it -->
-        <div id="accordion">
-          @foreach (var dr in datacategory)
-          {
-            var name = $"collapseOne{@index}";
-            var y = 1;
-            var classshow = index == 0 ? "collapse show" : "collapse";
-            var headerClass = pastelColors[index % pastelColors.Length];
-            <div class="card">
-              <div class="card-header @headerClass">
-                <h4 class="card-title w-100">
-                  <a class="d-block w-100" data-toggle="collapse" href="#@name">
-                    @dr.Name
-                  </a>
-                </h4>
-              </div>
-              <div id="@name" class="@classshow" data-parent="#accordion">
-                <div class="card-body">
-                  <table class="table table-bordered">
-                    <thead>
-                      <tr>
-                        <th style="width: 10px">#</th>
-                        <th>ชื่อรายการ</th>
-                        <th>วันที่</th>
-                        <th>โรงเรียน</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @foreach (var drr in competitionData.Where(x => x.c_id == dr.Id))
-                      {
-                        var sqldata = datarace.Where(x => x.c_id == drr.Id).FirstOrDefault();
-                        var dd = "";
-                        string[] startdate;
-                        string[] enddate;
-                        string[] ddsub;
-                        var building = "";
-                        var room = "";
-                        var name1 = "";
-                        var time = "";
-                        if (sqldata != null)
-                        {
-                          dd = sqldata.daterace ?? "";
-                          ddsub = dd.Split('-');
-                          if (ddsub.Length == 2)
-                          {
-                            startdate = ddsub[0].Split('/');
-                            enddate = ddsub[1].Split('/');
-                            if (startdate.Length == 3 && enddate.Length == 3)
-                            {
-                              DateTime startDateNow = new DateTime(Convert.ToInt16(startdate[2]), Convert.ToInt16(startdate[0]),
-                              Convert.ToInt16(startdate[1]));
-                              DateTime endDateNow = new DateTime(Convert.ToInt16(enddate[2]), Convert.ToInt16(enddate[0]),
-                              Convert.ToInt16(enddate[1]));
-                              int buddhistYearS = startDateNow.Year + 543;
-                              int buddhistYearN = endDateNow.Year + 543;
-                              dd = $"{startDateNow.ToString("dd MMMM", thaiCulture)} {buddhistYearS}-{endDateNow.ToString("ddMMMM", thaiCulture)} {buddhistYearN}";
-                                  }
-                                  }
-                                  time = sqldata.time;
-                                  building = sqldata.building ?? "";
-                                  room = sqldata.room ?? "";
-                              name1 = sqldata.Racelocation?.name ?? "";
-                            }
-                            <tr>
-                              <td>@y.</td>
-                              <td>@drr.Name</td>
-                              <td>
-                                @dd
-                              </td>
-                              <td>@name1</td>
-                            </tr>
-                            y += 1;
-                          }
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-                index++; // เพิ่มตัวนับ
-              }
-            </div>
-          </div>
-          <!-- /.card-body -->
-        </div>
-        <!-- /.card -->
-      </div>
-      <!-- /.col -->
-
-      <!-- /.col -->
-</div>
- <div class="row">
-  <div class="col-md-12">
- <div class="card card-danger">
-              <div class="card-header">
-                <h3 class="card-title">ยอดผู้เข้าแข่งขันในแต่ละศูนย์</h3>
-
-                <div class="card-tools">
-                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                    <i class="fas fa-minus"></i>
-                  </button>
-                  <button type="button" class="btn btn-tool" data-card-widget="remove">
-                    <i class="fas fa-times"></i>
-                  </button>
-                </div>
-              </div>
-              <div class="card-body">
-                <canvas id="pieChart" style="min-height: 350px; height: 350px; max-height: 350px; max-width: 100%;"></canvas>
-              </div>
-              <!-- /.card-body -->
-            </div>
-  </div>
- </div>
 <div class="modal fade" id="modal-xl" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">ข้อมูลเพิ่มเติม</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p>กำลังโหลดข้อมูล...</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalLabel">ข้อมูลเพิ่มเติม</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>กำลังโหลดข้อมูล...</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
     </div>
+  </div>
 </div>
 <!-- Modal Template -->
-<div class="modal fade" id="resultsModal" tabindex="-1" role="dialog" aria-labelledby="resultsModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="resultsModalLabel">รายการที่ยังไม่ประกาศผล</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="resultsContainer">
-                    <!-- รายการจะแสดงที่นี่ -->
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
-            </div>
+<div class="modal fade" id="resultsModal" tabindex="-1" role="dialog" aria-labelledby="resultsModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="resultsModalLabel">รายการที่ยังไม่ประกาศผล</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="resultsContainer">
+          <!-- รายการจะแสดงที่นี่ -->
         </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+      </div>
     </div>
+  </div>
 </div>
 
 <script src="~/plugins/jquery/jquery.min.js"></script>
 <script>
   $(function () {
-     
-      $.ajax({
-        url: '/api/ChartData/GetPieChartData',
-        method: 'GET',
-        success: function (response) {
-            var pieChartCanvas = $('#pieChart').get(0).getContext('2d');
 
-            // ใช้ข้อมูลจาก API ในการสร้างกราฟ
-            new Chart(pieChartCanvas, {
-                type: 'pie',
-                data: {
-                    labels: response.labels,
-                    datasets: response.datasets
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true
-                        }
-                    }
-                }
-            });
-        },
-        error: function (error) {
-            console.error('Error loading data:', error);
-        }
+    $.ajax({
+      url: '/api/ChartData/GetPieChartData',
+      method: 'GET',
+      success: function (response) {
+        var pieChartCanvas = $('#pieChart').get(0).getContext('2d');
+
+        // ใช้ข้อมูลจาก API ในการสร้างกราฟ
+        new Chart(pieChartCanvas, {
+          type: 'pie',
+          data: {
+            labels: response.labels,
+            datasets: response.datasets
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true
+              }
+            }
+          }
+        });
+      },
+      error: function (error) {
+        console.error('Error loading data:', error);
+      }
     });
   });
 </script>
 <script>
-   
+
   $(document).ready(function () {
-document.getElementById("openModal").addEventListener("click", function () {
-    // โหลดข้อมูลจากเซิร์ฟเวอร์
-    fetch('/Home/genshowlistrefect') // เรียก Action ใน Controller
+    document.getElementById("openModal").addEventListener("click", function () {
+      // โหลดข้อมูลจากเซิร์ฟเวอร์
+      fetch('/Home/genshowlistrefect') // เรียก Action ใน Controller
         .then(response => response.text()) // รับข้อมูลเป็น HTML
         .then(data => {
-            // ใส่ข้อมูลใน modal-body
-            document.querySelector("#modal-xl .modal-body").innerHTML = data;
+          // ใส่ข้อมูลใน modal-body
+          document.querySelector("#modal-xl .modal-body").innerHTML = data;
         })
         .catch(error => {
-            console.error('Error loading modal data:', error);
-            document.querySelector("#modal-xl .modal-body").innerHTML = "เกิดข้อผิดพลาดในการโหลดข้อมูล.";
+          console.error('Error loading modal data:', error);
+          document.querySelector("#modal-xl .modal-body").innerHTML = "เกิดข้อผิดพลาดในการโหลดข้อมูล.";
         });
-});
     });
-    function goToNewsAll(event) {
+  });
+  function goToNewsAll(event) {
     if (event) {
-        event.preventDefault(); // ป้องกันการรีเฟรช
+      event.preventDefault(); // ป้องกันการรีเฟรช
     }
     console.log('Navigating to News All...');
     window.location.href = '/Home/frmnewsAll'; // ตัวอย่างเปลี่ยนหน้าไปยัง URL ใหม่
-}
- document.getElementById("showResultsLink").addEventListener("click", function () {
-        fetch('/Home/GetSummaryResults')
-            .then(response => response.json())
-            .then(data => {
-                let container = document.getElementById("resultsContainer");
-                container.innerHTML = ""; // ล้างข้อมูลเก่า
+  }
+  document.getElementById("showResultsLink").addEventListener("click", function () {
+    fetch('/Home/GetSummaryResults')
+      .then(response => response.json())
+      .then(data => {
+        let container = document.getElementById("resultsContainer");
+        container.innerHTML = ""; // ล้างข้อมูลเก่า
 
-                if (data.length === 0) {
-                    container.innerHTML = "<p>ไม่มีข้อมูล</p>";
-                } else {
-                    let list = "<ul>";
-                    data.forEach(item => {
-                        list += `<li>${item.name}</li>`;
-                    });
-                    list += "</ul>";
-                    container.innerHTML = list;
-                }
+        if (data.length === 0) {
+          container.innerHTML = "<p>ไม่มีข้อมูล</p>";
+        } else {
+          let list = "<ul>";
+          data.forEach(item => {
+            list += `<li>${item.name}</li>`;
+          });
+          list += "</ul>";
+          container.innerHTML = list;
+        }
 
-                // เปิด Modal
-                let modal = new bootstrap.Modal(document.getElementById('resultsModal'));
-                modal.show();
-            })
-            .catch(error => {
-                console.error("Error:", error);
-            });
-    });
-    function goToFrmExamine() {
+        // เปิด Modal
+        let modal = new bootstrap.Modal(document.getElementById('resultsModal'));
+        modal.show();
+      })
+      .catch(error => {
+        console.error("Error:", error);
+      });
+  });
+  function goToFrmExamine() {
     var url = '@Url.Action("frmexamine", "Home")';
     window.location.href = url;
-}
-    </script>
-    <style>
-      .carousel-inner {
-    height: 400px; /* กำหนดความสูงของ Carousel */
-}
+  }
+</script>
+<style>
+  .carousel-inner {
+    height: 400px;
+    /* กำหนดความสูงของ Carousel */
+  }
 
-.carousel-img {
+  .carousel-img {
     height: 100%;
-    object-fit: cover; /* ทำให้ภาพปรับขนาดครอบคลุมคอนเทนเนอร์ */
-}
-.card-pastel-pink {
-    background-color: #FFD1DC; /* สีชมพูพาสเทล */
+    object-fit: cover;
+    /* ทำให้ภาพปรับขนาดครอบคลุมคอนเทนเนอร์ */
+  }
+
+  .card-pastel-pink {
+    background-color: #FFD1DC;
+    /* สีชมพูพาสเทล */
     border: 1px solid #FFC0CB;
-}
+  }
 
-.card-pastel-blue {
-    background-color: #CFE2F3; /* สีฟ้าพาสเทล */
+  .card-pastel-blue {
+    background-color: #CFE2F3;
+    /* สีฟ้าพาสเทล */
     border: 1px solid #B0C4DE;
-}
+  }
 
-.card-pastel-green {
-    background-color: #D5E8D4; /* สีเขียวพาสเทล */
+  .card-pastel-green {
+    background-color: #D5E8D4;
+    /* สีเขียวพาสเทล */
     border: 1px solid #A9DFBF;
-}
+  }
 
-.card-pastel-yellow {
-    background-color: #FFF9C4; /* สีเหลืองพาสเทล */
+  .card-pastel-yellow {
+    background-color: #FFF9C4;
+    /* สีเหลืองพาสเทล */
     border: 1px solid #FFEB3B;
-}
-    </style>
-
-    
-  
-
-    
-
-    
+  }
+</style>

@@ -13,6 +13,8 @@ namespace Silapa.Models
         [Required(ErrorMessage = "กรุณาเลือกสถานที่")]
         public int r_id { get; set; }
 
+        // 🚨 NEW: รหัสอ้างอิงถึงงานที่จัด (setupsystem)
+        public int SettingID { get; set; }
         [Display(Name = "อาคาร")]
         [Required(ErrorMessage = "กรุณากรอกอาคาร")]
         public string? building { get; set; }

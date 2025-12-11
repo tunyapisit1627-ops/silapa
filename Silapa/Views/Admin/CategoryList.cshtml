@@ -1,0 +1,152 @@
+@model IEnumerable<Silapa.Models.category>
+@{
+    ViewData["Title"] = "จัดการหมวดหมู่ (Category)";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">@ViewData["Title"]</h2>
+        <div class="card-tools">
+            <button type="button" class="btn btn-success btn-create"
+                data-url="@Url.Action("CreateCategoryModal", "Admin")">
+                <i class="fas fa-plus"></i> เพิ่มหมวดหมู่ใหม่
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>ชื่อ (Name)</th>
+                    <th>ชื่อเต็ม (Fullname)</th>
+                    <th style="width: 100px;">สถานะ (Status)</th>
+                    <th style="width: 150px;">จัดการ</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.fullname</td>
+                        <td class="text-center">
+                            <form asp-action="ToggleCategoryStatus" asp-route-id="@item.Id" method="post"
+                                style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                @if (item.status == "1")
+                                {
+                                    <button type="submit" class="btn btn-xs btn-success" title="คลิกเพื่อปิด">
+                                        <i class="fas fa-check-circle"></i> เปิด
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="submit" class="btn btn-xs btn-secondary" title="คลิกเพื่อเปิด">
+                                        <i class="fas fa-times-circle"></i> ปิด
+                                    </button>
+                                }
+                            </form>
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-warning btn-edit"
+                                data-url="@Url.Action("EditCategoryModal", "Admin", new { id = item.Id })">
+                                แก้ไข
+                            </button>
+                            <form asp-action="DeleteCategory" asp-route-id="@item.Id" method="post" style="display:inline;"
+                                class="form-delete ml-1">
+
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit" class="btn btn-sm btn-danger" title="ลบ">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="categoryModal" tabindex="-1" role="dialog" aria-labelledby="categoryModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" id="modalContent">
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $(function () {
+
+            // 1. (เหมือนเดิม) ดักจับปุ่ม "สร้าง" และ "แก้ไข"
+            $('.btn-create, .btn-edit').on('click', function () {
+                var url = $(this).data('url');
+
+                $('#modalContent').load(url, function () {
+                    $('#categoryModal').modal('show');
+                });
+            });
+
+            // 2. (เหมือนเดิม) ดักจับการ submit ฟอร์ม AJAX
+            // ⚡️ (สำคัญ) เปลี่ยน ID ฟอร์มเป็น #categoryForm
+            $(document).on('submit', '#categoryForm', function (e) {
+                e.preventDefault();
+                var form = $(this);
+
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'POST',
+                    data: form.serialize(), // 👈 ไม่ต้องใช้ FormData เพราะไม่มีไฟล์
+                    success: function (response) {
+                        if (response.success) {
+                            $('#categoryModal').modal('hide');
+                            location.reload(); // รีโหลดหน้า List
+                        } else {
+                            // ถ้า Validation ไม่ผ่าน, Server จะส่ง HTML กลับมา
+                            $('#modalContent').html(response);
+                        }
+                    },
+                    error: function () {
+                        alert("เกิดข้อผิดพลาดไม่สามารถบันทึกได้");
+                    }
+                });
+            });
+            $('.form-delete').on('submit', function (e) {
+                var form = $(this);
+                e.preventDefault(); // 1. หยุดการ Submit ปกติ
+
+                // 2. แสดง SweetAlert ยืนยัน
+                Swal.fire({
+                    title: 'คุณแน่ใจหรือไม่?',
+                    text: "คุณต้องการลบข้อมูลนี้ใช่ไหม (จะไม่สามารถกู้คืนได้)",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'ใช่, ลบเลย!',
+                    cancelButtonText: 'ยกเลิก'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // 3. ถ้ายืนยัน, ค่อย Submit ฟอร์ม
+                        form.get(0).submit();
+                    }
+                });
+            });
+
+            // ----------------------------------------------------
+            // ⬇️ 4. (เพิ่มใหม่) โค้ดแสดงผล TempData (จาก Controller)
+            // ----------------------------------------------------
+            var msgTitle = '@TempData["MessageTitle"]';
+            if (msgTitle) {
+                Swal.fire({
+                    title: msgTitle,
+                    text: '@Html.Raw(TempData["MessageText"])', // (เผื่อข้อความมีหลายบรรทัด)
+                    icon: '@TempData["MessageIcon"]'
+                });
+            }
+
+        });
+    </script>
+}

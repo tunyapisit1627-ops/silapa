@@ -1,0 +1,627 @@
+.news-content {
+    padding: 2rem;
+}
+
+.news-meta {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.news-date {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+.news-category {
+    background: #ecf0f1;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.news-content h3 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.news-content p {
+    color: #7f8c8d;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.news-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.news-link:hover {
+    gap: 1rem;
+    color: #764ba2;
+}
+
+.view-all-btn {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.view-all-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+}
+
+/*เกี่ยวกับตารางการแข่งขัน*/
+.containerkowaill {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    max-width: 1400px !important;
+    margin: 0 auto;
+    /* 💡 แนะนำเพิ่มเติม: เพิ่ม Padding และสีข้อความ */
+    padding: 30px; /* เพิ่มระยะห่างภายในเพื่อไม่ให้เนื้อหาชิดขอบ */
+    color: white; /* ตั้งค่าสีข้อความภายในคอนเทนเนอร์เป็นสีขาว */
+    border-radius: 10px; /* ทำให้มุมโค้งมนเล็กน้อย */
+}
+
+/* Header */
+.page-header {
+    text-align: center;
+    color: rgb(250, 248, 248);
+    margin-bottom: 3rem;
+    animation: fadeInDown 0.8s ease;
+}
+
+.page-header h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 2px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.page-header p {
+    font-size: 1.3rem;
+    opacity: 0.95;
+}
+
+/* Filter Section */
+.filter-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: fadeInUp 0.8s ease 0.2s both;
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.filter-tabs button {
+    padding: 0.8rem 2rem;
+    border: none;
+    background: #f8f9fa;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #2c3e50;
+}
+
+.filter-tabs button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.filter-tabs button.active {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.schedule-search-filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+/* 🚨 เปลี่ยน .search-group เป็น .schedule-search-group เพื่อให้ตรงกับ HTML */
+/* 1. สไตล์สำหรับ DIV แม่ (Block) */
+.schedule-search-group {
+    position: relative;
+}
+
+/* 🚨 2. สไตล์สำหรับ INPUT และ SELECT ที่อยู่ภายใน .schedule-search-group */
+/* เราใช้ Selector ที่เจาะจงว่า "input หรือ select ที่อยู่ข้างใน class นี้" */
+.schedule-search-group input[type="text"],
+/* ใช้ ID ของ select เพื่อเจาะจง (แรงกว่า Class) */
+.schedule-search-group #venueFilter { 
+    width: 100% !important; /* 💡 บังคับความกว้าง */
+    padding: 1rem 1rem 1rem 3rem !important; /* 💡 บังคับ Padding สำหรับไอคอน */
+    height: auto !important; /* 💡 ป้องกันการถูกกำหนดความสูงตายตัว */
+    border: 2px solid #ecf0f1 !important; /* 💡 บังคับขอบ */
+    border-radius: 15px !important;
+    font-size: 1rem !important;
+    font-family: 'Sarabun', sans-serif !important;
+    transition: all 0.3s ease;
+    
+    /* สไตล์ที่จำเป็นเพื่อจัดการ Select ใน AdminLTE */
+    -webkit-appearance: none !important; /* ลบสไตล์เดิมของ Chrome/Safari */
+    -moz-appearance: none !important; /* ลบสไตล์เดิมของ Firefox */
+    appearance: none !important; /* ลบสไตล์เดิมของ browser */
+    background-color: white !important; 
+    color: #333 !important; 
+    cursor: pointer;
+}
+
+/* 3. สไตล์สำหรับการ Focus */
+.schedule-search-group input[type="text"]:focus,
+.schedule-search-group #venueFilter:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+.schedule-search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+}
+
+/* Day Tabs */
+.day-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    justify-content: center;
+    animation: fadeInUp 0.8s ease 0.4s both;
+}
+
+.day-tab {
+    background: white;
+    color: rgb(5, 5, 5); 
+    padding: 2rem;
+    border-radius: 20px;
+    flex: 1;
+    max-width: 300px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    text-align: center;
+}
+
+.day-tab:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.day-tab.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.day-tab .day-number {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.day-tab .day-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+
+.day-tab .day-date {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+.day-tab .event-count {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    display: inline-block;
+}
+
+.day-tab.active .event-count {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Timeline Schedule */
+.schedule-container {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: fadeInUp 0.8s ease 0.6s both;
+}
+
+.venue-section {
+    margin-bottom: 3rem;
+}
+
+.venue-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 3px solid #667eea;
+}
+
+.venue-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.venue-info h3 {
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin-bottom: 0.3rem;
+}
+
+.venue-info p {
+    color: #7f8c8d;
+    font-size: 1rem;
+}
+
+/* Event Cards */
+.events-timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.events-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, #667eea, #764ba2);
+}
+
+.event-card {
+    position: relative;
+    margin-bottom: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.event-card:hover {
+    transform: translateX(10px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    background: white;
+    border-left-color: #667eea;
+}
+
+.event-card::before {
+    content: '';
+    position: absolute;
+    left: -2.75rem;
+    top: 2rem;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border: 4px solid #667eea;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+}
+
+.event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.event-time {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.event-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.badge {
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.badge-category {
+    background: linear-gradient(45deg, #3498db, #2980b9);
+    color: white;
+}
+
+.badge-level {
+    background: linear-gradient(45deg, #2ecc71, #27ae60);
+    color: white;
+}
+
+.badge-live {
+    background: linear-gradient(45deg, #e74c3c, #c0392b);
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.event-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.8rem;
+}
+
+.event-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #7f8c8d;
+    font-size: 0.95rem;
+}
+
+.detail-icon {
+    font-size: 1.1rem;
+}
+
+.event-schools {
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-top: 1rem;
+}
+
+.schools-title {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.schools-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.school-tag {
+    background: #ecf0f1;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    color: #2c3e50;
+}
+
+.event-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid #667eea;
+    color: #667eea;
+}
+
+.btn-outline:hover {
+    background: #667eea;
+    color: white;
+}
+
+/* Quick Stats */
+.quick-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    animation: fadeInUp 0.8s ease 0.3s both;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #2c3e50;
+    margin-bottom: 0.3rem;
+}
+
+.stat-label {
+    color: #7f8c8d;
+    font-size: 0.95rem;
+}
+
+/* Floating Action Button */
+.fab {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(45deg, #e74c3c, #c0392b);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 30px rgba(231, 76, 60, 0.6);
+}
+
+/* Animations */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+    }
+
+    .page-header p {
+        font-size: 1rem;
+    }
+
+    .day-tabs {
+        flex-direction: column;
+    }
+
+    .day-tab {
+        max-width: 100%;
+    }
+
+    .events-timeline {
+        padding-left: 1.5rem;
+    }
+
+    .event-card::before {
+        left: -2.25rem;
+    }
+
+    .event-header {
+        flex-direction: column;
+    }
+
+    .quick-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

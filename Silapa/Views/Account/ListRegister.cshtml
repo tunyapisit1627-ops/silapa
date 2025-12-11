@@ -1,15 +1,28 @@
 @model IEnumerable<RegisterViewModel>
 @{
     ViewData["Title"] = "ข้อมูลผู้ใช้งานระบบ";
-    var i=1;
-    IList<RegisterViewModel> models=ViewBag.data;
+    var i = 1;
+    IList<RegisterViewModel> models = ViewBag.data;
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
 }
 <div class="card">
- <div class="card-header">
+    <div class="card-header">
         <h2 class="card-title">ข้อมูลผู้ใช้งานระบบ</h2>
     </div>
- <div>
-    <form asp-controller="Home" asp-action="studentList">
+    <div>
+        <form asp-controller="Account" asp-action="ListRegister">
             <div class="card-body">
                 <!-- Main content -->
                 <section class="content">
@@ -18,7 +31,26 @@
                         <div class="card card-default">
                             <div class="card-header">
                                 <h3 class="card-title">เงื่อนไขการค้นหา</h3>
-
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>ค้นหาตามชื่อ, นามสกุล, หรือ Username</label>
+                                                <input type="text" name="searchString" class="form-control"
+                                                    placeholder="กรอกคำค้นหา...">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>ค้นหาตามกลุ่มผู้ใช้งาน</label>
+                                                <select name="roleName" class="form-control select2"
+                                                    asp-items="ViewBag.RolesList">
+                                                    <option value="">-- แสดงทุกกลุ่ม --</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="card-tools">
                                     <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                         <i class="fas fa-minus"></i>
@@ -30,8 +62,8 @@
                             </div>
                             <!-- /.card-header -->
 
-                               
-                            
+
+
                         </div>
                     </div>
                     <!-- /.container-fluid -->
@@ -45,10 +77,10 @@
                 <!-- /.card-footer -->
             </div>
         </form>
- </div>
-  <div class="card-body">
-     <table id="example1" class="table table-bordered table-striped">
-        <thead>
+    </div>
+    <div class="card-body">
+        <table id="example1" class="table table-bordered table-striped">
+            <thead>
                 <tr>
                     <th>
                         #
@@ -70,11 +102,12 @@
                     </th>
                     <th>กลุ่ม</th>
                     <th>
-                        <a asp-action="Register" asp-controller="Account" class="btn btn-outline-success"><i class="fa fa-plus-square"></i>Create New</a>
+                        <a asp-action="Register" asp-controller="Account" class="btn btn-outline-success"><i
+                                class="fa fa-plus-square"></i>Create New</a>
                     </th>
                 </tr>
             </thead>
-             <tbody>
+            <tbody>
                 @foreach (var item in Model)
                 {
                     <tr>
@@ -96,27 +129,46 @@
                         <td>
                             @Html.DisplayFor(modelItem => item.Email)
                         </td>
-                         <td>
+                        <td>
                             @Html.DisplayFor(modelItem => item.Roles)
                         </td>
                         <td>
                             <a asp-action="RegisterEdit" asp-route-id="@item.Id"><i class="fa fa-edit fa-lg"></i></a> |
-                            <a asp-action="Deletestudent" asp-route-id="@item.Id" class="text-danger ml-1" onclick="return confirm('Are you sure to delete this record?')"><i class="fa fa-trash fa-lg"></i></a>
+                            <form asp-action="Deletestudent" asp-route-id="@item.Id" method="post" style="display:inline;">
+
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit" class="btn btn-link text-danger ml-1 p-0"
+                                    onclick="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบผู้ใช้นี้?')">
+                                    <i class="fa fa-trash fa-lg"></i>
+                                </button>
+                            </form>
+                            @if (User.IsInRole("Admin") && item.Roles != null && !item.Roles.Contains("Admin"))
+                            {
+                                <form asp-action="ResetPassword" asp-controller="Account" asp-route-id="@item.Id" method="post"
+                                    style="display:inline;">
+                                    <button type="submit" class="btn btn-link text-warning p-0 ml-1"
+                                        onclick="return confirm('คุณต้องการรีเซ็ตรหัสผ่านของผู้ใช้ @item.UserName ใช่หรือไม่?')">
+                                        <i class="fa fa-key fa-lg"></i>
+                                    </button>
+                                </form>
+                            }
                         </td>
                     </tr>
-                    i+=1;
+                    i += 1;
                 }
             </tbody>
-     </table>
-  </div>
+        </table>
+    </div>
 </div>
 <link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
 <script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
 <script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
 <script src="~/plugins/jquery/jquery.min.js"></script>
 <script>$(function () {
+        $('.select2').select2()
         $("#example1").DataTable({
-            "responsive": true, "lengthChange": false, "autoWidth": false, "ordering": true, "pageLength": 20, "orderMulti":true,
+            "responsive": true, "lengthChange": false, "autoWidth": false, "ordering": true, "pageLength": 20, "orderMulti": true,
             "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
         }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         $('#example2').DataTable({

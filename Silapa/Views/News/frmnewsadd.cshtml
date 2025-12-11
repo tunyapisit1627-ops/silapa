@@ -8,7 +8,6 @@
         <form asp-action="frmnewsadd" asp-controller="News" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input asp-for="id" hidden>
-            <input asp-for="ImageUrl" hidden>
             <div class="card card-info">
                 <div class="card-header">
                     <h2 class="card-title">เพิ่มข้อมูลข่าวประชาสัมพันธ์</h2>
@@ -36,12 +35,69 @@
                                             <span asp-validation-for="details" class="text-danger"></span>
                                         </div>
                                     </div>
-                                    <!-- ฟิลด์อัปโหลดรูปภาพ -->
                                     <div class="form-group row">
-                                        <label for="image" class="col-sm-2 col-form-label">อัปโหลดรูปภาพ</label>
+                                        <label asp-for="Category" class="col-sm-2 col-form-label">หมวดหมู่</label>
                                         <div class="col-sm-10">
-                                            <input asp-for="ImageFile" type="file" class="form-control-file" accept="image/*" />
+                                            <select asp-for="Category" class="form-control">
+                                                <option value="ทั่วไป">ทั่วไป</option>
+                                                <option value="กิจกรรม">กิจกรรม</option>
+                                                <option value="ประกาศ">ประกาศ</option>
+                                            </select>
+                                            <span asp-validation-for="Category" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label asp-for="BadgeText"
+                                            class="col-sm-2 col-form-label">ข้อความแถบสถานะ</label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="BadgeText" class="form-control"
+                                                placeholder="เช่น 'ใหม่' หรือ 'ด่วน'" />
+                                            <span asp-validation-for="BadgeText" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label asp-for="BadgeClass" class="col-sm-2 col-form-label">สีแถบสถานะ
+                                            (CSS)</label>
+                                        <div class="col-sm-10">
+                                            <select asp-for="BadgeClass" class="form-control">
+                                                <option value="bg-danger">สีแดง (Danger)</option>
+                                                <option value="bg-success">สีเขียว (Success)</option>
+                                                <option value="bg-warning">สีเหลือง (Warning)</option>
+                                                <option value="bg-info">สีฟ้า (Info)</option>
+                                            </select>
+                                            <span asp-validation-for="BadgeClass" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label asp-for="BackgroundGradient" class="col-sm-2 col-form-label">สีพื้นหลัง
+                                            Gradient</label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="BackgroundGradient" class="form-control"
+                                                placeholder="เช่น #007bff, หรือ linear-gradient(#f00, #fff)" />
+                                            <span asp-validation-for="BackgroundGradient" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="image" class="col-sm-2 col-form-label">อัปโหลดรูปภาพหน้าปก
+                                            (Cover)</label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="ImageFile" type="file" class="form-control-file"
+                                                accept="image/*" />
                                             <span asp-validation-for="ImageFile" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="GalleryFiles" class="col-sm-2 col-form-label">รูปภาพแกลเลอรี
+                                            (หลายภาพ)</label>
+                                        <div class="col-sm-10">
+                                            <input type="file" name="GalleryFiles" multiple class="form-control-file"
+                                                accept="image/*" />
+                                            <span class="text-muted small">เลือกไฟล์ได้หลายไฟล์พร้อมกัน</span>
                                         </div>
                                     </div>
                                 </div>
@@ -64,6 +120,6 @@
 <script src="~/plugins/jquery/jquery.min.js"></script>
 <script>$(function () {
         $('.select2').select2()
-         $('#summernote').summernote()
+        $('#summernote').summernote()
     });
 </script>

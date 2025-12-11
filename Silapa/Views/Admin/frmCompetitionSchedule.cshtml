@@ -1,0 +1,112 @@
+@model List<AdminScheduleViewModel>
+@{
+    ViewData["Title"] = "ตารางสรุปสถานที่และเวลาแข่งขัน";
+    int i = 1;
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">📅 ตารางสรุปสถานที่และเวลาแข่งขัน</h1>
+                <small class="text-muted">@ViewBag.ActiveSettingName</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card card-primary card-outline">
+            <div class="card-header">
+                <h3 class="card-title">รายการแข่งขันทั้งหมด</h3>
+                <div class="card-tools">
+                    </div>
+            </div>
+            
+            <div class="card-body">
+                <table id="scheduleTable" class="table table-bordered table-striped table-hover">
+                    <thead>
+                        <tr class="text-center">
+                            <th style="width: 5%">#</th>
+                            <th style="width: 30%">รายการแข่งขัน</th>
+                            <th style="width: 15%">หมวดหมู่</th>
+                            <th style="width: 20%">วันและเวลา</th>
+                            <th style="width: 20%">สถานที่</th>
+                            <th style="width: 10%">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="text-center">@(i++)</td>
+                                <td>
+                                    <strong>@item.CompetitionName</strong>
+                                </td>
+                                <td>@item.CategoryName</td>
+                                <td>
+                                    <i class="far fa-calendar-alt text-primary"></i> @FormatThaiDateRange(item.DateRange)<br/>
+                                    <i class="far fa-clock text-success"></i> @item.Time
+                                </td>
+                                <td>
+                                    <strong>@item.LocationName</strong><br/>
+                                    <small>อาคาร: @item.Building | ห้อง: @item.Room</small>
+                                </td>
+                                <td class="text-center">
+                                    <a asp-controller="Manager" asp-action="frmracedetails" 
+                                       class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i> แก้ไข
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+@functions {
+    // ฟังก์ชันแปลงวันที่ (ใช้ตัวเดียวกับหน้า ContestSchedule)
+    private string FormatThaiDateRange(string dateRangeString)
+    {
+        if (string.IsNullOrEmpty(dateRangeString)) return "-";
+        try
+        {
+            var parts = dateRangeString.Split(new string[] { " - ", "-" }, StringSplitOptions.RemoveEmptyEntries);
+            string[] formats = { "MM/dd/yyyy","dd/MM/yyyy" }; 
+            var provider = System.Globalization.CultureInfo.InvariantCulture;
+            var thai = new System.Globalization.CultureInfo("th-TH");
+
+            if (DateTime.TryParseExact(parts[0].Trim(), formats, provider, System.Globalization.DateTimeStyles.None, out DateTime start))
+            {
+                DateTime end = start;
+                if (parts.Length > 1) DateTime.TryParseExact(parts[1].Trim(), formats, provider, System.Globalization.DateTimeStyles.None, out end);
+
+                if (start.Date == end.Date) return start.ToString("d MMMM yyyy", thai);
+                if (start.Month == end.Month && start.Year == end.Year) return $"{start.Day}-{end.Day} {end.ToString("MMMM yyyy", thai)}";
+                return $"{start.ToString("d MMM", thai)} - {end.ToString("d MMM yyyy", thai)}";
+            }
+            return dateRangeString;
+        }
+        catch { return dateRangeString; }
+    }
+}
+
+@section Scripts {
+    <script>
+        $(function () {
+            $("#scheduleTable").DataTable({
+                "responsive": true, "lengthChange": true, "autoWidth": false,
+                "pageLength": 50, // แสดงเยอะหน่อย
+                "order": [[ 2, "asc" ]], // เรียงตามหมวดหมู่ก่อน
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Thai.json" // ภาษาไทย
+                }
+            }).buttons().container().appendTo('#scheduleTable_wrapper .col-md-6:eq(0)');
+        });
+    </script>
+}

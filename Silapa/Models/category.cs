@@ -11,6 +11,6 @@ namespace Silapa.Models
         public string? status { get; set; }
 
         public ICollection<groupreferee>? groupreferee { get; set;}
-        public ICollection<Competitionlist> competitionlists{get; set;} 
+        public ICollection<Competitionlist>? competitionlists{get; set;} 
     }
 }

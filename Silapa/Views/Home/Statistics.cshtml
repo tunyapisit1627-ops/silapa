@@ -1,0 +1,258 @@
+@model StatsViewModel
+@{
+    var setupsystem = ViewBag.setupsystem;
+    ViewData["Title"] = "รายงานสถิติการแข่งขัน";
+}
+
+<div class="content-header">
+    <div class="container">
+        <div class="row mb-2">
+            <div class="col-sm-12 text-center">
+                <h1 class="m-0 font-weight-bold text-dark">📊 รายงานสถิติการแข่งขัน</h1>
+                <p class="text-muted">@setupsystem.name ครั้งที่ @setupsystem.time ปีการศึกษา @setupsystem.yaer
+                    @setupsystem.ProvinceName</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>@Model.TotalCompetitions</h3>
+                        <p>รายการแข่งขัน</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-trophy"></i></div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>@Model.TotalSchools</h3>
+                        <p>โรงเรียนเข้าร่วม</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-school"></i></div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>@Model.TotalStudents</h3>
+                        <p>นักเรียน</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-user-graduate"></i></div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>@Model.TotalTeachers</h3>
+                        <p>ครูผู้ฝึกสอน</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-5">
+                <div class="card card-outline card-primary h-100">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-chart-pie mr-1"></i> สรุปเหรียญรางวัล</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="medalChart"
+                            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-7">
+                <div class="card card-outline card-primary h-100">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-chart-bar mr-1"></i> 10 อันดับโรงเรียน (เหรียญทองสูงสุด)
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="topSchoolChart"
+                            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card card-warning card-outline shadow-sm">
+                    <div class="card-header">
+                        <h3 class="card-title text-dark">
+                            <i class="fas fa-crown text-warning mr-2"></i> 5 อันดับโรงเรียนยอดเยี่ยม
+                            (วัดจากจำนวนชนะเลิศ)
+                        </h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="text-center" style="width: 10%">อันดับ</th>
+                                        <th style="width: 45%">โรงเรียน</th>
+                                        <th class="text-center text-warning" style="width: 15%"><i
+                                                class="fas fa-trophy"></i> ชนะเลิศ</th>
+                                        <th class="text-center text-secondary" style="width: 15%">รองฯ 1</th>
+                                        <th class="text-center text-danger" style="width: 15%">รองฯ 2</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var school in Model.SchoolRankings.OrderByDescending(s =>
+                                                                        s.WinnerCount).ThenByDescending(s => s.RunnerUp1Count).Take(5))
+                                    {
+                                        <tr>
+                                            <td class="text-center">
+                                                @if (school == Model.SchoolRankings.OrderByDescending(s =>
+                                                                                            s.WinnerCount).First())
+                                                {
+                                                    <i class="fas fa-crown text-warning fa-lg"></i>
+                                                }
+                                                else
+                                                {
+                                                    <span
+                                                        class="badge badge-light border">@Model.SchoolRankings.OrderByDescending(s
+                                                                                                        => s.WinnerCount).ToList().IndexOf(school) + 1</span>
+                                                                                        }
+                                            </td>
+                                            <td class="font-weight-bold">@school.SchoolName</td>
+                                            <td class="text-center font-weight-bold"
+                                                style="background-color: #fff8e1; color: #b8860b; font-size: 1.1em;">
+                                                @school.WinnerCount
+                                            </td>
+                                            <td class="text-center text-secondary">@school.RunnerUp1Count</td>
+                                            <td class="text-center text-muted">@school.RunnerUp2Count</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4 mb-5">
+            <div class="col-12">
+                <div class="card shadow">
+                    <div class="card-header bg-dark">
+                        <h3 class="card-title mb-0"><i class="fas fa-list-ol mr-1"></i> ตารางสรุปเหรียญรางวัลตามโรงเรียน
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <table id="rankingTable" class="table table-bordered table-striped table-hover">
+                            <thead class="bg-light">
+                                <tr class="text-center">
+                                    <th style="width: 5%">อันดับ</th>
+                                    <th style="text-align: left;">โรงเรียน</th>
+                                    <th style="width: 10%" class="text-warning"><i class="fas fa-medal"></i> ทอง</th>
+                                    <th style="width: 10%" class="text-secondary"><i class="fas fa-medal"></i> เงิน</th>
+                                    <th style="width: 10%" class="text-danger"><i class="fas fa-medal"></i> ทองแดง</th>
+                                    <th style="width: 10%">รวมเหรียญ</th>
+                                    <th style="width: 10%">คะแนนรวม</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int rank = 1;
+                                }
+                                @foreach (var school in Model.SchoolRankings)
+                                {
+                                    <tr>
+                                        <td class="text-center font-weight-bold">@rank</td>
+                                        <td>@school.SchoolName</td>
+                                        <td class="text-center font-weight-bold text-warning"
+                                            style="background-color: #fff3cd;">@school.Gold</td>
+                                        <td class="text-center text-secondary">@school.Silver</td>
+                                        <td class="text-center text-danger">@school.Bronze</td>
+                                        <td class="text-center font-weight-bold">@school.TotalMedals</td>
+                                        <td class="text-center text-muted">@school.TotalScore.ToString("N2")</td>
+                                    </tr>
+                                    rank++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/plugins/chart.js/Chart.min.js"></script>
+
+    <script>
+        $(function () {
+            // 1. Init DataTables
+            $("#rankingTable").DataTable({
+                "responsive": true, "lengthChange": false, "autoWidth": false,
+                "pageLength": 20,
+                "buttons": ["copy", "csv", "excel", "pdf", "print"]
+            }).buttons().container().appendTo('#rankingTable_wrapper .col-md-6:eq(0)');
+
+            // -------------------------------------------
+            // 2. Pie Chart (Medals)
+            // -------------------------------------------
+            var donutData = {
+                labels: ['เหรียญทอง', 'เหรียญเงิน', 'เหรียญทองแดง', 'เข้าร่วม'],
+                datasets: [{
+                    data: [@Model.GoldMedals, @Model.SilverMedals, @Model.BronzeMedals, @Model.Participation],
+                    backgroundColor: ['#FFD700', '#C0C0C0', '#CD7F32', '#6c757d'],
+                }]
+            }
+            var pieChartCanvas = $('#medalChart').get(0).getContext('2d')
+            new Chart(pieChartCanvas, {
+                type: 'doughnut',
+                data: donutData,
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    legend: { position: 'right' }
+                }
+            })
+
+            // -------------------------------------------
+            // 3. Bar Chart (Top 10 Schools)
+            // -------------------------------------------
+            // ดึงข้อมูล 10 อันดับแรกจาก Model ส่งมาเป็น JSON
+            var topSchools = @Html.Raw(Json.Serialize(Model.SchoolRankings.Take(10).Select(s => s.SchoolName)));
+            var goldData = @Html.Raw(Json.Serialize(Model.SchoolRankings.Take(10).Select(s => s.Gold)));
+
+            var barChartCanvas = $('#topSchoolChart').get(0).getContext('2d')
+            new Chart(barChartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: topSchools,
+                    datasets: [{
+                        label: 'จำนวนเหรียญทอง',
+                        backgroundColor: '#FFD700',
+                        borderColor: '#DAA520',
+                        borderWidth: 1,
+                        data: goldData
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        yAxes: [{ ticks: { beginAtZero: true, stepSize: 1 } }],
+                        xAxes: [{ ticks: { autoSkip: false, maxRotation: 45, minRotation: 45 } }]
+                    },
+                    legend: { display: false },
+                    title: { display: false }
+                }
+            })
+        });
+    </script>
+}

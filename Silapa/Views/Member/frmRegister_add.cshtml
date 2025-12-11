@@ -4,509 +4,533 @@
     IList<Registerdetail> registerdetails = ViewBag.registerdetails;
     var c_name = ViewBag.c_name;
 
-
-    var s = 1;
-    var t = 1;
+    // (ค่า s และ t ถูกดึงใน <script> ด้านล่างแล้ว)
 }
 
 <body class="hold-transition sidebar-mini">
     <div class="card card-info">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        
+        <form id="registerTeamForm" method="post">
+            
+            @Html.AntiForgeryToken()
 
-        <div class="card-header">
-            <h2 class="card-title">ลงทะเบียนรายการแข่งขัน</h2>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="card-header">
+                <h2 class="card-title">ลงทะเบียนรายการแข่งขัน</h2>
+            </div>
+
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card-header">
+                                <h3 class="card-title">รายละเอียดกิจกรรม</h3>
+                                <input asp-for="id" hidden>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">ชื่อรายการ</label>
+                                    <div class="col-sm-10">
+                                        <input hidden id="c_id" value="@ViewBag.c_id">
+                                        <input hidden id="s_id" value="@ViewBag.s_id">
+                                        <input value="@c_name" id="c_name" readonly class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">ประเภท</label>
+                                    <div class="col-sm-10">
+                                        <input value="@ViewBag.type" id="type" readonly class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">จำนวนนักเรียน</label>
+                                    <div class="col-sm-10">
+                                        <input value="@ViewBag.s" id="s" readonly class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">จำนวนครู</label>
+                                    <div class="col-sm-10">
+                                        <input value="@ViewBag.t" id="t" readonly class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">นักเรียน</h3>
+                                </div>
+                                <div class="row p-2"> <div class="col-2">
+                                        <select class="form-control" id="prefixs">
+                                            <option value="" disabled selected>คำนำ</option>
+                                            <option value="เด็กชาย">เด็กชาย</option>
+                                            <option value="เด็กหญิง">เด็กหญิง</option>
+                                            <option value="นาย">นาย</option>
+                                            <option value="นางสาว">นางสาว</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="text" class="form-control" id="firstNames" placeholder="ชื่อ">
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="text" class="form-control" id="lastNames" placeholder="สกุล">
+                                    </div>
+                                    <div class="col-2">
+                                        <button type="button" class="btn btn-block bg-gradient-primary"
+                                            id="addRows">เพิ่ม</button>
+                                        <button type="button" class="btn btn-block bg-gradient-success" id="saveEdits"
+                                            style="display:none;">บันทึก</button>
+                                    </div>
+                                </div>
+                                <div class="card-body p-0">
+                                    <table id="studentTable" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>คำนำ</th>
+                                                <th>ชื่อ</th>
+                                                <th>นามสกุล</th>
+                                                <th>การจัดการ</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tableBodys">
+                                            @if (registerdetails != null)
+                                            {
+                                                foreach (var dr in registerdetails.Where(x => x.Type == "student").OrderBy(x => x.no))
+                                                {
+                                                    <tr>
+                                                        <td>@dr.no</td>
+                                                        <td>@dr.Prefix</td>
+                                                        <td>@dr.FirstName</td>
+                                                        <td>@dr.LastName</td>
+                                                        <td>
+                                                            <input type="hidden" class="imageUrl" value="@dr.ImageUrl" />
+                                                            <button type="button" class="btn btn-warning btn-sm"
+                                                                onclick="editStudentRowData(this)">แก้ไข</button>
+                                                            <button type="button" class="btn btn-danger btn-sm"
+                                                                onclick="deleteStudentRow(this)">ลบ</button>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">ครู</h3>
+                                </div>
+                                <div class="row p-2"> <div class="col-2">
+                                        <input type="text" class="form-control" id="prefix" placeholder="คำนำ">
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="text" class="form-control" id="firstName" placeholder="ชื่อ">
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="text" class="form-control" id="lastName" placeholder="สกุล">
+                                    </div>
+                                    <div class="col-2">
+                                        <button type="button" class="btn btn-block bg-gradient-primary"
+                                            id="addRow">เพิ่ม</button>
+                                        <button type="button" class="btn btn-block bg-gradient-success" id="saveEdit"
+                                            style="display:none;">บันทึก</button>
+                                    </div>
+                                </div>
+                                <div class="card-body p-0">
+                                    <table id="teacherTable" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>คำนำ</th>
+                                                <th>ชื่อ</th>
+                                                <th>นามสกุล</th>
+                                                <th>การจัดการ</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tableBody">
+                                            @if (registerdetails != null)
+                                            {
+                                                foreach (var dr in registerdetails.Where(x => x.Type == "teacher").OrderBy(x => x.no))
+                                                {
+                                                    <tr>
+                                                        <td>@dr.no</td>
+                                                        <td>@dr.Prefix</td>
+                                                        <td>@dr.FirstName</td>
+                                                        <td>@dr.LastName</td>
+                                                        <td>
+                                                            <input type="hidden" class="imageUrl" value="@dr.ImageUrl" />
+                                                            <button type="button" class="btn btn-warning btn-sm"
+                                                                onclick="editTeacherRowData(this)">แก้ไข</button>
+                                                            <button type="button" class="btn btn-danger btn-sm"
+                                                                onclick="deleteTeacherRow(this)">ลบ</button>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <button type="submit" id="save" value="Submit" class="btn btn-info">บันทึกข้อมูล</button>
+                    <button asp-action="frmList" asp-controller="Admin" class="btn btn-default float-right">Cancel</button>
+                </div>
+            </section>
+        </form> </div>
+
+    <div id="loadingModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <i class="fas fa-spinner fa-spin fa-3x mb-3"></i>
+            <p>กำลังบันทึกข้อมูล กรุณารอสักครู่...</p>
         </div>
-
-        <!-- Main content -->
-        <section class="content">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card-header">
-                            <h3 class="card-title">รายละเอียดกิจกรรม</h3>
-                            <input asp-for="id" hidden>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-2 col-form-label">ชื่อรายการ</label>
-                                <div class="col-sm-10">
-                                    <input hidden id="c_id" value="@ViewBag.c_id">
-                                    <input hidden id="s_id" asp-for="s_id">
-                                    <input value="@c_name" id="c_name" readonly class="form-control" />
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-2 col-form-label">ประเภท</label>
-                                <div class="col-sm-10">
-                                    <input value="@ViewBag.type" id="type" readonly class="form-control" />
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-2 col-form-label">จำนวนนักเรียน</label>
-                                <div class="col-sm-10">
-                                    <input value="@ViewBag.s" id="s" readonly class="form-control" />
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-2 col-form-label">จำนวนครู</label>
-                                <div class="col-sm-10">
-                                    <input value="@ViewBag.t" id="t" readonly class="form-control" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">นักเรียน</h3>
-                            </div>
-                            <div class="row">
-                                <div class="col-2">
-                                    <select class="form-control" id="prefixs">
-                                        <option value="" disabled selected>คำนำ</option>
-                                        <option value="เด็กชาย">เด็กชาย</option>
-                                        <option value="เด็กหญิง">เด็กหญิง</option>
-                                        <option value="นาย">นาย</option>
-                                        <option value="นางสาว">นางสาว</option>
-                                    </select>
-                                </div>
-                                <div class="col-4">
-                                    <input type="text" class="form-control" id="firstNames" placeholder="ชื่อ">
-                                </div>
-                                <div class="col-4">
-                                    <input type="text" class="form-control" id="lastNames" placeholder="สกุล">
-                                </div>
-                                <div class="col-2">
-                                    <button type="button" class="btn btn-block bg-gradient-primary"
-                                        id="addRows">เพิ่ม</button>
-                                    <button type="button" class="btn btn-block bg-gradient-success" id="saveEdits"
-                                        style="display:none;">บันทึก</button>
-                                </div>
-                            </div>
-                            <div class="card-body p-0">
-                                <table id="studentTable" class="table table-bordered table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>คำนำ</th>
-                                            <th>ชื่อ</th>
-                                            <th>นามสกุล</th>
-                                            <th>การจัดการ</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tableBodys">
-                                        @if (registerdetails != null)
-                                        {
-                                            foreach (var dr in registerdetails.Where(x => x.Type == "student").ToList())
-                                            {
-                                                <tr>
-                                                    <td>@dr.no</td>
-                                                    <td>@dr.Prefix</td>
-                                                    <td>@dr.FirstName</td>
-                                                    <td>@dr.LastName</td>
-                                                    <td>
-                                                        <input type="hidden" class="imageUrl" value="@dr.ImageUrl" />
-                                                        <button class="btn btn-warning btn-sm"
-                                                            onclick="editStudentRowData(this)">แก้ไข</button>
-                                                        <button class="btn btn-danger btn-sm"
-                                                            onclick="deleteStudentRow(this)">ลบ</button>
-                                                    </td>
-                                                </tr>
-                                            }
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">ครู</h3>
-                            </div>
-                            <div class="row">
-                                <div class="col-2">
-                                    <input type="text" class="form-control" id="prefix" placeholder="คำนำ">
-                                </div>
-                                <div class="col-4">
-                                    <input type="text" class="form-control" id="firstName" placeholder="ชื่อ">
-                                </div>
-                                <div class="col-4">
-                                    <input type="text" class="form-control" id="lastName" placeholder="สกุล">
-                                </div>
-                                <div class="col-2">
-                                    <button type="button" class="btn btn-block bg-gradient-primary"
-                                        id="addRow">เพิ่ม</button>
-                                    <button type="button" class="btn btn-block bg-gradient-success" id="saveEdit"
-                                        style="display:none;">บันทึก</button>
-                                </div>
-                            </div>
-                            <div class="card-body p-0">
-                                <table id="teacherTable" class="table table-bordered table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>คำนำ</th>
-                                            <th>ชื่อ</th>
-                                            <th>นามสกุล</th>
-                                            <th>การจัดการ</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tableBody">
-                                        @if (registerdetails != null)
-                                        {
-                                            foreach (var dr in registerdetails.Where(x => x.Type == "teacher").ToList())
-                                            {
-                                                <tr>
-                                                    <td>@dr.no</td>
-                                                    <td>@dr.Prefix</td>
-                                                    <td>@dr.FirstName</td>
-                                                    <td>@dr.LastName</td>
-                                                    <td>
-                                                        <input type="hidden" class="imageUrl" value="@dr.ImageUrl" />
-                                                        <button class="btn btn-warning btn-sm"
-                                                            onclick="editTeacherRowData(this)">แก้ไข</button>
-                                                        <button class="btn btn-danger btn-sm"
-                                                            onclick="deleteTeacherRow(this)">ลบ</button>
-                                                    </td>
-                                                </tr>
-                                            }
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <div class="card-footer">
-                <button type="submit" id="save" value="Submit" class="btn btn-info">บันทึกข้อมูล</button>
-                <button asp-action="frmList" asp-controller="Admin" class="btn btn-default float-right">Cancel</button>
-            </div>
-        </section>
-
     </div>
+    <style>
+        #loadingModal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        #loadingModal .modal-content {
+            background-color: #fff; padding: 20px 40px; border-radius: 5px;
+            text-align: center;
+        }
+    </style>
 </body>
-<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
-<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
-<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
-<script src="~/plugins/jquery/jquery.min.js"></script>
-<script>$(function () {
-        $('.select2').select2()
-    });
-</script>
-<script>
-    var editStudentRow = null;
-    var editTeacherRow = null;
-    var maxStudents = parseInt(document.getElementById("s").value);
-    var maxTeachers = parseInt(document.getElementById("t").value);
-    var c_id = document.getElementById("c_id").value;
-    var s_id = document.getElementById("s_id").value;
-    var id = document.getElementById("id").value;
-
-    // ฟังก์ชันเพิ่มข้อมูลนักเรียน
-    document.getElementById("addRows").addEventListener("click", function () {
-        var prefix = document.getElementById("prefixs").value;
-        var firstName = document.getElementById("firstNames").value;
-        var lastName = document.getElementById("lastNames").value;
-        var imageUrl = "";  // ใส่ค่าหรือรับค่าจากฟอร์มเพิ่มเติมถ้ามี
 
 
-        if (prefix && firstName && lastName) {
-            var table = document.getElementById("tableBodys");
-            var rowCount = table.rows.length;
-            if (rowCount >= maxStudents) {
-                alert("จำนวนนักเรียนเกินกว่าที่กำหนด");
-                return;
-            }
-            var row = table.insertRow(rowCount);
+@section Scripts {
+    
+    <script>
+        $(function () {
+            // (เราไม่มี .select2 ในหน้านี้ แต่เผื่อไว้)
+            $('.select2').select2()
+        });
+    </script>
 
-            row.insertCell(0).innerHTML = rowCount + 1;
-            row.insertCell(1).innerHTML = prefix;
-            row.insertCell(2).innerHTML = firstName;
-            row.insertCell(3).innerHTML = lastName;
-            row.insertCell(4).innerHTML = '<button class="btn btn-warning btn-sm" onclick="editStudentRowData(this)">แก้ไข</button> ' +
-                '<button class="btn btn-danger btn-sm" onclick="deleteStudentRow(this)">ลบ</button>';
+    <script>
+        // --- (Global Variables) ---
+        var editStudentRow = null;
+        var editTeacherRow = null;
+        var maxStudents = parseInt(document.getElementById("s").value);
+        var maxTeachers = parseInt(document.getElementById("t").value);
+        var c_id = document.getElementById("c_id").value;
+        var s_id = document.getElementById("s_id").value;
+        var id = document.getElementById("id").value; // (RegisterHead.Id ถ้าเป็นการแก้ไข)
 
-            // ซ่อน imageUrl ไว้ในเซลล์
-            var hiddenCell = row.insertCell(4);
-            hiddenCell.innerHTML = `<input type="hidden" class="imageUrl" value="${imageUrl}" />`;
-            hiddenCell.style.display = "none";
-
-            clearInputs('student');
-        } else {
-            alert("กรุณากรอกข้อมูลให้ครบทุกช่อง");
-        }
-    });
-
-    // ฟังก์ชันเพิ่มข้อมูลครู
-    document.getElementById("addRow").addEventListener("click", function () {
-        var prefix = document.getElementById("prefix").value;
-        var firstName = document.getElementById("firstName").value;
-        var lastName = document.getElementById("lastName").value;
-        var imageUrl = "";  // ค่า imageUrl ถ้าไม่มีข้อมูล
-
-
-        if (prefix && firstName && lastName) {
-            var table = document.getElementById("tableBody");
-            var rowCount = table.rows.length;
-            var row = table.insertRow(rowCount);
-            if (rowCount >= maxTeachers) {
-                alert("จำนวนครูเกินกว่าที่กำหนด");
-                return;
-            }
-            row.insertCell(0).innerHTML = rowCount + 1;
-            row.insertCell(1).innerHTML = prefix;
-            row.insertCell(2).innerHTML = firstName;
-            row.insertCell(3).innerHTML = lastName;
-            row.insertCell(4).innerHTML = '<button class="btn btn-warning btn-sm" onclick="editTeacherRowData(this)">แก้ไข</button> ' +
-                '<button class="btn btn-danger btn-sm" onclick="deleteTeacherRow(this)">ลบ</button>';
-
-            // ซ่อน imageUrl ไว้ในเซลล์สุดท้าย
-            var hiddenCell = row.insertCell(4);
-            hiddenCell.innerHTML = `<input type="hidden" class="imageUrl" value="${imageUrl}" />`;
-            hiddenCell.style.display = "none";
-
-            clearInputs('teacher');
-        } else {
-            alert("กรุณากรอกข้อมูลให้ครบทุกช่อง");
-        }
-    });
-
-    // ฟังก์ชันลบแถวนักเรียน
-    function deleteStudentRow(button) {
-        var row = button.parentNode.parentNode;
-        row.parentNode.removeChild(row);
-        updateRowNumbers('student');
-    }
-
-    // ฟังก์ชันลบแถวครู
-    function deleteTeacherRow(button) {
-        var row = button.parentNode.parentNode;
-        row.parentNode.removeChild(row);
-        updateRowNumbers('teacher');
-    }
-
-    // ฟังก์ชันแก้ไขแถวนักเรียน
-    function editStudentRowData(button) {
-        editStudentRow = button.parentNode.parentNode;
-        var cells = editStudentRow.getElementsByTagName("td");
-
-        document.getElementById("prefixs").value = cells[1].innerText;
-        document.getElementById("firstNames").value = cells[2].innerText;
-        document.getElementById("lastNames").value = cells[3].innerText;
-
-        // ซ่อนปุ่ม "เพิ่ม" และแสดงปุ่ม "บันทึก"
-        document.getElementById("addRows").style.display = "none";
-        document.getElementById("saveEdits").style.display = "block";
-    }
-
-    // ฟังก์ชันแก้ไขแถวครู
-    function editTeacherRowData(button) {
-        editTeacherRow = button.parentNode.parentNode;
-        var cells = editTeacherRow.getElementsByTagName("td");
-
-        document.getElementById("prefix").value = cells[1].innerHTML;
-        document.getElementById("firstName").value = cells[2].innerHTML;
-        document.getElementById("lastName").value = cells[3].innerHTML;
-        var imageUrl = cells[4].getElementsByTagName("input")[0].value;
-
-        document.getElementById("addRow").style.display = "none";
-        document.getElementById("saveEdit").style.display = "block";
-    }
-
-    // บันทึกการแก้ไขนักเรียน
-    document.getElementById("saveEdits").addEventListener("click", function () {
-        if (editStudentRow) {
+        // ---------------------------------
+        // นักเรียน (Student) Functions
+        // ---------------------------------
+        document.getElementById("addRows").addEventListener("click", function () {
             var prefix = document.getElementById("prefixs").value;
             var firstName = document.getElementById("firstNames").value;
             var lastName = document.getElementById("lastNames").value;
+            var imageUrl = ""; // (ค่าเริ่มต้นสำหรับแถวใหม่)
 
-            if (prefix && firstName && lastName) {
+            if (!prefix || !firstName || !lastName) {
+                Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอก คำนำ, ชื่อ และ สกุล ของนักเรียน', 'warning');
+                return;
+            }
+
+            var table = document.getElementById("tableBodys");
+            var rowCount = table.rows.length;
+            if (rowCount >= maxStudents) {
+                Swal.fire('เต็มแล้ว', 'จำนวนนักเรียนเกินกว่าที่กำหนด (' + maxStudents + ' คน)', 'error');
+                return;
+            }
+
+            var row = table.insertRow(rowCount);
+            row.insertCell(0).innerHTML = rowCount + 1;
+            row.insertCell(1).innerHTML = prefix;
+            row.insertCell(2).innerHTML = firstName;
+            row.insertCell(3).innerHTML = lastName;
+            
+            // ⚡️ (แก้ไข Bug) รวมปุ่มและ hidden input ไว้ใน Cell เดียว (Cell 4)
+            row.insertCell(4).innerHTML = 
+                '<input type="hidden" class="imageUrl" value="' + imageUrl + '" />' +
+                '<button type="button" class="btn btn-warning btn-sm" onclick="editStudentRowData(this)">แก้ไข</button> ' +
+                '<button type="button" class="btn btn-danger btn-sm" onclick="deleteStudentRow(this)">ลบ</button>';
+
+            clearInputs('student');
+        });
+
+        function editStudentRowData(button) {
+            editStudentRow = button.closest("tr"); 
+            var cells = editStudentRow.getElementsByTagName("td");
+            var imageUrl = cells[4].getElementsByTagName("input")[0].value; 
+
+            document.getElementById("prefixs").value = cells[1].innerText;
+            document.getElementById("firstNames").value = cells[2].innerText;
+            document.getElementById("lastNames").value = cells[3].innerText;
+            editStudentRow.dataset.editingImageUrl = imageUrl; 
+
+            document.getElementById("addRows").style.display = "none";
+            document.getElementById("saveEdits").style.display = "block";
+        }
+
+        document.getElementById("saveEdits").addEventListener("click", function () {
+            if (editStudentRow) {
+                var prefix = document.getElementById("prefixs").value;
+                var firstName = document.getElementById("firstNames").value;
+                var lastName = document.getElementById("lastNames").value;
+                var imageUrl = editStudentRow.dataset.editingImageUrl; 
+
+                if (!prefix || !firstName || !lastName) {
+                    Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอกข้อมูลให้ครบทุกช่อง', 'warning');
+                    return;
+                }
+
                 var cells = editStudentRow.getElementsByTagName("td");
                 cells[1].innerText = prefix;
                 cells[2].innerText = firstName;
                 cells[3].innerText = lastName;
-
+                cells[4].getElementsByTagName("input")[0].value = imageUrl; // ⚡️ (แก้ไข Bug) บันทึก imageUrl กลับ
+                
                 clearInputs('student');
-
-                // สลับปุ่มกลับไปที่ "เพิ่ม"
                 document.getElementById("addRows").style.display = "block";
                 document.getElementById("saveEdits").style.display = "none";
-            } else {
-                alert("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+                editStudentRow = null;
             }
-        }
-    });
+        });
 
-    // บันทึกการแก้ไขครู
-    document.getElementById("saveEdit").addEventListener("click", function () {
-        if (editTeacherRow) {
+        function deleteStudentRow(button) {
+            var row = button.closest("tr");
+            row.parentNode.removeChild(row);
+            updateRowNumbers('student');
+        }
+
+        // ---------------------------------
+        // ครู (Teacher) Functions
+        // ---------------------------------
+        document.getElementById("addRow").addEventListener("click", function () {
             var prefix = document.getElementById("prefix").value;
             var firstName = document.getElementById("firstName").value;
             var lastName = document.getElementById("lastName").value;
+            var imageUrl = ""; 
 
-            if (prefix && firstName && lastName) {
+            if (!prefix || !firstName || !lastName) {
+                Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอก คำนำ, ชื่อ และ สกุล ของครู', 'warning');
+                return;
+            }
+
+            var table = document.getElementById("tableBody");
+            var rowCount = table.rows.length;
+            if (rowCount >= maxTeachers) {
+                Swal.fire('เต็มแล้ว', 'จำนวนครูเกินกว่าที่กำหนด (' + maxTeachers + ' คน)', 'error');
+                return;
+            }
+            
+            var row = table.insertRow(rowCount);
+            row.insertCell(0).innerHTML = rowCount + 1;
+            row.insertCell(1).innerHTML = prefix;
+            row.insertCell(2).innerHTML = firstName;
+            row.insertCell(3).innerHTML = lastName;
+            
+            // ⚡️ (แก้ไข Bug) รวมปุ่มและ hidden input ไว้ใน Cell เดียว (Cell 4)
+            row.insertCell(4).innerHTML = 
+                '<input type="hidden" class="imageUrl" value="' + imageUrl + '" />' +
+                '<button type="button" class="btn btn-warning btn-sm" onclick="editTeacherRowData(this)">แก้ไข</button> ' +
+                '<button type="button" class="btn btn-danger btn-sm" onclick="deleteTeacherRow(this)">ลบ</button>';
+
+            clearInputs('teacher');
+        });
+
+        function editTeacherRowData(button) {
+            editTeacherRow = button.closest("tr");
+            var cells = editTeacherRow.getElementsByTagName("td");
+            var imageUrl = cells[4].getElementsByTagName("input")[0].value; 
+
+            document.getElementById("prefix").value = cells[1].innerHTML;
+            document.getElementById("firstName").value = cells[2].innerHTML;
+            document.getElementById("lastName").value = cells[3].innerHTML;
+            editTeacherRow.dataset.editingImageUrl = imageUrl; 
+
+            document.getElementById("addRow").style.display = "none";
+            document.getElementById("saveEdit").style.display = "block";
+        }
+
+        document.getElementById("saveEdit").addEventListener("click", function () {
+            if (editTeacherRow) {
+                var prefix = document.getElementById("prefix").value;
+                var firstName = document.getElementById("firstName").value;
+                var lastName = document.getElementById("lastName").value;
+                var imageUrl = editTeacherRow.dataset.editingImageUrl; 
+
+                if (!prefix || !firstName || !lastName) {
+                    Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอกข้อมูลให้ครบทุกช่อง', 'warning');
+                    return;
+                }
+
                 var cells = editTeacherRow.getElementsByTagName("td");
                 cells[1].innerText = prefix;
                 cells[2].innerText = firstName;
                 cells[3].innerText = lastName;
-
+                cells[4].getElementsByTagName("input")[0].value = imageUrl; // ⚡️ (แก้ไข Bug)
+                
                 clearInputs('teacher');
-
-                // สลับปุ่มกลับไปที่ "เพิ่ม"
                 document.getElementById("addRow").style.display = "block";
                 document.getElementById("saveEdit").style.display = "none";
+                editTeacherRow = null;
+            }
+        });
+
+        function deleteTeacherRow(button) {
+            var row = button.closest("tr");
+            row.parentNode.removeChild(row);
+            updateRowNumbers('teacher');
+        }
+
+        // ---------------------------------
+        // Helper Functions
+        // ---------------------------------
+        function updateRowNumbers(type) {
+            let tableBody = (type === 'student') ? document.getElementById("tableBodys") : document.getElementById("tableBody");
+            let rows = tableBody.getElementsByTagName("tr");
+            for (let i = 0; i < rows.length; i++) {
+                rows[i].getElementsByTagName("td")[0].innerHTML = i + 1;
+            }
+        }
+
+        function clearInputs(type) {
+            if (type === 'student') {
+                document.getElementById("prefixs").value = "";
+                document.getElementById("firstNames").value = "";
+                document.getElementById("lastNames").value = "";
             } else {
-                alert("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+                document.getElementById("prefix").value = "";
+                document.getElementById("firstName").value = "";
+                document.getElementById("lastName").value = "";
             }
         }
-    });
 
-    // UpdateRowNumbers for dynamic counts
-    function updateRowNumbers(type) {
-        let table = (type === 'student') ? document.getElementById("tableBodys") : document.getElementById("tableBody");
-        let rows = table.getElementsByTagName("tr");
+        // ⚡️ (แก้ไข Bug) ฟังก์ชันรวบรวมข้อมูล
+        function collectData(tableBodyId) {
+            var data = [];
+            var rows = document.getElementById(tableBodyId).getElementsByTagName("tr");
 
-        for (let i = 0; i < rows.length; i++) {
-            rows[i].getElementsByTagName("td")[0].innerHTML = i + 1;
-        }
-    }
-
-
-    // ฟังก์ชันเคลียร์ input fields
-    function clearInputs(type) {
-        if (type === 'student') {
-            document.getElementById("prefixs").value = "";
-            document.getElementById("firstNames").value = "";
-            document.getElementById("lastNames").value = "";
-        } else {
-            document.getElementById("prefix").value = "";
-            document.getElementById("firstName").value = "";
-            document.getElementById("lastName").value = "";
-        }
-    }
-    // ฟังก์ชันรวบรวมข้อมูลนักเรียนและครูพร้อม imageUrl
-    function collectData(tableBodyId) {
-        var data = [];
-        var rows = document.getElementById(tableBodyId).getElementsByTagName("tr");
-
-        for (var i = 0; i < rows.length; i++) {
-            var cells = rows[i].getElementsByTagName("td");
-            var imageUrl = cells[4].getElementsByTagName("input")[0].value;  // รับค่า imageUrl จากเซลล์ที่ซ่อนไว้
-            data.push({
-                Id: id,
-                c_id: c_id,
-                s_id: s_id,
-                Prefix: cells[1].innerText,
-                FirstName: cells[2].innerText,
-                LastName: cells[3].innerText,
-                ImageUrl: imageUrl
-            });
-        }
-        return data;
-    }
-    document.getElementById("save").addEventListener("click", function (event) {
-        event.preventDefault();  // ป้องกันการส่งฟอร์มแบบปกติ
-
-        // แสดง Modal
-        function showLoadingModal() {
-            document.getElementById("loadingModal").style.display = "flex";
-        }
-
-        // ซ่อน Modal
-        function hideLoadingModal() {
-            document.getElementById("loadingModal").style.display = "none";
-        }
-
-        // เรียกใช้งาน Modal
-        showLoadingModal();
-        // รวบรวมข้อมูลนักเรียนจากตาราง
-        var studentTable = document.getElementById("studentTable").getElementsByTagName("tbody")[0];
-        var rows = studentTable.getElementsByTagName("tr");
-        var studentData = [];
-        if (rows <= 0) {
-            alert("กรุณาใส่ข้อมูลนักเรียนก่อน");
-            hideLoadingModal(); // ซ่อน Modal หากตรวจพบข้อผิดพลาด
-            return;
-        }
-
-        // ตัวอย่างการเรียกใช้ collectData
-        var studentData = collectData("tableBodys");
-        var teacherData = collectData("tableBody");
-
-
-        // เช็คว่ามีข้อมูลหรือไม่
-        if (studentData.length === 0 || teacherData.length === 0) {
-            alert("กรุณากรอกข้อมูลทั้งนักเรียนและครู");
-            hideLoadingModal(); // ซ่อน Modal หากตรวจพบข้อผิดพลาด
-            return;  // หยุดการดำเนินการหากข้อมูลไม่ครบ
-        }
-
-        // เตรียมข้อมูล JSON ที่จะส่ง
-        var data = {
-            Students: studentData,
-            Teachers: teacherData
-        };
-
-        // ส่งข้อมูลไปที่เซิร์ฟเวอร์ในรูปแบบ JSON
-        fetch("/Member/SaveStudents", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"  // ระบุให้ใช้ JSON
-            },
-            body: JSON.stringify(data)
-        }).then(response => {
-            // Check if the response is OK (status in the range 200-299)
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+            for (var i = 0; i < rows.length; i++) {
+                var cells = rows[i].getElementsByTagName("td");
+                var hiddenInputs = cells[4].getElementsByTagName("input");
+                var imageUrlInput = Array.from(hiddenInputs).find(i => i.classList.contains('imageUrl')); // ⚡️ (แก้ไข)
+                
+                data.push({
+                    Id: id, // (ส่ง id (RegisterHead.Id) ไปด้วย)
+                    c_id: c_id,
+                    s_id: s_id,
+                    Prefix: cells[1].innerText,
+                    FirstName: cells[2].innerText,
+                    LastName: cells[3].innerText,
+                    ImageUrl: imageUrlInput ? imageUrlInput.value : "" // ⚡️ (แก้ไข)
+                });
             }
-            return response.json();
-        })
+            return data;
+        }
+
+        // ---------------------------------
+        // Save (Fetch) Function
+        // ---------------------------------
+        
+        // ⚡️ (แก้ไข) เปลี่ยนจาก "click" เป็น "submit"
+        document.getElementById("registerTeamForm").addEventListener("submit", function (event) {
+            event.preventDefault();  
+            showLoadingModal();
+
+            var studentData = collectData("tableBodys");
+            var teacherData = collectData("tableBody");
+            
+            // ⚡️ (แก้ไข) ดึง Token
+            var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            // (Validation Check)
+            if (studentData.length === 0) {
+                hideLoadingModal();
+                Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอกข้อมูลนักเรียนอย่างน้อย 1 คน', 'warning');
+                return; 
+            }
+            if (teacherData.length === 0) {
+                hideLoadingModal();
+                Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอกข้อมูลครูอย่างน้อย 1 คน', 'warning');
+                return;
+            }
+            if (studentData.length > maxStudents) {
+                hideLoadingModal();
+                Swal.fire('ข้อมูลเกิน', 'จำนวนนักเรียนเกินกว่าที่กำหนด (' + maxStudents + ' คน)', 'error');
+                return;
+            }
+            if (teacherData.length > maxTeachers) {
+                hideLoadingModal();
+                Swal.fire('ข้อมูลเกิน', 'จำนวนครูเกินกว่าที่กำหนด (' + maxTeachers + ' คน)', 'error');
+                return;
+            }
+
+            var payload = {
+                Students: studentData,
+                Teachers: teacherData
+            };
+
+            fetch("/Member/SaveStudents", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "RequestVerificationToken": token // ⬅️ (ส่ง Token)
+                },
+                body: JSON.stringify(payload)
+            }).then(response => {
+                if (!response.ok) {
+                    // (ถ้า Server ตอบ Error 400/500)
+                    return response.json().then(err => { 
+                        // (พยายามอ่าน message จาก Controller ที่เราแก้แล้ว)
+                        throw new Error(err.message || 'Network response was not ok'); 
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
-                    alert("บันทึกข้อมูลสำเร็จ!"); // Show success message
-                    setTimeout(function () {
-                        window.location.href = data.redirectUrl; // Redirect to the URL from the response
-                    }, 2000); // Wait for 2 seconds before redirecting
+                    Swal.fire(
+                        'บันทึกสำเร็จ!', 
+                        data.message || 'ข้อมูลของคุณถูกบันทึกเรียบร้อย', 
+                        'success'
+                    ).then(() => {
+                        window.location.href = data.redirectUrl; // Redirect
+                    });
                 } else {
-                    alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล: " + data.message); // Show error message
+                    Swal.fire(
+                        'บันทึกไม่สำเร็จ', 
+                        data.message, // (แสดง Error จาก Controller)
+                        'error'
+                    ); 
                 }
             })
             .catch(error => {
-                console.error('Error occurred:', error); // Log the error
-                alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล"); // Show error alert
+                console.error('Error occurred:', error);
+                Swal.fire(
+                    'เกิดข้อผิดพลาด', 
+                    error.message || 'ไม่สามารถเชื่อมต่อได้', 
+                    'error'
+                ); 
             }).finally(() => {
-                hideLoadingModal(); // ซ่อน Modal เมื่อการดำเนินการเสร็จสิ้น
+                hideLoadingModal(); 
             });
-    });
-</script>
-<div id="loadingModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <p>กำลังบันทึกข้อมูล กรุณารอสักครู่...</p>
-    </div>
-</div>
-<style>
-    .modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-    }
+        });
 
-    .modal-content {
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 5px;
-        text-align: center;
-    }
-</style>
+        // (ฟังก์ชัน Loading Modal ของคุณ)
+        function showLoadingModal() {
+            document.getElementById("loadingModal").style.display = "flex";
+        }
+        function hideLoadingModal() {
+            document.getElementById("loadingModal").style.display = "none";
+        }
+    </script>
+}

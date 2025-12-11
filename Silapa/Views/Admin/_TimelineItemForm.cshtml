@@ -1,0 +1,78 @@
+@* ที่ Views/TimelineEvents/_TimelineItemForm.cshtml *@
+@model TimelineItem
+
+<form asp-controller="Admin" asp-action="@(Model.EventID == 0 ? "CreateTimeline" : "EditTimeline")" id="timelineForm"
+    novalidate>
+    @Html.AntiForgeryToken()
+    @* ส่งค่า id ไปด้วยถ้าเป็นการแก้ไข *@
+    @if (Model.EventID != 0)
+    {
+        <input type="hidden" name="id" value="@Model.EventID" />
+    }
+    <div class="modal-header">
+        <h5 class="modal-title">@(Model.EventID == 0 ? "เพิ่ม" : "แก้ไข") กำหนดการ</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <input type="hidden" asp-for="EventID" />
+        <input type="hidden" asp-for="SetupSystemID" />
+
+        <div class="form-group">
+            <label asp-for="Title"></label>
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Description"></label>
+            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="StartDate"></label>
+                    <input asp-for="StartDate" class="form-control" type="date" />
+                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="EndDate"></label>
+                    <input asp-for="EndDate" class="form-control" type="date" />
+                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="IconNumber"></label>
+                    <input asp-for="IconNumber" type="number" class="form-control" />
+                    <span asp-validation-for="IconNumber" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="DisplayOrder"></label>
+                    <input asp-for="DisplayOrder" type="number" class="form-control" />
+                    <span asp-validation-for="DisplayOrder" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+        <button type="submit" class="btn btn-primary">บันทึกข้อมูล</button>
+    </div>
+</form>
+
+@* เพิ่ม Script สำหรับ Client-side Validation *@
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.unobtrusive.validate.min.js"></script>

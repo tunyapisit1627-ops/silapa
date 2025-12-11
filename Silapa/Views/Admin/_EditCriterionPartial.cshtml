@@ -1,0 +1,53 @@
+@model criterion
+
+<form id="editCriterionForm" 
+      asp-action="@(Model.id == 0 ? "CreateCriterionModal" : "EditCriterionModal")" 
+      method="post" 
+      enctype="multipart/form-data">
+    <div class="modal-header">
+        <h5 class="modal-title">แก้ไขเกณฑ์: @Model.name</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        
+        <input type="hidden" asp-for="id" />
+        <input type="hidden" asp-for="file" /> <input type="hidden" asp-for="g_id" />
+        <input type="hidden" asp-for="status" />
+        <input type="hidden" asp-for="SettingID" />
+
+        <div class="form-group">
+            <label asp-for="name" class="control-label"></label>
+            <input asp-for="name" class="form-control" />
+            <span asp-validation-for="name" class="text-danger"></span>
+        </div>
+        
+        <div class="form-group">
+            <label>ไฟล์ปัจจุบัน:</label>
+            <div>
+                @if (!string.IsNullOrEmpty(Model.file))
+                {
+                    <a href="~/pdf/@Model.file" target="_blank">@Model.file</a>
+                }
+                else
+                {
+                    <span class="text-muted">ยังไม่มีไฟล์</span>
+                }
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PdfFile" class="control-label"></label>
+            <input asp-for="PdfFile" type="file" class="form-control" accept=".pdf" />
+            <span asp-validation-for="PdfFile" class="text-danger"></span>
+            <small class="form-text text-muted">*หากอัปโหลดไฟล์ใหม่ ไฟล์เก่าจะถูกลบและแทนที่</small>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+        <button type="submit" class="btn btn-primary">บันทึก</button>
+    </div>
+</form>

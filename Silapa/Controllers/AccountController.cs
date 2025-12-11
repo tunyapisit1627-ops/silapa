@@ -12,20 +12,23 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 
 public class AccountController : Controller
 {
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
     public readonly ApplicationDbContext _connectDbContext;
     // private readonly ApplicationDbContext _context;
 
-    public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ApplicationDbContext connectDbContext)
+    public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ApplicationDbContext connectDbContext, RoleManager<IdentityRole> roleManager)
     {
         _signInManager = signInManager;
         _userManager = userManager;
         _connectDbContext = connectDbContext;
+        _roleManager = roleManager;
     }
 
     [HttpGet]
@@ -99,7 +102,7 @@ public class AccountController : Controller
 
             var user = new ApplicationUser { UserName = model.UserName, Email = model.Email, titlename = model.titlename, FirstName = model.FirstName, LastName = model.LastName, m_id = m_id, s_id = model.s_id };
             //var user=new IdentityUser{ UserName = model.Email, Email = model.Email};
-            
+
 
 
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -136,42 +139,46 @@ public class AccountController : Controller
         await _signInManager.SignOutAsync();
         return RedirectToAction("Index", "Home");
     }
-    public async Task<IActionResult> ListRegisterAsync()
+    public async Task<IActionResult> ListRegisterAsync(string searchString, string roleName)
     {
-        /* var data = _userManager.Users.Select(u => new RegisterViewModel
-         {
-             Id =u.Id.ToString(),
-             UserName = u.UserName,
-             titlename = u.titlename,
-             FirstName = u.FirstName,
-             LastName = u.LastName,
-             Email = u.Email,
-             Roles = _userManager.GetRolesAsync(u).Result // ดึงบทบาทของผู้ใช้แต่ละคน
-         }).ToList(); */
-        var users = _userManager.Users.ToList(); // ดึงข้อมูลผู้ใช้ทั้งหมดมาเป็นลิสต์ก่อน
+        // 1. ดึงผู้ใช้ทั้งหมดมาก่อน
+        var users = _userManager.Users.ToList();
+        var userViewModels = new List<RegisterViewModel>();
 
-        var data = new List<RegisterViewModel>();
-
-        foreach (var u in users)
+        foreach (var user in users)
         {
-            var roles = await _userManager.GetRolesAsync(u); // ใช้ await เพื่อดึงบทบาทแบบ async
-
-            var registerViewModel = new RegisterViewModel
+            var roles = await _userManager.GetRolesAsync(user);
+            userViewModels.Add(new RegisterViewModel
             {
-                Id = u.Id.ToString(),
-                UserName = u.UserName,
-                titlename = u.titlename,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                Email = u.Email,
-                Roles = roles // กำหนดบทบาทที่ดึงมาให้กับ ViewModel
-            };
-
-            data.Add(registerViewModel); // เพิ่มข้อมูลในลิสต์
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                titlename = user.titlename,
+                Roles = roles.ToList() // ส่งเป็น List
+            });
         }
 
+        // 2. กรองข้อมูลตามเงื่อนไขที่ส่งมา
+        if (!String.IsNullOrEmpty(searchString))
+        {
+            userViewModels = userViewModels.Where(u =>
+                (u.FirstName != null && u.FirstName.Contains(searchString)) ||
+                (u.UserName != null && u.UserName.Contains(searchString))
+            ).ToList();
+        }
 
-        return View(data);
+        if (!String.IsNullOrEmpty(roleName))
+        {
+           userViewModels = userViewModels.Where(u => u.Roles != null && u.Roles.Contains(roleName)).ToList();
+        }
+
+        // 3. ส่งรายชื่อกลุ่มทั้งหมดไปให้ Dropdown
+        var allRoles = _roleManager.Roles.Select(r => r.Name).ToList();
+        ViewBag.RolesList = new SelectList(allRoles);
+
+        return View(userViewModels);
         //return View(model);
     }
     public IActionResult UrlDatasource([FromBody] DataManagerRequest dm)
@@ -245,98 +252,267 @@ public class AccountController : Controller
     {
         internal string? titlename;
 
-        public string Id { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
+        public string? Id { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? Email { get; set; }
+        public string? Password { get; set; }
         public string? UserName { get; internal set; }
-        public IList<string> Roles { get; internal set; }
-        public object Tel { get; internal set; }
+        public IList<string>? Roles { get; internal set; }
+        public object? Tel { get; internal set; }
     }
     [HttpGet]
     public async Task<IActionResult> RegisterEdit(string id)
     {
         var user = _userManager.Users.FirstOrDefault(u => u.Id == id);
-        var dt = new RegisterViewModel();
+        if (user == null)
+        {
+            return NotFound();
+        }
 
+        var dt = new RegisterEditViewModel();
         dt.Id = user.Id;
         dt.FirstName = user.FirstName;
         dt.LastName = user.LastName;
-        dt.Email = user.Email;
-        dt.UserName = user.UserName;
         dt.titlename = user.titlename;
         dt.tel = user.PhoneNumber;
 
+        // ----------------------------------------------------
+        // ⬇️ (สำคัญมาก) ส่วนที่ต้องเพิ่ม 3 อย่าง
+        // ----------------------------------------------------
 
-        return View(dt); ;
+        // 1. ดึง Role ของผู้ใช้คนนี้ (ส่ง "Manager" ไปให้ a_id)
+        var roles = await _userManager.GetRolesAsync(user);
+        dt.a_id = roles.FirstOrDefault();
+
+        // 2. แปลง m_id (string "1,2,3") กลับเป็น List<string> (ส่งไปให้ Model.m_id)
+        if (!string.IsNullOrEmpty(user.m_id))
+        {
+            dt.m_id = user.m_id
+                .Split(',')                         // 1. ได้ string[] { "1", "2", "3" }
+                .Select(idStr => int.Parse(idStr))  // 2. แปลง "1" -> 1, "2" -> 2 ...
+                .ToList();                          // 3. ได้ List<int> { 1, 2, 3 }
+        }
+        else
+        {
+            dt.m_id = new List<int>(); // 4. ถ้าว่าง ก็ต้องเป็น List<int> ที่ว่าง
+        }
+
+        // 3. ส่ง List กลุ่มการแข่งขันไปให้ Dropdown (ส่งไปให้ ViewBag.CompetitionList)
+        ViewBag.CompetitionList = new SelectList(
+    _connectDbContext.category.Where(x => x.status == "1").ToList(), // 1. รายการตัวเลือก
+    "Id",        // 2. ชื่อฟิลด์ Value
+    "Name",      // 3. ชื่อฟิลด์ Text
+    dt.m_id      // 4. ⬅️⬅️ (สำคัญ) ส่ง "List ของค่าที่ถูกเลือก" เข้าไปตรงนี้
+);
+        // ----------------------------------------------------
+
+        return View(dt);
     }
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> RegisterEdit([Bind("Id,titlename,FirstName,LastName,tel,CurrentPassword,NewPassword,ConfirmNewPassword,m_id")] RegisterViewModel data)
+    public async Task<IActionResult> RegisterEdit([Bind("Id,titlename,FirstName,LastName,tel,CurrentPassword,NewPassword,ConfirmNewPassword,m_id")] RegisterEditViewModel data)
     {
+        // --- 1. ตรวจสอบ Password Validation ---
+        if (string.IsNullOrEmpty(data.CurrentPassword) &&
+            string.IsNullOrEmpty(data.NewPassword) &&
+            string.IsNullOrEmpty(data.ConfirmNewPassword))
+        {
+            ModelState.Remove("CurrentPassword");
+            ModelState.Remove("NewPassword");
+            ModelState.Remove("ConfirmNewPassword");
+            ModelState.Remove("Email");
+        }
+
+        // (เพิ่ม) ถ้าคนบันทึกไม่ใช่ Admin, ลบ m_id ออกจาก Validation
+        if (!User.IsInRole("Admin"))
+        {
+            ModelState.Remove(nameof(data.m_id));
+        }
+
+        // --- 2. ตรวจสอบ ModelState "ก่อน" ทำงาน ---
         if (!ModelState.IsValid)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (data.CurrentPassword != null && data.ConfirmNewPassword != null && data.NewPassword != null)
-            {
-                var m_id = "";
-                if (User.IsInRole("Manager"))
-                {
-                     m_id = string.Join(",",user.m_id.ToString());
-                }
+            // (แก้ไข ⬇️) เพิ่ม Argument ที่ 4 (data.m_id)
+            ViewBag.CompetitionList = new SelectList(
+                _connectDbContext.category.Where(x => x.status == "1").ToList(),
+                "Id",
+                "Name",
+                data.m_id // ⬅️ (ค่าที่ถูกเลือก)
+            );
+            return View(data);
+        }
 
-                user.titlename = data.titlename;
-                user.FirstName = data.LastName;
-                user.LastName = data.LastName;
-                user.PhoneNumber = data.tel;
-                user.m_id = m_id;
-                await _userManager.UpdateAsync(user);
-                if (user == null)
-                {
-                    return RedirectToAction("Login", "Account"); // ส่งผู้ใช้ไปหน้า Login หากไม่มีการล็อกอิน
-                }
-                // เปลี่ยนรหัสผ่าน
-                var result = await _userManager.ChangePasswordAsync(user, data.CurrentPassword, data.NewPassword);
-                // หากการเปลี่ยนรหัสผ่านล้มเหลว ให้แสดงข้อผิดพลาด
-                foreach (var error in result.Errors)
+        // --- 3. ค้นหา "ผู้ใช้ที่กำลังถูกแก้ไข" ---
+        var userToUpdate = await _userManager.FindByIdAsync(data.Id);
+        if (userToUpdate == null)
+        {
+            return NotFound();
+        }
+
+        // --- 4. จัดการการเปลี่ยนรหัสผ่าน (ถ้ามีการกรอก) ---
+        if (!string.IsNullOrEmpty(data.CurrentPassword) && !string.IsNullOrEmpty(data.NewPassword))
+        {
+            var passResult = await _userManager.ChangePasswordAsync(userToUpdate, data.CurrentPassword, data.NewPassword);
+
+            if (!passResult.Succeeded)
+            {
+                foreach (var error in passResult.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
-                if (result.Succeeded)
-                {
-                    // รหัสผ่านเปลี่ยนสำเร็จ
-                    await _signInManager.RefreshSignInAsync(user); // อัปเดตสถานะการล็อกอินของผู้ใช้
-                    return RedirectToAction("Index", "Home"); // ไปยังหน้าแสดงผลสำเร็จ
-                }
-                else
-                {
-                    return View(data);
-                }
+                // (แก้ไข ⬇️) เพิ่ม Argument ที่ 4 (data.m_id)
+                ViewBag.CompetitionList = new SelectList(
+                    _connectDbContext.category.Where(x => x.status == "1").ToList(),
+                    "Id",
+                    "Name",
+                    data.m_id // ⬅️ (ค่าที่ถูกเลือก)
+                );
+                return View(data);
             }
-            if (User.IsInRole("Member"))
-            {
-                await _connectDbContext.school.Where(x => x.Id == user.s_id).ExecuteUpdateAsync(x => x.SetProperty(
-                       i => i.titlename, data.titlename)
-                       .SetProperty(i => i.FirstName, data.FirstName)
-                       .SetProperty(i => i.LastName, data.LastName)
-                       .SetProperty(i => i.tel, data.tel)
-                   );
-            }
-            else if (User.IsInRole("Manager"))
-            {
-                string m_id = string.Join(",", data.m_id);
-                user.titlename = data.titlename;
-                user.FirstName = data.FirstName;
-                user.LastName = data.LastName;
-                user.PhoneNumber = data.tel;
-                user.m_id = m_id;
-                await _userManager.UpdateAsync(user);
-
-            }
-
         }
-        return RedirectToAction("Index", "Home");
-    }
 
+        // --- 5. อัปเดตข้อมูล Profile ---
+        userToUpdate.titlename = data.titlename;
+        userToUpdate.FirstName = data.FirstName;
+        userToUpdate.LastName = data.LastName;
+        userToUpdate.PhoneNumber = data.tel;
+
+        // --- 6. อัปเดต m_id โดยมี Admin Check ---
+        var roles = await _userManager.GetRolesAsync(userToUpdate);
+        if (roles.Contains("Manager"))
+        {
+            if (User.IsInRole("Admin"))
+            {
+                userToUpdate.m_id = (data.m_id != null && data.m_id.Any())
+                                    ? string.Join(",", data.m_id)
+                                    : string.Empty;
+            }
+            // (ถ้าไม่ใช่ Admin, ไม่ต้องทำอะไร, m_id จะคงเดิม)
+        }
+
+        // --- 7. บันทึก "userToUpdate" ---
+        var updateResult = await _userManager.UpdateAsync(userToUpdate);
+
+        if (updateResult.Succeeded)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser.Id == userToUpdate.Id)
+            {
+                await _signInManager.RefreshSignInAsync(userToUpdate);
+            }
+            return RedirectToAction("ListRegister", "Account");
+        }
+
+        // ถ้า Update ไม่สำเร็จ
+        foreach (var error in updateResult.Errors)
+        {
+            ModelState.AddModelError(string.Empty, error.Description);
+        }
+        // (แก้ไข ⬇️) เพิ่ม Argument ที่ 4 (data.m_id)
+        ViewBag.CompetitionList = new SelectList(
+            _connectDbContext.category.Where(x => x.status == "1").ToList(),
+            "Id",
+            "Name",
+            data.m_id // ⬅️ (ค่าที่ถูกเลือก)
+        );
+        return View(data);
+    }
+    [HttpPost]
+    [ValidateAntiForgeryToken] // เพื่อความปลอดภัย
+    [Authorize(Roles = "Admin")] // *** สำคัญ: จำกัดสิทธิ์ให้เฉพาะ Admin เท่านั้นที่เรียกใช้เมธอดนี้ได้ ***
+    public async Task<IActionResult> ResetPassword(string id)
+    {
+        // 1. ค้นหาผู้ใช้จาก ID ที่ส่งมา
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        // 2. ตรวจสอบอีกครั้งเพื่อความปลอดภัยว่าผู้ใช้เป้าหมายไม่ใช่ Admin
+        var isUserAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+        if (isUserAdmin)
+        {
+            // ไม่ควรเกิดขึ้นถ้า View ถูกต้อง แต่เป็นการป้องกันที่ Server-side
+            TempData["ErrorMessage"] = "ไม่สามารถรีเซ็ตรหัสผ่านของ Admin ได้";
+            return RedirectToAction("ListRegister");
+        }
+
+        // 3. กำหนดรหัสผ่านใหม่ (ควรตั้งเป็นค่าที่คาดเดายากและแจ้งให้ผู้ใช้เปลี่ยนในภายหลัง)
+        const string defaultPassword = "Kr@123"; // <--- คุณสามารถเปลี่ยนค่านี้ได้
+
+        // 4. สร้าง Token สำหรับการรีเซ็ตรหัสผ่าน
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+        // 5. ทำการรีเซ็ตรหัสผ่านด้วย Token และรหัสผ่านใหม่
+        var result = await _userManager.ResetPasswordAsync(user, token, defaultPassword);
+
+        if (result.Succeeded)
+        {
+            // ส่งข้อความแจ้งเตือนว่าสำเร็จ
+            TempData["SuccessMessage"] = $"รีเซ็ตรหัสผ่านของ {user.UserName} เป็น '{defaultPassword}' เรียบร้อยแล้ว";
+        }
+        else
+        {
+            // หากเกิดข้อผิดพลาด ให้รวบรวม Error
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            TempData["ErrorMessage"] = $"เกิดข้อผิดพลาดในการรีเซ็ตรหัสผ่าน: {errors}";
+        }
+
+        // 6. กลับไปที่หน้ารายชื่อผู้ใช้
+        return RedirectToAction("ListRegister");
+    }
+    [HttpPost] // 1. ใช้ [HttpPost] เสมอสำหรับการลบข้อมูล
+    [ValidateAntiForgeryToken] // 2. ป้องกันการโจมตีแบบ CSRF
+    [Authorize(Roles = "Admin")] // 3. จำกัดสิทธิ์เฉพาะ Admin เท่านั้น
+    public async Task<IActionResult> Deletestudent(string id)
+    {
+        if (string.IsNullOrEmpty(id))
+        {
+            return NotFound();
+        }
+
+        // 4. ค้นหาผู้ใช้ที่จะลบ
+        var userToDelete = await _userManager.FindByIdAsync(id);
+        if (userToDelete == null)
+        {
+            TempData["ErrorMessage"] = "ไม่พบผู้ใช้ที่ต้องการลบ";
+            return RedirectToAction("ListRegister");
+        }
+
+        // 5. [สำคัญ] ตรวจสอบว่า Admin ไม่ได้ลบตัวเอง
+        var currentAdminId = _userManager.GetUserId(User);
+        if (userToDelete.Id == currentAdminId)
+        {
+            TempData["ErrorMessage"] = "ไม่สามารถลบผู้ดูแลระบบ (Admin) ที่กำลังใช้งานอยู่ได้";
+            return RedirectToAction("ListRegister");
+        }
+
+        // 6. [สำคัญ] ตรวจสอบว่าไม่ได้พยายามลบ Admin คนอื่น
+        // (เหมือนกับตรรกะใน ResetPassword ของคุณ)
+        var isUserAdmin = await _userManager.IsInRoleAsync(userToDelete, "Admin");
+        if (isUserAdmin)
+        {
+            TempData["ErrorMessage"] = "ไม่สามารถลบผู้ใช้ที่เป็น Admin ได้";
+            return RedirectToAction("ListRegister");
+        }
+
+        // 7. ทำการลบผู้ใช้
+        var result = await _userManager.DeleteAsync(userToDelete);
+
+        if (result.Succeeded)
+        {
+            TempData["SuccessMessage"] = $"ลบผู้ใช้ {userToDelete.UserName} เรียบร้อยแล้ว";
+        }
+        else
+        {
+            // รวบรวมข้อผิดพลาด
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            TempData["ErrorMessage"] = $"เกิดข้อผิดพลาดในการลบผู้ใช้: {errors}";
+        }
+
+        // 8. กลับไปที่หน้ารายชื่อ
+        return RedirectToAction("ListRegister");
+    }
 }

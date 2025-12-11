@@ -31,16 +31,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // Configure Entity Framework to use MySQL
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         new MySqlServerVersion(new Version(10, 11, 10)) // Specify the MySQL version here
     ));
-builder.Services.AddDbContext<ConnectDbContext>(options =>
-options.UseMySql(
-    builder.Configuration.GetConnectionString("DefaultConnection"),
-    new MySqlServerVersion(new Version(10, 11, 10)) // Specify the MySQL version here
-));
 // If using Identity, configure Identity as well
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.SignIn.RequireConfirmedAccount = false)
@@ -53,6 +48,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/Account/Login";   // Redirect path for unauthenticated users
     options.LogoutPath = "/Account/Logout";
 });
+
+builder.Services.AddDbContextFactory<ApplicationDbContext>();
+
 
 builder.Services.AddRazorPages();
 builder.Services.AddCors(options =>
@@ -75,7 +73,15 @@ builder.Services.Configure<FormOptions>(options =>
 });
 // เพิ่มบริการ SignalR
 builder.Services.AddSignalR();
-
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    // ตั้งเวลาหมดอายุของ Session (เช่น 20 นาทีถ้าไม่ใช้งาน)
+    options.IdleTimeout = TimeSpan.FromMinutes(20);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -97,6 +103,8 @@ app.UseAuthentication(); // Ensure this is before UseAuthorization
 app.UseAuthorization();
 
 app.UseCors();
+
+app.UseSession();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
@@ -136,10 +144,34 @@ app.UseStaticFiles(new StaticFileOptions
 {
     OnPrepareResponse = ctx =>
     {
-        ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=31536000");
+        // ดึง path ของไฟล์ที่กำลังถูกเรียก
+        var path = ctx.Context.Request.Path.Value?.ToLower();
+
+        // 1. ถ้าเป็นไฟล์รูปภาพที่อัปโหลด (เช่น อยู่ในโฟลเดอร์ /images/)
+        // ให้ "ห้ามจำ Cache" (เพื่อให้เห็นรูปใหม่เสมอ)
+        if (path.StartsWith("/images"))
+        {
+            ctx.Context.Response.Headers.Append("Cache-Control", "no-cache, no-store, must-revalidate");
+            ctx.Context.Response.Headers.Append("Pragma", "no-cache");
+            ctx.Context.Response.Headers.Append("Expires", "0");
+        }
+        // 2. ถ้าเป็นไฟล์ระบบอื่นๆ (CSS, JS, Libs) 
+        // ให้ "จำ Cache นานๆ" (เพื่อความเร็ว)
+        else
+        {
+            ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=31536000");
+        }
     }
 });
 
 // กำหนดเส้นทางสำหรับ SignalR
 app.MapHub<ResultsHub>("/resultsHub");
+
+// เพิ่มโค้ดส่วนนี้เข้าไป
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    // ใช้ MigrateAsync() สำหรับเวอร์ชัน async
+    await dbContext.Database.MigrateAsync();
+}
 app.Run();

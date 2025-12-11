@@ -1,0 +1,174 @@
+@model IEnumerable<IGrouping<string, PublicCompetitionViewModel>>
+
+@{
+    var mySchoolName = ViewBag.MySchoolName as string;
+}
+
+<div class="container py-5">
+    <div class="page-header text-center mb-4">
+        <h1>สถานะการลงทะเบียน</h1>
+        <p>ตรวจสอบรายชื่อโรงเรียนที่เข้าร่วมในแต่ละรายการแข่งขัน</p>
+    </div>
+
+    <div class="search-section mb-4">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+            </div>
+            <input type="text" id="competitionSearchInput" class="form-control" placeholder="ค้นหารายการแข่งขัน หรือ ชื่อโรงเรียนที่ลงทะเบียน...">
+        </div>
+    </div>
+
+    @foreach (var categoryGroup in Model.OrderBy(g => g.Key))
+    {
+        <div class="category-section mb-4">
+            <h2 class="category-title">@categoryGroup.Key</h2>
+
+            @foreach (var competition in categoryGroup)
+            {
+                // คำนวณยอดรวมจากข้อมูลใหม่
+                var totalRegisteredSchools = competition.SchoolRegistrationDetails.Count;
+                bool isMySchoolRegistered = !string.IsNullOrEmpty(mySchoolName) && 
+                                            competition.SchoolRegistrationDetails.Any(s => s.SchoolName == mySchoolName);
+
+                <div class="card competition-status-card">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-lg-7 col-md-12">
+                                <h5 class="competition-name">@competition.CompetitionName</h5>
+                                
+                                <div class="competition-info mt-2">
+                                    <span class="badge badge-pill badge-primary">
+                                        @if (competition.CompetitionType == "เดี่ยว") {
+                                            <i class="fas fa-user"></i> <span>ประเภท: เดี่ยว</span>
+                                        } else {
+                                            <i class="fas fa-users"></i> <span>ประเภท: ทีม</span>
+                                        }
+                                    </span>
+                                    <span class="badge badge-pill badge-secondary">
+                                        <i class="fas fa-user-graduate"></i> กำหนดนักเรียน: @competition.StudentLimit คน
+                                    </span>
+                                    <span class="badge badge-pill badge-secondary">
+                                        <i class="fas fa-chalkboard-teacher"></i> กำหนดครู: @competition.TeacherLimit คน
+                                    </span>
+                                </div>
+
+                                @if (isMySchoolRegistered)
+                                {
+                                    <span class="badge badge-success mt-2"><i class="fas fa-check-circle"></i> โรงเรียนของคุณลงทะเบียนแล้ว</span>
+                                }
+                            </div>
+                            <div class="col-lg-3 col-md-6 text-lg-center mt-2 mt-lg-0">
+                                <span class="status-text">
+                                    <strong>@totalRegisteredSchools</strong> แห่งลงทะเบียนแล้ว
+                                </span>
+                            </div>
+                            <div class="col-lg-2 col-md-6 text-md-right text-lg-right mt-2 mt-lg-0">
+                                @if (totalRegisteredSchools > 0)
+                                {
+                                    <button class="btn btn-sm btn-outline-primary" type="button" data-toggle="collapse"
+                                        data-target="#schools-@competition.Id">
+                                        ดูรายละเอียด
+                                    </button>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">ยังไม่มีผู้ลงทะเบียน</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (totalRegisteredSchools > 0)
+                    {
+                        <div class="collapse" id="schools-@competition.Id">
+                            <div class="school-list">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped mb-0">
+                                        <thead class="thead-light">
+                                        <tr>
+                                            <th class="text-center" style="width: 50px;">ลำดับ</th>
+                                            <th>โรงเรียน</th>
+                                            <th class="text-center">นักเรียน (ลง/กำหนด)</th>
+                                            <th class="text-center">ครู (ลง/กำหนด)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{ int schoolOrder = 1; }
+                                        @foreach (var school in competition.SchoolRegistrationDetails)
+                                        {
+                                            <tr>
+                                                <td class="text-center">@(schoolOrder++)</td>
+                                                <td>@school.SchoolName</td>
+                                                <td class="text-center">@school.RegisteredStudentCount / @competition.StudentLimit</td>
+                                                <td class="text-center">@school.RegisteredTeacherCount / @competition.TeacherLimit</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .category-title {
+        background-color: #f8f9fa;
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin-bottom: 1rem;
+        border-left: 5px solid #007bff;
+        font-size: 1.5rem;
+    }
+    .competition-status-card { margin-bottom: 10px; }
+    .status-text { font-weight: bold; font-size: 1.1rem; }
+
+    .competition-info .badge {
+        font-size: 0.8rem;
+        padding: .4em .7em;
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+    .school-list {
+        padding: 0;
+        border-top: 1px solid #dee2e6;
+    }
+    .page-header h1 { color: #343a40; font-weight: 700; }
+    .page-header p { color: #6c757d; font-size: 1.2rem; }
+</style>
+
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            $('#competitionSearchInput').on('keyup', function () {
+                var searchText = $(this).val().toLowerCase().trim();
+
+                $('.competition-status-card').each(function () {
+                    var $card = $(this);
+                    var competitionName = $card.find('.competition-name').text().toLowerCase();
+                    // 🚨 อัปเดตให้ค้นหาในตารางของโรงเรียน
+                    var registeredSchoolsData = $card.find('.school-list table').text().toLowerCase();
+                    var searchableText = competitionName + ' ' + registeredSchoolsData;
+
+                    if (searchableText.includes(searchText)) {
+                        $card.show();
+                    } else {
+                        $card.hide();
+                    }
+                });
+
+                $('.category-section').each(function () {
+                    var $category = $(this);
+                    var visibleCards = $category.find('.competition-status-card:visible').length;
+                    $category.toggle(visibleCards > 0);
+                });
+            });
+        });
+    </script>
+}

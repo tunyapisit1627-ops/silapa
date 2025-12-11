@@ -17,8 +17,6 @@ using Syncfusion.Pdf.Barcode;
 using System.Globalization;
 using AspNetCoreGeneratedDocument;
 using Syncfusion.EJ2.Linq;
-
-
 // Example usage of BouncyCastleFactoryCreator
 
 namespace Silapa.Controllers
@@ -42,7 +40,11 @@ namespace Silapa.Controllers
         {
             using (PdfDocument document = new PdfDocument())
             {
-                var setting = await _context.setupsystem.FirstOrDefaultAsync();
+                var activeSettingIds = await _context.setupsystem
+    .Where(s => s.status == "1")
+    .Select(s => s.id)
+    .ToListAsync();
+                var setting = await _context.setupsystem.Where(x => x.status == "1").FirstOrDefaultAsync();
                 var filename = "บัตร";
                 // เพิ่มหน้ากระดาษใหม่
                 // PdfPage page = document.Pages.Add();
@@ -55,13 +57,13 @@ namespace Silapa.Controllers
                 PdfTrueTypeFont bFont8 = new PdfTrueTypeFont(fontStream, 8, PdfFontStyle.Bold);
                 PdfTrueTypeFont bFont6 = new PdfTrueTypeFont(fontStream, 6, PdfFontStyle.Bold);
                 PdfTrueTypeFont bFont7 = new PdfTrueTypeFont(fontStream, 7, PdfFontStyle.Bold);
-                var datarace = await _context.racedetails.Where(x => x.status == "1").ToListAsync();
+                var datarace = await _context.racedetails.Where(x => x.status == "1" && activeSettingIds.Contains(x.SettingID)).ToListAsync();
                 if (type == "s")
                 {
 
-                    var urlnames = setting.cardstudents ?? "";
+                    var urlnames = setting?.cardstudents ?? "";
                     var pathCards = _env.WebRootPath + "/card/" + urlnames;
-                    var urlnamet = setting.cardteacher ?? "";
+                    var urlnamet = setting?.cardteacher ?? "";
                     var pathCardt = _env.WebRootPath + "/card/" + urlnamet;
 
                     // สร้าง Graphics สำหรับการเขียนลงใน PDF
@@ -69,11 +71,12 @@ namespace Silapa.Controllers
                     FileStream docStreams = new FileStream(pathCards, FileMode.Open, FileAccess.Read);
                     FileStream docStreamt = new FileStream(pathCardt, FileMode.Open, FileAccess.Read);
 
-                    var datah = await _context.Registerhead.Where(x => x.id == id).Include(x => x.Competitionlist).ThenInclude(x => x.racedetails).ThenInclude(x => x.Racelocation).Include(x => x.School).ThenInclude(x => x.grouplist).FirstOrDefaultAsync();
+
+                    var datah = await _context.Registerhead.Where(x => x.id == id && activeSettingIds.Contains(x.SettingID)).Include(x => x.Competitionlist).ThenInclude(x => x.racedetails).ThenInclude(x => x.Racelocation).Include(x => x.School).ThenInclude(x => x.grouplist).FirstOrDefaultAsync();
                     var datad = await _context.Registerdetail.Where(x => x.h_id == id).OrderBy(x => x.Type).ToListAsync();
-                    var sqlrace = datarace.Where(x => x.c_id == datah.c_id).FirstOrDefault();
+                    var sqlrace = datarace.Where(x => x.c_id == datah?.c_id).FirstOrDefault();
                     var dd = GetCompetitionDetails(sqlrace, thaiCulture);
-                    filename += "นักเรียนและครู-" + datah.Competitionlist.Name;
+                    filename += "นักเรียนและครู-" + datah?.Competitionlist?.Name;
                     foreach (var dr in datad)
                     {
                         PdfLoadedDocument loadedDocument;
@@ -105,10 +108,10 @@ namespace Silapa.Controllers
                         PdfBitmap image1 = new PdfBitmap(imageStream);
                         // กำหนดตำแหน่งและขนาด
                         // กำหนดตำแหน่งและขนาดของรูปภาพ
-                        float x = 35;
-                        float y = 50;
-                        float width = 70;
-                        float height = 70;
+                        float x = 38;
+                        float y = 52;
+                        float width = 100;
+                        float height = 100;
                         // สีและขนาดของขอบ
                         float borderWidth = 2; // ความหนาของขอบ
                         PdfPen borderPen = new PdfPen(Syncfusion.Drawing.Color.White, borderWidth); // สีขอบ
@@ -124,9 +127,9 @@ namespace Silapa.Controllers
                         {
                             ErrorCorrectionLevel = PdfErrorCorrectionLevel.High,
                             XDimension = 0.36f,
-                            Text = "https://korat.sillapas.com/Home/frmresults" // The data to encode
+                            Text = "https://silpa.in.th/" // The data to encode
                         };
-                        barcode.Draw(graphics, new PointF(126, 220)); // Adjust position as needed
+                        barcode.Draw(graphics, new PointF(145, 188)); // Adjust position as needed
 
 
                         // วาดข้อความเพิ่มเติม
@@ -140,7 +143,7 @@ namespace Silapa.Controllers
 
                         // คำนวณตำแหน่งให้อยู่ตรงกลางหน้า
                         float centerX = (page.Size.Width - textSize.Width) / 2;
-                        float yPosition = 140; // ตำแหน่ง Y ตามที่ต้องการ
+                        float yPosition = 190; // ตำแหน่ง Y ตามที่ต้องการ
 
                         // กำหนดความกว้างของพื้นที่ข้อความที่ต้องการให้จัดกึ่งกลาง
                         float pageWidth = page.Graphics.ClientSize.Width;
@@ -160,29 +163,33 @@ namespace Silapa.Controllers
 
                         // วาดข้อความตรงกลาง
                         graphics.DrawString(fullName, bFont2, PdfBrushes.Black, rect, centerAlignment);
-                        graphics.DrawString($"{datah.School.Name} {datah.School.grouplist.Name}", bFont8, PdfBrushes.Black, rect1, centerAlignment);
+                        graphics.DrawString($"{datah?.School.Name} {datah?.School.grouplist?.Name}", bFont8, PdfBrushes.Black, rect1, centerAlignment);
+                        float horizontalMargin = 20; // ระยะห่างจากขอบ (คุณสามารถปรับเลขนี้ได้)
+                        float totalDrawWidth = pageWidth - (2 * horizontalMargin);
 
-
-                        string text1 = $"{datah.Competitionlist.Name}";
-                        float maxWidth = pageWidth - 20; // ลดขอบซ้ายและขวา
+                        string text1 = $"{datah?.Competitionlist?.Name}";
+                        float maxWidth = totalDrawWidth; // ⬅️ ให้ใช้ TotalDrawWidth ในการ Split
                         yPosition += bFont8.Height;
-                        float currentY = yPosition; // เริ่มจากตำแหน่ง Y ปัจจุบัน
+                        float currentY = yPosition;
 
                         // แบ่งข้อความถ้ากว้างเกิน
                         string[] lines1 = SplitTextToFitWidth(text1, graphics, bFont8, maxWidth);
 
                         foreach (string line in lines1)
                         {
-                            RectangleF rectLine = new RectangleF(0, currentY, pageWidth, bFont2.Height);
+                            // 🚨 FIX: เริ่มต้นที่ขอบซ้าย (horizontalMargin) และจำกัดความกว้าง
+                            RectangleF rectLine = new RectangleF(horizontalMargin, currentY, totalDrawWidth, bFont8.Height);
+
+                            // (คำสั่ง DrawString จะจัดกึ่งกลางภายใน rectLine นี้)
                             graphics.DrawString(line, bFont8, PdfBrushes.Black, rectLine, centerAlignment);
-                            currentY += lineHeight; // ขยับตำแหน่ง Y สำหรับบรรทัดถัดไป
+                            currentY += lineHeight;
                         }
 
                         // ปรับ yPosition สำหรับเนื้อหาถัดไป
                         yPosition = currentY;
                         string text = $"{dd}"; // ข้อความที่ต้องการวาด
 
-                        RectangleF rect4 = new RectangleF(10, yPosition, 120, 200);
+                        RectangleF rect4 = new RectangleF(20, yPosition, 120, 200);
                         List<string> lines = WrapText1(text, bFont6, rect4.Width, graphics);
 
                         // คำนวณความสูงของข้อความทั้งหมด
@@ -217,7 +224,7 @@ namespace Silapa.Controllers
                     // สร้าง Graphics สำหรับการเขียนลงใน PDF
                     //PdfGraphics graphics = page.Graphics;
                     FileStream docStream = new FileStream(pathCard, FileMode.Open, FileAccess.Read);
-                    var data = await _context.referee.Where(x => x.c_id == id && x.status == "1").Include(x => x.Competitionlist).ThenInclude(x => x.racedetails).ThenInclude(x => x.Racelocation).ToListAsync();
+                    var data = await _context.referee.Where(x => x.c_id == id && x.status == "1" && activeSettingIds.Contains(x.SettingID)).Include(x => x.Competitionlist).ThenInclude(x => x.racedetails).ThenInclude(x => x.Racelocation).ToListAsync();
                     if (r_id != 0)
                     {
                         data = data.Where(x => x.id == r_id).ToList();
@@ -252,10 +259,10 @@ namespace Silapa.Controllers
                             PdfBitmap image1 = new PdfBitmap(imageStream);
                             // กำหนดตำแหน่งและขนาด
                             // กำหนดตำแหน่งและขนาดของรูปภาพ
-                            float x = 35;
-                            float y = 50;
-                            float width = 70;
-                            float height = 70;
+                            float x = 38;
+                            float y = 52;
+                            float width = 100;
+                            float height = 100;
                             // สีและขนาดของขอบ
                             float borderWidth = 2; // ความหนาของขอบ
                             PdfPen borderPen = new PdfPen(Syncfusion.Drawing.Color.White, borderWidth); // สีขอบ
@@ -271,9 +278,9 @@ namespace Silapa.Controllers
                             {
                                 ErrorCorrectionLevel = PdfErrorCorrectionLevel.High,
                                 XDimension = 0.36f,
-                                Text = "https://korat.sillapas.com/" // The data to encode
+                                Text = "https://silpa.in.th/" // The data to encode
                             };
-                            barcode.Draw(graphics, new PointF(126, 220)); // Adjust position as needed
+                            barcode.Draw(graphics, new PointF(145, 188)); // Adjust position as needed
 
                         }
                         catch { }
@@ -288,7 +295,7 @@ namespace Silapa.Controllers
 
                         // คำนวณตำแหน่งให้อยู่ตรงกลางหน้า
                         float centerX = (page.Size.Width - textSize.Width) / 2;
-                        float yPosition = 140; // ตำแหน่ง Y ตามที่ต้องการ
+                        float yPosition = 190; // ตำแหน่ง Y ตามที่ต้องการ
 
                         // กำหนดความกว้างของพื้นที่ข้อความที่ต้องการให้จัดกึ่งกลาง
                         float pageWidth = page.Graphics.ClientSize.Width;
@@ -308,26 +315,32 @@ namespace Silapa.Controllers
 
                         // วาดข้อความในแนวนอน (กึ่งกลาง)
                         graphics.DrawString(fullName, bFont2, PdfBrushes.Black, rect, centerAlignment);
-                        graphics.DrawString($"{dr.position}", bFont8, PdfBrushes.Black, rect1, centerAlignment);
-                        string text1 = $"{dr.Competitionlist.Name}";
-                        float maxWidth = pageWidth - 20; // ลดขอบซ้ายและขวา
+                        graphics.DrawString($"{dr.position}", bFont6, PdfBrushes.Black, rect1, centerAlignment);
+
+                        float horizontalMargin = 20;
+                        float totalDrawWidth = pageWidth - (2 * horizontalMargin);
+                        string text1 = $"{dr.Competitionlist?.Name}";
+                        float maxWidth = totalDrawWidth; // ⬅️ ให้ใช้ TotalDrawWidth ในการ Split
                         yPosition += bFont8.Height;
-                        float currentY = yPosition; // เริ่มจากตำแหน่ง Y ปัจจุบัน
+                        float currentY = yPosition;
 
                         // แบ่งข้อความถ้ากว้างเกิน
                         string[] lines1 = SplitTextToFitWidth(text1, graphics, bFont8, maxWidth);
 
                         foreach (string line in lines1)
                         {
-                            RectangleF rectLine = new RectangleF(0, currentY, pageWidth, bFont2.Height);
+                            // 🚨 FIX: เริ่มต้นที่ขอบซ้าย (horizontalMargin) และจำกัดความกว้าง
+                            RectangleF rectLine = new RectangleF(horizontalMargin, currentY, totalDrawWidth, bFont8.Height);
+
+                            // (คำสั่ง DrawString จะจัดกึ่งกลางภายใน rectLine นี้)
                             graphics.DrawString(line, bFont8, PdfBrushes.Black, rectLine, centerAlignment);
-                            currentY += lineHeight; // ขยับตำแหน่ง Y สำหรับบรรทัดถัดไป
+                            currentY += lineHeight;
                         }
 
                         yPosition = currentY;
                         // ข้อความที่ต้องการวาด
                         string text = $"{dd}";
-                        RectangleF rect4 = new RectangleF(10, yPosition, 120, 200);
+                        RectangleF rect4 = new RectangleF(20, yPosition, 120, 200);
                         // แบ่งข้อความเป็นบรรทัดๆ โดยใช้ WrapText1
                         List<string> lines = WrapText1(text, bFont6, rect4.Width, graphics);
 
@@ -364,7 +377,7 @@ namespace Silapa.Controllers
                     // สร้าง Graphics สำหรับการเขียนลงใน PDF
                     //PdfGraphics graphics = page.Graphics;
                     FileStream docStream = new FileStream(pathCard, FileMode.Open, FileAccess.Read);
-                    var data = await _context.referee.Where(x => x.m_id == id && x.g_id == g_id && x.status == "1")
+                    var data = await _context.referee.Where(x => x.m_id == id && x.g_id == g_id && x.status == "1" && activeSettingIds.Contains(x.SettingID))
                     .Include(x => x.Groupreferee)
                     .AsNoTracking()
                     .ToListAsync();
@@ -402,10 +415,10 @@ namespace Silapa.Controllers
                             PdfBitmap image1 = new PdfBitmap(imageStream);
                             // กำหนดตำแหน่งและขนาด
                             // กำหนดตำแหน่งและขนาดของรูปภาพ
-                            float x = 35;
-                            float y = 50;
-                            float width = 70;
-                            float height = 70;
+                            float x = 38;
+                            float y = 52;
+                            float width = 100;
+                            float height = 100;
                             // สีและขนาดของขอบ
                             float borderWidth = 2; // ความหนาของขอบ
                             PdfPen borderPen = new PdfPen(Syncfusion.Drawing.Color.White, borderWidth); // สีขอบ
@@ -423,9 +436,9 @@ namespace Silapa.Controllers
                             {
                                 ErrorCorrectionLevel = PdfErrorCorrectionLevel.High,
                                 XDimension = 0.36f,
-                                Text = "https://korat.sillapas.com/" // The data to encode
+                                Text = "https://silpa.in.th/" // The data to encode
                             };
-                            barcode.Draw(graphics, new PointF(126, 220)); // Adjust position as needed
+                            barcode.Draw(graphics, new PointF(145, 188)); // Adjust position as needed
 
                         }
                         catch { }
@@ -440,7 +453,7 @@ namespace Silapa.Controllers
 
                         // คำนวณตำแหน่งให้อยู่ตรงกลางหน้า
                         float centerX = (page.Size.Width - textSize.Width) / 2;
-                        float yPosition = 140; // ตำแหน่ง Y ตามที่ต้องการ
+                        float yPosition = 200; // ตำแหน่ง Y ตามที่ต้องการ
 
                         // กำหนดความกว้างของพื้นที่ข้อความที่ต้องการให้จัดกึ่งกลาง
                         float pageWidth = page.Graphics.ClientSize.Width;
@@ -523,7 +536,7 @@ namespace Silapa.Controllers
         [HttpGet]
         public async Task<IActionResult> GenerateListPdf(int id, int type)
         {
-            System.Globalization.CultureInfo thaiCulture = new System.Globalization.CultureInfo("th-TH");
+            //System.Globalization.CultureInfo thaiCulture = new System.Globalization.CultureInfo("th-TH");
             using (PdfDocument document = new PdfDocument())
             {
                 var roleOrder = new Dictionary<string, int>
@@ -549,10 +562,15 @@ namespace Silapa.Controllers
                 PdfSolidBrush brush = new PdfSolidBrush(Color.Black);
                 // เพิ่มหน้าใหม่ในเอกสาร
                 PdfPage page = document.Pages.Add();
+                var activeSettingIds = await _context.setupsystem
+    .Where(s => s.status == "1")
+    .Select(s => s.id)
+    .ToListAsync();
                 // PdfGraphics graphics = page.Graphics;
-                var datasetting = await _context.setupsystem.Where(x => x.id == 1).FirstOrDefaultAsync();
+                var datasetting = await _context.setupsystem.Where(x => x.status == "1").FirstOrDefaultAsync();
                 var datacom = await _context.Competitionlist.Where(x => x.Id == id).Include(x => x.racedetails).FirstOrDefaultAsync();
-                var daterace = datacom.racedetails.Where(x => x.c_id == id).FirstOrDefault();
+                var daterace = datacom.racedetails.Where(x => x.c_id == id && activeSettingIds.Contains(x.SettingID)).FirstOrDefault();
+                string namejob = $"{datasetting?.name} {datasetting?.ProvinceName} ครั้งที่ {datasetting?.time} ปีการศึกษา {datasetting?.yaer}";
                 string formattedDateRange = "";
                 string time = "";
                 if (daterace != null && daterace.daterace != null)
@@ -606,7 +624,7 @@ namespace Silapa.Controllers
                 yPosition += 20;
 
                 //ดึงข้อมูลมา
-                var data = await _context.Registerhead.Where(x => x.c_id == id && x.status == "1").Include(x => x.Registerdetail).Include(x => x.School).ThenInclude(x => x.grouplist).ToListAsync();
+                var data = await _context.Registerhead.Where(x => x.c_id == id && x.status == "1" && activeSettingIds.Contains(x.SettingID)).Include(x => x.Registerdetail).Include(x => x.School).ThenInclude(x => x.grouplist).ToListAsync();
                 if (type == 1)
                 {
                     data.OrderBy(x => x.School.grouplist.Id);
@@ -614,6 +632,28 @@ namespace Silapa.Controllers
                 else
                 {
                     data.OrderBy(x => x.id);
+                }
+                // 1. กำหนดตัวแปร Path เริ่มต้น
+                string logoPhysicalPath = "";
+                // ตรวจสอบว่ามีข้อมูลใน DB หรือไม่
+                if (datasetting != null && !string.IsNullOrEmpty(datasetting.LogoPath))
+                {
+                    // ⚡️ แก้ไข: จัดการเครื่องหมาย Slash ให้ถูกต้องตาม OS (Windows/Linux)
+                    // เปลี่ยน / เป็น \ (ถ้าเป็น Windows) และลบตัวหน้าสุดออก
+                    string cleanPath = datasetting.LogoPath
+                        .Replace("/", Path.DirectorySeparatorChar.ToString())
+                        .Replace("\\", Path.DirectorySeparatorChar.ToString())
+                        .TrimStart(Path.DirectorySeparatorChar);
+
+                    logoPhysicalPath = Path.Combine(_env.WebRootPath, cleanPath);
+                }
+
+                // 2. ตรวจสอบไฟล์ (ถ้าไม่มีไฟล์จริง ให้ใช้ Default)
+                if (string.IsNullOrEmpty(logoPhysicalPath) || !System.IO.File.Exists(logoPhysicalPath))
+                {
+                    // ใช้รูปสำรอง (AdminLTE)
+                    // ใช้ Path.Combine เพื่อต่อ Path ให้ถูกต้องแน่นอน
+                    logoPhysicalPath = Path.Combine(_env.WebRootPath, "dist", "img", "AdminLTELogo.png");
                 }
                 ///หน้า2 doc1
                 ///
@@ -624,21 +664,31 @@ namespace Silapa.Controllers
                         yPosition = 70;
                         PdfPage page2 = document.Pages.Add();
                         PdfGraphics graphics = page2.Graphics;
-                        using (FileStream logoStream = new FileStream("wwwroot/images/logo/logo.jpg", FileMode.Open, FileAccess.Read))
+                        // 3. เริ่มวาดโลโก้
+                        if (System.IO.File.Exists(logoPhysicalPath))
                         {
-                            // สร้าง PdfBitmap จากภาพโลโก้
-                            PdfBitmap logoImage = new PdfBitmap(logoStream);
+                            try
+                            {
+                                using (FileStream logoStream = new FileStream(logoPhysicalPath, FileMode.Open, FileAccess.Read))
+                                {
+                                    PdfBitmap logoImage = new PdfBitmap(logoStream);
 
-                            // กำหนดตำแหน่งโลโก้ที่ต้องการในหน้า (ตัวอย่างที่มุมซ้ายบน)
-                            float logoX = 220;  // ระยะห่างจากซ้าย
-                            float logoY = 0;  // ระยะห่างจากด้านบน
-                            float logoWidth = 70;  // กำหนดความกว้างของโลโก้
-                            float logoHeight = 70;  // กำหนดความสูงของโลโก้
+                                    float logoWidth = 75;
+                                    float logoHeight = 75;
+                                    float logoX = (pageWidth - logoWidth) / 2;
+                                    float logoY = 0;
 
-                            // วาดโลโก้บนหน้า PDF
-                            graphics.DrawImage(logoImage, logoX, logoY, logoWidth, logoHeight);
+                                    page.Graphics.DrawImage(logoImage, logoX, logoY, logoWidth, logoHeight);
+                                    graphics.DrawImage(logoImage, logoX, logoY, logoWidth, logoHeight);
+                                }
+                            }
+                            catch
+                            {
+                                // (ซ่อน Error กรณีไฟล์รูปมีปัญหา)
+                            }
                         }
-                        string formattedText = WrapText(datasetting.name, 100);
+
+                        string formattedText = WrapText(namejob, 100);
                         RectangleF bound2_1 = new RectangleF(20, yPosition, page.GetClientSize().Width, page.GetClientSize().Height - 100);
                         DrawTextWithWrapping(page2, formattedText, bFont, PdfBrushes.Black, bound2_1);
                         yPosition += 40;
@@ -667,12 +717,9 @@ namespace Silapa.Controllers
                         dataTable.Columns.Add("รายชื่อ");
                         dataTable.Columns.Add("ลงชื่อตัวบรรจง");
 
-
-
-
                         // เพิ่มข้อมูลใน DataTable
                         int index = 1;
-                        foreach (var item in data)
+                        foreach (var item in data.OrderBy(x => x.School.Name))
                         {
                             int y = 1;
                             string studentNames = "";
@@ -751,21 +798,51 @@ namespace Silapa.Controllers
                         yPosition = 70;
                         PdfPage page2 = document.Pages.Add();
                         PdfGraphics graphics = page2.Graphics;
-                        using (FileStream logoStream = new FileStream("wwwroot/images/logo/logo.jpg", FileMode.Open, FileAccess.Read))
+                        // 1. กำหนดตัวแปร Path เริ่มต้น
+                        string logoPhysicalPath1 = "";
+
+                        // ตรวจสอบว่ามีข้อมูลใน DB หรือไม่
+                        if (datasetting != null && !string.IsNullOrEmpty(datasetting.LogoPath))
                         {
-                            // สร้าง PdfBitmap จากภาพโลโก้
-                            PdfBitmap logoImage = new PdfBitmap(logoStream);
+                            // ⚡️ แก้ไข: จัดการเครื่องหมาย Slash ให้ถูกต้องตาม OS (Windows/Linux)
+                            // เปลี่ยน / เป็น \ (ถ้าเป็น Windows) และลบตัวหน้าสุดออก
+                            string cleanPath = datasetting.LogoPath
+                                .Replace("/", Path.DirectorySeparatorChar.ToString())
+                                .Replace("\\", Path.DirectorySeparatorChar.ToString())
+                                .TrimStart(Path.DirectorySeparatorChar);
 
-                            // กำหนดตำแหน่งโลโก้ที่ต้องการในหน้า (ตัวอย่างที่มุมซ้ายบน)
-                            float logoX = 220;  // ระยะห่างจากซ้าย
-                            float logoY = 0;  // ระยะห่างจากด้านบน
-                            float logoWidth = 70;  // กำหนดความกว้างของโลโก้
-                            float logoHeight = 70;  // กำหนดความสูงของโลโก้
-
-                            // วาดโลโก้บนหน้า PDF
-                            graphics.DrawImage(logoImage, logoX, logoY, logoWidth, logoHeight);
+                            logoPhysicalPath1 = Path.Combine(_env.WebRootPath, cleanPath);
                         }
-                        string formattedText = WrapText(datasetting.name, 100);
+
+                        // 2. ตรวจสอบไฟล์ (ถ้าไม่มีไฟล์จริง ให้ใช้ Default)
+                        if (string.IsNullOrEmpty(logoPhysicalPath1) || !System.IO.File.Exists(logoPhysicalPath1))
+                        {
+                            // ใช้รูปสำรอง (AdminLTE)
+                            // ใช้ Path.Combine เพื่อต่อ Path ให้ถูกต้องแน่นอน
+                            logoPhysicalPath1 = Path.Combine(_env.WebRootPath, "dist", "img", "AdminLTELogo.png");
+                        }
+                        // 3. เริ่มวาดโลโก้
+                        if (System.IO.File.Exists(logoPhysicalPath1))
+                        {
+                            try
+                            {
+                                using (FileStream logoStream = new FileStream(logoPhysicalPath1, FileMode.Open, FileAccess.Read))
+                                {
+                                    PdfBitmap logoImage = new PdfBitmap(logoStream);
+
+                                    float logoWidth = 75;
+                                    float logoHeight = 75;
+                                    float logoX = (pageWidth - logoWidth) / 2;
+                                    float logoY = 0;
+                                    graphics.DrawImage(logoImage, logoX, logoY, logoWidth, logoHeight);
+                                }
+                            }
+                            catch
+                            {
+                                // (ซ่อน Error กรณีไฟล์รูปมีปัญหา)
+                            }
+                        }
+                        string formattedText = WrapText(namejob, 100);
                         RectangleF bound2_1 = new RectangleF(20, yPosition, page.GetClientSize().Width, page.GetClientSize().Height - 100);
                         DrawTextWithWrapping(page2, formattedText, bFont, PdfBrushes.Black, bound2_1);
                         yPosition += 40;
@@ -788,7 +865,7 @@ namespace Silapa.Controllers
                         dataTable.Columns.Add("ลายเซ็นกลับ");
 
                         //ดึงข้อมูลมา
-                        var data1 = await _context.referee.Where(x => x.c_id == id && x.status == "1").ToListAsync();
+                        var data1 = await _context.referee.Where(x => x.c_id == id && x.status == "1" && activeSettingIds.Contains(x.SettingID)).ToListAsync();
                         data1 = data1.OrderBy(x => roleOrder.ContainsKey(x.role) ? roleOrder[x.role] : int.MaxValue).ToList();
 
                         // เพิ่มข้อมูลใน DataTable
@@ -842,21 +919,51 @@ namespace Silapa.Controllers
                 PdfPage page3 = document.Pages.Add();
                 PdfGraphics graphics3 = page3.Graphics;
                 yPosition = 70;
-                using (FileStream logoStream = new FileStream("wwwroot/images/logo/logo.jpg", FileMode.Open, FileAccess.Read))
+                // 1. กำหนดตัวแปร Path เริ่มต้น
+
+                // ตรวจสอบว่ามีข้อมูลใน DB หรือไม่
+                if (datasetting != null && !string.IsNullOrEmpty(datasetting.LogoPath))
                 {
-                    // สร้าง PdfBitmap จากภาพโลโก้
-                    PdfBitmap logoImage = new PdfBitmap(logoStream);
+                    // ⚡️ แก้ไข: จัดการเครื่องหมาย Slash ให้ถูกต้องตาม OS (Windows/Linux)
+                    // เปลี่ยน / เป็น \ (ถ้าเป็น Windows) และลบตัวหน้าสุดออก
+                    string cleanPath = datasetting.LogoPath
+                        .Replace("/", Path.DirectorySeparatorChar.ToString())
+                        .Replace("\\", Path.DirectorySeparatorChar.ToString())
+                        .TrimStart(Path.DirectorySeparatorChar);
 
-                    // กำหนดตำแหน่งโลโก้ที่ต้องการในหน้า (ตัวอย่างที่มุมซ้ายบน)
-                    float logoX = 220;  // ระยะห่างจากซ้าย
-                    float logoY = 0;  // ระยะห่างจากด้านบน
-                    float logoWidth = 70;  // กำหนดความกว้างของโลโก้
-                    float logoHeight = 70;  // กำหนดความสูงของโลโก้
-
-                    // วาดโลโก้บนหน้า PDF
-                    graphics3.DrawImage(logoImage, logoX, logoY, logoWidth, logoHeight);
+                    logoPhysicalPath = Path.Combine(_env.WebRootPath, cleanPath);
                 }
-                string formattedText3 = WrapText(datasetting.name, 100);
+
+                // 2. ตรวจสอบไฟล์ (ถ้าไม่มีไฟล์จริง ให้ใช้ Default)
+                if (string.IsNullOrEmpty(logoPhysicalPath) || !System.IO.File.Exists(logoPhysicalPath))
+                {
+                    // ใช้รูปสำรอง (AdminLTE)
+                    // ใช้ Path.Combine เพื่อต่อ Path ให้ถูกต้องแน่นอน
+                    logoPhysicalPath = Path.Combine(_env.WebRootPath, "dist", "img", "AdminLTELogo.png");
+                }
+                // 3. เริ่มวาดโลโก้
+                if (System.IO.File.Exists(logoPhysicalPath))
+                {
+                    try
+                    {
+                        using (FileStream logoStream = new FileStream(logoPhysicalPath, FileMode.Open, FileAccess.Read))
+                        {
+                            PdfBitmap logoImage = new PdfBitmap(logoStream);
+
+                            float logoWidth = 75;
+                            float logoHeight = 75;
+                            float logoX = (pageWidth - logoWidth) / 2;
+                            float logoY = 0;
+                            graphics3.DrawImage(logoImage, logoX, logoY, logoWidth, logoHeight);
+                        }
+                    }
+                    catch
+                    {
+                        // (ซ่อน Error กรณีไฟล์รูปมีปัญหา)
+                    }
+                }
+
+                string formattedText3 = WrapText(namejob, 100);
                 RectangleF bound3_1 = new RectangleF(20, yPosition, page.GetClientSize().Width, page.GetClientSize().Height - 100);
                 DrawTextWithWrapping(page3, formattedText3, bFont, PdfBrushes.Black, bound3_1);
                 yPosition += 40;
@@ -864,11 +971,10 @@ namespace Silapa.Controllers
                 graphics3.DrawString("แบบบันทึกคะแนน " + datacom.Name, bFont, PdfBrushes.Black, new PointF(0, yPosition));
 
 
-
-
                 var dataD = await _context.dCompetitionlist.Where(x => x.h_id == id).ToListAsync();
                 // สร้าง PdfGrid สำหรับสร้างตาราง
                 PdfGrid pdfGrid = new PdfGrid();
+
                 int totalColumns = 4 + dataD.Count;
                 // เพิ่มคอลัมน์ทั้งหมด 7 คอลัมน์
                 pdfGrid.Columns.Add(totalColumns);
@@ -934,7 +1040,7 @@ namespace Silapa.Controllers
                 pdfGrid.RepeatHeader = true;
 
                 int x = 1;
-                foreach (var dr in data)
+                foreach (var dr in data.OrderBy(x => x.School.Name))
                 {
                     // เพิ่มแถวข้อมูลตัวอย่าง
                     PdfGridRow dataRow = pdfGrid.Rows.Add();
@@ -966,7 +1072,7 @@ namespace Silapa.Controllers
 
                 float currentYPosition = 130f;
                 // ดึงข้อมูลจากฐานข้อมูล
-                var judges = await _context.referee.Where(x => x.c_id == id).ToListAsync();
+                var judges = await _context.referee.Where(x => x.c_id == id && activeSettingIds.Contains(x.SettingID)).ToListAsync();
                 judges = judges.OrderBy(x => roleOrder.ContainsKey(x.role) ? roleOrder[x.role] : int.MaxValue).ToList();
                 // แทนที่ 'Judges' ด้วยชื่อ Model หรือ Table ที่เหมาะสม
                 string chair = judges.FirstOrDefault(x => x.role == "ประธาน")?.name ?? "";
@@ -1021,6 +1127,7 @@ namespace Silapa.Controllers
                 }
                 // ตารางใหม่
                 PdfGrid grid = new PdfGrid();
+
                 grid.Columns.Add(3); // สร้าง 3 คอลัมน์
 
                 // กำหนดความกว้างของคอลัมน์
@@ -1063,7 +1170,7 @@ namespace Silapa.Controllers
                         Borders = new PdfBorders { All = PdfPens.Transparent }   // กำหนดเส้นขอบ
                     };
                 }
-
+                int currentMemberIndex = 3;
                 int remainingMembers = committeeNames.Count - 3;
                 while (remainingMembers > 0)
                 {
@@ -1071,10 +1178,23 @@ namespace Silapa.Controllers
                     PdfGridRow row = grid.Rows.Add();
 
                     // วางกรรมการในแถวใหม่
-                    for (int i = 0; i < 3 && remainingMembers > 0; i++)
+                    for (int i = 0; i < 3; i++)
                     {
-                        row.Cells[i].Value = $"ลงชื่อ............................ กรรมการ\n({committeeNames[3 + i]})\nเบอร์โทร....................";
-                        remainingMembers--;
+                        // ตรวจสอบว่ายังมีคนเหลือให้แสดงไหม
+                        if (remainingMembers > 0 && currentMemberIndex < committeeNames.Count)
+                        {
+                            // ✅ แก้ไขจุดนี้: ใช้ currentMemberIndex แทน 3 + i
+                            row.Cells[i].Value = $"ลงชื่อ............................ กรรมการ\n({committeeNames[currentMemberIndex]})\nเบอร์โทร....................";
+
+                            // ขยับไปคนถัดไป
+                            currentMemberIndex++;
+                            remainingMembers--;
+                        }
+                        else
+                        {
+                            // ถ้าไม่มีคนเหลือแล้วในแถวนี้ ให้ใส่ค่าว่างหรือจัดรูปแบบตามต้องการ
+                            row.Cells[i].Value = "";
+                        }
                     }
 
                     // ปรับแต่งให้กับแต่ละเซลล์ในแถวใหม่
@@ -1099,6 +1219,16 @@ namespace Silapa.Controllers
                     StringFormat = new PdfStringFormat(PdfTextAlignment.Center, PdfVerticalAlignment.Middle),
                     Borders = new PdfBorders { All = PdfPens.Transparent }   // กำหนดเส้นขอบ
                 };
+                float estimatedGridHeight = grid.Rows.Count * 100;
+
+                // เช็คว่าพื้นที่ที่เหลือในหน้า พอสำหรับตารางไหม?
+                float pageHeight = currentPage1.GetClientSize().Height;
+                if (nextPositionY1 + estimatedGridHeight > pageHeight)
+                {
+                    // ถ้าไม่พอ ให้ขึ้นหน้าใหม่ทันที
+                    currentPage1 = document.Pages.Add();
+                    nextPositionY1 = 20; // รีเซ็ตตำแหน่ง Y สำหรับหน้าใหม่
+                }
                 // เพิ่มตารางลงในหน้า PDF
                 grid.Draw(currentPage1, new PointF(0, nextPositionY1)); // วางตำแหน่งตาราง
                 ///ใบให้คะแนนของกรรมการแต่ละคน
@@ -1109,21 +1239,29 @@ namespace Silapa.Controllers
                     PdfPage page4 = document.Pages.Add();
                     PdfGraphics graphics4 = page4.Graphics;
                     yPosition = 70;
-                    using (FileStream logoStream = new FileStream("wwwroot/images/logo/logo.jpg", FileMode.Open, FileAccess.Read))
+                    // 1. กำหนดตัวแปร Path เริ่มต้น
+                    // string logoPhysicalPath = ""; 
+                    // 3. เริ่มวาดโลโก้
+                    if (System.IO.File.Exists(logoPhysicalPath))
                     {
-                        // สร้าง PdfBitmap จากภาพโลโก้
-                        PdfBitmap logoImage = new PdfBitmap(logoStream);
+                        try
+                        {
+                            using (FileStream logoStream = new FileStream(logoPhysicalPath, FileMode.Open, FileAccess.Read))
+                            {
+                                PdfBitmap logoImage = new PdfBitmap(logoStream);
 
-                        // กำหนดตำแหน่งโลโก้ที่ต้องการในหน้า (ตัวอย่างที่มุมซ้ายบน)
-                        float logoX = 220;  // ระยะห่างจากซ้าย
-                        float logoY = 0;  // ระยะห่างจากด้านบน
-                        float logoWidth = 70;  // กำหนดความกว้างของโลโก้
-                        float logoHeight = 70;  // กำหนดความสูงของโลโก้
-
-                        // วาดโลโก้บนหน้า PDF
-                        graphics4.DrawImage(logoImage, logoX, logoY, logoWidth, logoHeight);
+                                float logoWidth = 75;
+                                float logoHeight = 75;
+                                float logoX = (pageWidth - logoWidth) / 2;
+                                float logoY = 0;
+                                graphics4.DrawImage(logoImage, logoX, logoY, logoWidth, logoHeight);
+                            }
+                        }
+                        catch
+                        {
+                            // (ซ่อน Error กรณีไฟล์รูปมีปัญหา)
+                        }
                     }
-
                     DrawTextWithWrapping(page4, formattedText3, bFont, PdfBrushes.Black, bound3_1);
                     yPosition += 40;
                     graphics4.DrawString("DOC.4.1 ", bFont, PdfBrushes.Black, new PointF(0, 0));
@@ -1180,7 +1318,7 @@ namespace Silapa.Controllers
                             Alignment = PdfTextAlignment.Center,
                             LineAlignment = PdfVerticalAlignment.Middle
                         };
-                        r++;
+                        r4_1++;
                     }
 
                     // ปรับแต่งลักษณะเซลล์หัวตารางหลัก
@@ -1195,7 +1333,7 @@ namespace Silapa.Controllers
                     pdfGrid4_1.RepeatHeader = true;
 
                     int x4_1 = 1;
-                    foreach (var dr in data)
+                    foreach (var dr in data.OrderBy(x => x.School.Name))
                     {
                         // เพิ่มแถวข้อมูลตัวอย่าง
                         PdfGridRow dataRow = pdfGrid4_1.Rows.Add();
@@ -1270,17 +1408,28 @@ namespace Silapa.Controllers
                 PdfPage page5 = document.Pages.Add();
                 PdfGraphics graphics5 = page5.Graphics;
                 yPosition = 50;
-
-                // วาดโลโก้
-                using (FileStream logoStream = new FileStream("wwwroot/images/logo/logo.jpg", FileMode.Open, FileAccess.Read))
+                // 3. เริ่มวาดโลโก้
+                if (System.IO.File.Exists(logoPhysicalPath))
                 {
-                    PdfBitmap logoImage = new PdfBitmap(logoStream);
-                    float logoX = 220;
-                    float logoY = 0;
-                    float logoWidth = 70;
-                    float logoHeight = 70;
-                    graphics5.DrawImage(logoImage, logoX, logoY, logoWidth, logoHeight);
+                    try
+                    {
+                        using (FileStream logoStream = new FileStream(logoPhysicalPath, FileMode.Open, FileAccess.Read))
+                        {
+                            PdfBitmap logoImage = new PdfBitmap(logoStream);
+
+                            float logoWidth = 75;
+                            float logoHeight = 75;
+                            float logoX = (pageWidth - logoWidth) / 2;
+                            float logoY = 0;
+                            graphics5.DrawImage(logoImage, logoX, logoY, logoWidth, logoHeight);
+                        }
+                    }
+                    catch
+                    {
+                        // (ซ่อน Error กรณีไฟล์รูปมีปัญหา)
+                    }
                 }
+
                 graphics5.DrawString("DOC.5 ", bFont, PdfBrushes.Black, new PointF(0, yPosition));
                 graphics5.DrawString("เอกสารการเปลี่ยนตัว แก้ไข เพิ่ม ชื่อ-สกุลของนักเรียน/ครูผู้สอน/กรรมการ ", bFont, PdfBrushes.Black, new PointF(0, yPosition += bFont.Height));
                 graphics5.DrawString("รายการ " + datacom.Name, bFont, PdfBrushes.Black, new PointF(0, yPosition += bFont.Height));
@@ -1380,7 +1529,11 @@ namespace Silapa.Controllers
         public async Task<IActionResult> printreferee(int id, int type)
         {
             System.Globalization.CultureInfo thaiCulture = new System.Globalization.CultureInfo("th-TH");
-            var datasetting = await _context.setupsystem.FirstOrDefaultAsync();
+            var datasetting = await _context.setupsystem.Where(x => x.status == "1").FirstOrDefaultAsync();
+            var activeSettingIds = await _context.setupsystem
+    .Where(s => s.status == "1")
+    .Select(s => s.id)
+    .ToListAsync();
             using (PdfDocument document = new PdfDocument())
             {
                 // เพิ่มหน้ากระดาษใหม่
@@ -1427,7 +1580,7 @@ namespace Silapa.Controllers
                 // ข้อความ
                 string text2 = "ประกาศสำนักงานเขตพื้นที่การศึกษามัธยมศึกษานครราชสีมา";
                 string text3 = "เรื่อง แต่งตั้งคณะกรรมการดำเนินงานและคณะกรรมการตัดสินกิจกรรมการประกวด";
-                string text4 = "แข่งขันงานศิลปหัตถกรรมนักเรียนครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗";
+                string text4 = $"{datasetting.name}";
                 string text5 = "--------------------------------------------------------";
 
                 // คำนวณความกว้างของข้อความและจัดกึ่งกลาง
@@ -1452,8 +1605,8 @@ namespace Silapa.Controllers
 
                 #region htmlText
 
-                string longtext = "               เพื่อให้การจัดการแข่งขันงานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๑<br/>" +
-                                  "ปีการศึกษา ๒๕๖๗ เป็นไปด้วยความเรียบร้อย ตรงตามวัตถุประสงค์ของการจัดงานศิลปหัตถกรรมนักเรียน<br/>" +
+                string longtext = "               เพื่อให้การจัดการแข่งขันงานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๓<br/>" +
+                                  "ปีการศึกษา ๒๕๖๘ เป็นไปด้วยความเรียบร้อย ตรงตามวัตถุประสงค์ของการจัดงานศิลปหัตถกรรมนักเรียน<br/>" +
                                   "เป็นเวทีให้นักเรียนได้แสดงออก ถึงความรู้ ความสามารถของตนเอง นักเรียนได้รับการพัฒนา ทักษะทางด้าน<br/>" +
                                   "วิชาการ วิชาชีพ ดนตรี นาฏศิลป์ ศิลปะ เห็นคุณค่าและเกิดความภาคภูมิใจในความเป็นไทย รักและหวงแหน <br/> " +
                                   "ในมรดกทางวัฒนธรรมของไทย รวมทั้งการใช้กิจกรรมเป็นสื่อเพื่อการพัฒนาคุณธรรม จริยธรรม เสริมสร้างวิถี <br/>" +
@@ -1462,58 +1615,58 @@ namespace Silapa.Controllers
                                   "ประกาศสำนักงานเขตพื้นที่การศึกษามัธยมศึกษานครราชสีมา เรื่อง การจัดการแข่งขันงานศิลปหัตถกรรม<br/>" +
                                   "นักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗ และประกาศสำนักงานเขตพื้นที่การศึกษา<br/>" +
                                   "มัธยมศึกษานครราชสีมา เรื่อง สถานที่การจัดการแข่งขันงานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา<br/>" +
-                                  "ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗ <br/>" +
+                                  "ครั้งที่ ๗๓ ปีการศึกษา ๒๕๖๘ <br/>" +
                                   "               อาศัยอำนาจตามความใน มาตรา ๓๙ แห่งพระราชบัญญัติระเบียบบริหารราชการ<br/>" +
                                   "กระทรวงศึกษาธิการ พ.ศ. ๒๕๔๖ ประกอบ มาตรา ๒๔ แห่งพระราชบัญญัติระเบียบข้าราชการครูและ<br/>" +
                                   "บุคลากรทางการศึกษา พ.ศ. ๒๕๔๗ และมติที่ประชุมร่วม กําหนดการจัดการแข่งขันงานศิลปหัตถกรรม<br/>" +
-                                  "นักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๒ เมื่อวันที่ ๑๒ พฤศจิกายน ๒๕๖๗ ระหว่าง<br/>" +
+                                  "นักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๓ ปีการศึกษา ๒๕๖๘ เมื่อวันที่ ๑๒ พฤศจิกายน ๒๕๖๘ ระหว่าง<br/>" +
                                   "สำนักงานเขตพื้นที่การศึกษามัธยมศึกษานครราชสีมา สำนักงานเขตพื้นที่การศึกษาประถมศึกษานครราชสีมา<br/>" +
                                   "เขต ๓, เขต ๕ และ เขต ๗ องค์การบริหารส่วนจังหวัดนครราชสีมา สำนักงานเทศบาลนครราชสีมา<br/>" +
                                   "สถานศึกษาเอกชนจังหวัดนครราชสีมา สำนักงานศึกษาธิการจังหวัดนครราชสีมา โรงเรียนสุรวิวัฒน์<br/>" +
                                   "มหาวิทยาลัยเทคโนโลยีสุรนารี และโรงเรียนสาธิต มหาวิทยาลัยราชภัฏนครราชสีมา ฝ่ายมัธยม<br/>" +
                                   "               จึงขอประกาศแต่งตั้งคณะกรรมการดำเนินงานและคณะกรรมการตัดสินกิจกรรมการประกวด<br/>" +
-                                  "แข่งขันงานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗ ระหว่างวันที่<br/>" +
-                                  "๑๒ - ๑๔ ธันวาคม ๒๕๖๖ รายละเอียดปรากฏตามเอกสารแนบท้ายประกาศนี้<br/>" +
+                                  "แข่งขันงานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๓ ปีการศึกษา ๒๕๖๘ ระหว่างวันที่<br/>" +
+                                  "๑๐ - ๑๒ ธันวาคม ๒๕๖๘ รายละเอียดปรากฏตามเอกสารแนบท้ายประกาศนี้<br/>" +
                                   "               ๑. คณะกรรมการดำเนินงานและคณะกรรมการตัดสินกิจกรรมการประกวดแข่งขัน<br/>" +
-                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗ ศูนย์พัฒนาวิชาการ<br/>" +
+                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๓ ปีการศึกษา ๒๕๖๘ ศูนย์พัฒนาวิชาการ<br/>" +
                                   "กลุ่มสาระการเรียนรู้ภาษาไทย โรงเรียนปากช่อง (รายละเอียดตามเอกสารแนบท้าย ๑)<br/>" +
                                   "               ๒. คณะกรรมการดำเนินงานและคณะกรรมการตัดสินกิจกรรมการประกวดแข่งขัน<br/>" +
-                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗ ศูนย์พัฒนาวิชาการ<br/>" +
+                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๓ ปีการศึกษา ๒๕๖๘ ศูนย์พัฒนาวิชาการ<br/>" +
                                   "กลุ่มสาระการเรียนรู้คณิตศาสตร์ โรงเรียนราชสีมาวิทยาลัย (รายละเอียดตามเอกสารแนบท้าย ๒)<br/>" +
                                   "               ๓. คณะกรรมการดำเนินงานและคณะกรรมการตัดสินกิจกรรมการประกวดแข่งขัน<br/>" +
-                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗ ศูนย์พัฒนาวิชาการ<br/>" +
+                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๓ ปีการศึกษา ๒๕๖๘ ศูนย์พัฒนาวิชาการ<br/>" +
                                   "กลุ่มสาระการเรียนรู้วิทยาศาสตร์และเทคโนโลยี โรงเรียนบุญวัฒนา (รายละเอียดตามเอกสารแนบท้าย ๓)<br/>" +
                                   "               ๔. คณะกรรมการดำเนินงานและคณะกรรมการตัดสินกิจกรรมการประกวดแข่งขัน<br/>" +
-                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗ ศูนย์พัฒนาวิชาการ<br/>" +
+                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๓ ปีการศึกษา ๒๕๖๘ ศูนย์พัฒนาวิชาการ<br/>" +
                                   "กลุ่มสาระการเรียนรู้สังคมศึกษา ศาสนาและวัฒนธรรม โรงเรียนบุญเหลือวิทยานุสรณ์<br/>" +
                                   "(รายละเอียดตามเอกสารแนบท้าย ๔)<br/>" +
                                    "               ๕. คณะกรรมการดำเนินงานและคณะกรรมการตัดสินกิจกรรมการประกวดแข่งขัน<br/>" +
-                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗ ศูนย์พัฒนาวิชาการ<br/>" +
+                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๓ ปีการศึกษา ๒๕๖๘ ศูนย์พัฒนาวิชาการ<br/>" +
                                   "กลุ่มสาระการเรียนรู้สุขศึกษาและพลศึกษา โรงเรียนราชสีมาวิทยาลัย (รายละเอียดตามเอกสารแนบท้าย ๕)<br/>" +
                                    "               ๖. คณะกรรมการดำเนินงานและคณะกรรมการตัดสินกิจกรรมการประกวดแข่งขัน<br/>" +
-                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗ ศูนย์พัฒนาวิชาการ<br/>" +
+                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๓ ปีการศึกษา ๒๕๖๘ ศูนย์พัฒนาวิชาการ<br/>" +
                                   "กลุ่มสาระการเรียนรู้ศิลปะ โรงเรียนพิมายวิทยา (รายละเอียดตามเอกสารแนบท้าย ๖)<br/>" +
                                   "               ๗. คณะกรรมการดำเนินงานและคณะกรรมการตัดสินกิจกรรมการประกวดแข่งขัน<br/>" +
-                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗ ศูนย์พัฒนาวิชาการ<br/>" +
+                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๓ ปีการศึกษา ๒๕๖๘ ศูนย์พัฒนาวิชาการ<br/>" +
                                   "กลุ่มสาระการเรียนรู้การงานอาชีพ โรงเรียนโชคชัยสามัคคี (รายละเอียดตามเอกสารแนบท้าย ๗)<br/>" +
                                   "               ๘. คณะกรรมการดำเนินงานและคณะกรรมการตัดสินกิจกรรมการประกวดแข่งขัน<br/>" +
-                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗ ศูนย์พัฒนาวิชาการ<br/>" +
+                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๓ ปีการศึกษา ๒๕๖๘ ศูนย์พัฒนาวิชาการ<br/>" +
                                   "กลุ่มสาระการเรียนรู้ภาษาต่างประเทศ โรงเรียนสุรนารีวิทยา (รายละเอียดตามเอกสารแนบท้าย ๘)<br/>" +
                                   "               ๙. คณะกรรมการดำเนินงานและคณะกรรมการตัดสินกิจกรรมการประกวดแข่งขัน<br/>" +
-                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗ ศูนย์กิจกรรมพัฒนา<br/>" +
+                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๓ ปีการศึกษา ๒๕๖๘ ศูนย์กิจกรรมพัฒนา<br/>" +
                                   "ผู้เรียน โรงเรียนอุบลรัตนราชกัญญา ราชวิทยาลัยนครราชสีมา (รายละเอียดตามเอกสารแนบท้าย ๙)<br/>" +
                                   "               ๑๐. คณะกรรมการดำเนินงานและคณะกรรมการตัดสินกิจกรรมการประกวดแข่งขัน<br/>" +
-                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗ ศูนย์เทคโนโลยี<br/>" +
+                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๓ ปีการศึกษา ๒๕๖๘ ศูนย์เทคโนโลยี<br/>" +
                                   "สารสนเทศและการสื่อสาร โรงเรียนสุรธรรมพิทักษ์ (รายละเอียดตามเอกสารแนบท้าย ๑๐)<br/>" +
                                   "               ๑๐. คณะกรรมการดำเนินงานและคณะกรรมการตัดสินกิจกรรมการประกวดแข่งขัน<br/>" +
-                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗ ศูนย์การจัดการศึกษา<br/>" +
+                                  "งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๓ ปีการศึกษา ๒๕๖๘ ศูนย์การจัดการศึกษา<br/>" +
                                   "เรียนรวม โรงเรียนบุญเหลือวิทยานุสรณ์ (รายละเอียดตามเอกสารแนบท้าย ๑๑ )<br/>" +
                                    "                    ทั้งนี้ ตั้งแต่บัดนี้เป็นต้นไป<br/>" +
-                                    "                              ประกาศ ณ วันที่ ๒๕ พฤศจิกายน พ.ศ. ๒๕๖๗<br/>" +
+                                    "                              ประกาศ ณ วันที่ ๒๕ พฤศจิกายน พ.ศ. ๒๕๖๘<br/>" +
                                      "                         <br/>" +
                                       "                         <br/>" +
                                        "                         <br/>" +
-                                       "                                                       ดร.นัยนา ตันเจริญ<br/>" +
+                                       "                                                       ว่าร้อยเอก ดร.ทิณกรณ์ ภูโทถ้ำ<br/>" +
                                         "                             ผู้อำนวยการสำนักงานเขตพื้นที่การศึกษามัธยมศึกษานครราชสีมา<br/>" +
                                   ""
                                   ;
@@ -1531,25 +1684,28 @@ namespace Silapa.Controllers
 
                 //Drawing htmlString
                 richTextElement.Draw(page, new RectangleF(20, yPosition, page.GetClientSize().Width, page.GetClientSize().Height), format);
-                var datarefereeAll = await _context.referee.Where(x => x.status == "1").ToListAsync();
+                var datarefereeAll = await _context.referee.Where(x => x.status == "1" && activeSettingIds.Contains(x.SettingID)).ToListAsync();
 
                 ////หน้าที่ 2
                 ///
                 int s = 1;
-                int[] s_id = { 12, 13, 14, 16, 17, 19, 21, 22, 23, 15, 24 };
-                string[] s_name = { "ศูนย์พัฒนาวิชาการกลุ่มสาระการเรียนรู้ภาษาไทย", "ศูนย์พัฒนาวิชาการกลุ่มสาระการเรียนรู้คณิตศาสตร์", "ศูนย์พัฒนาวิชาการกลุ่มสาระการเรียนรู้วิทยาศาสตร์และเทคโนโลยี", "ศูนย์พัฒนาวิชาการกลุ่มสาระการเรียนรู้สังคมศึกษาศาสนาและวัฒนธรรม", "ศูนย์พัฒนาวิชาการกลุ่มสาระการเรียนรู้สุขศึกษาและพลศึกษา", "ศูนย์พัฒนาวิชาการกลุ่มสาระการเรียนรู้ศิลปะ", "ศูนย์พัฒนาวิชาการกลุ่มสาระการเรียนรู้การงานอาชีพ", "ศูนย์พัฒนาวิชาการกลุ่มสาระการเรียนรู้ภาษาต่างประเทศ", "ศูนย์กิจกรรมพัฒนาผู้เรียน", "ศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร", "ศูนย์การจัดการศึกษาเรียนรวม" };
-                string[] school = { "โรงเรียนสุรนารีวิทยา", "โรงเรียนราชสีมาวิทยาลัย", "โรงเรียนบุญวัฒนา", "โรงเรียนบุญเหลือวิทยานุสรณ์", "โรงเรียนราชสีมาวิทยาลัย", "โรงเรียนพิมายวิทยา", "โรงเรียนโชคชัยสามัคคี", "โรงเรียนสุรนารีวิทยา", "โรงเรียนอุบลรัตนราชกัญญา ราชวิทยาลัยนครราชสีมา", "โรงเรียนสุรธรรมพิทักษ์", "โรงเรียนบุญเหลือวิทยานุสรณ์" };
+                int[] s_id = { 12, 13, 14, 16, 17, 19, 21, 22, 23, 15, 24, 32 };
+                string[] s_name = { "ศูนย์พัฒนาวิชาการกลุ่มสาระการเรียนรู้ภาษาไทย", "ศูนย์พัฒนาวิชาการกลุ่มสาระการเรียนรู้คณิตศาสตร์", "ศูนย์พัฒนาวิชาการกลุ่มสาระการเรียนรู้วิทยาศาสตร์และเทคโนโลยี", "ศูนย์พัฒนาวิชาการกลุ่มสาระการเรียนรู้สังคมศึกษาศาสนาและวัฒนธรรม", "ศูนย์พัฒนาวิชาการกลุ่มสาระการเรียนรู้สุขศึกษาและพลศึกษา", "ศูนย์พัฒนาวิชาการกลุ่มสาระการเรียนรู้ศิลปะ", "ศูนย์พัฒนาวิชาการกลุ่มสาระการเรียนรู้การงานอาชีพ", "ศูนย์พัฒนาวิชาการกลุ่มสาระการเรียนรู้ภาษาต่างประเทศ", "ศูนย์กิจกรรมพัฒนาผู้เรียน", "ศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร", "ศูนย์การจัดการศึกษาเรียนรวม", "ศูนย์พัฒนาวิชาการแนะแนว" };
+                string[] school = { "โรงเรียนปากช่อง", "โรงเรียนราชสีมาวิทยาลัย", "โรงเรียนบุญวัฒนา", "โรงเรียนบุญเหลือวิทยานุสรณ์", "โรงเรียนราชสีมาวิทยาลัย", "โรงเรียนพิมายวิทยา", "โรงเรียนโชคชัยสามัคคี", "โรงเรียนสุรนารีวิทยา", "โรงเรียนอุบลรัตนราชกัญญา ราชวิทยาลัยนครราชสีมา", "โรงเรียนสุรธรรมพิทักษ์", "โรงเรียนบุญเหลือวิทยานุสรณ์", "โรงเรียนบุญวัฒนา" };
+                System.Globalization.CultureInfo thaiCulture1 = new System.Globalization.CultureInfo("th-TH");
                 // ลูปผ่านค่าใน s_name
                 foreach (var name in s_name)
                 {
+                    string sArabic = s.ToString();
+                    string sThai = ToThaiDigits(sArabic);
                     // เพิ่มหน้าใหม่
                     PdfPage page2 = document.Pages.Add();
-                    string text2_1 = $"เอกสารแนบท้าย {s}";
-                    string text2_2 = $"งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗";
-                    string text2_3 = $"สำนักงานเขตพื้นที่การศึกษามัธยมศึกษานคราชสีมา {name}";
-                    string text2_4 = $"แนบท้ายประกาศสำนักงานเขตพื้นที่การศึกษามัธยมศึกษานครราชสีมา ลงวันที่ ๒๕ พฤศจิกายน ๒๕๖๗";
-                    string text2_5 = $"สนามแข่งขัน ณ {school[s - 1]} ระหว่างวันที่ ๑๒ - ๑๔ ธันวาคม พ.ศ. ๒๕๖๗";
-                    string text2_6 = $".................................................................................................................................";
+                    string text2_1 = $"เอกสารแนบท้าย {sThai}";
+                    string text2_2 = $"การแข่งขันงานศิลปหัถกรรมนักเรียนมัธยมศึกษา {datasetting.ProvinceName} ครั้งที่ ๗๓ ปีการศึกษา ๒๕๖๘";
+                    string text2_3 = $"{name}";
+                    string text2_4 = $"สนามแข่งขัน ณ {school[s - 1]}";
+                    string text2_5 = $"ระหว่างวันที่ ๑๐ - ๑๒ ธันวาคม พ.ศ. ๒๕๖๘";
+                    string text2_6 = $"***********************************************************************************************************************";
                     float textWidth = ttFont16.MeasureString(text2_1).Width;
                     float xCenter2_1 = (page.GetClientSize().Width - bFont.MeasureString(text2_1).Width) / 2;
                     float xCenter2_2 = (page.GetClientSize().Width - bFont.MeasureString(text2_2).Width) / 2;
@@ -1563,7 +1719,7 @@ namespace Silapa.Controllers
                     yPosition2 += 15;
                     page2.Graphics.DrawString(text2_2, ttFont16, brush, new PointF(xCenter2_2, yPosition2));
                     yPosition2 += 15;
-                    page2.Graphics.DrawString(text2_3, ttFont16, brush, new PointF(xCenter2_3, yPosition2));
+                    page2.Graphics.DrawString(text2_3, bFont, brush, new PointF(xCenter2_3, yPosition2));
                     yPosition2 += 15;
                     page2.Graphics.DrawString(text2_4, ttFont16, brush, new PointF(xCenter2_4, yPosition2));
                     yPosition2 += 15;
@@ -1571,11 +1727,11 @@ namespace Silapa.Controllers
                     yPosition2 += 15;
                     page2.Graphics.DrawString(text2_6, ttFont16, brush, new PointF(xCenter2_6, yPosition2));
                     yPosition2 += 15;
-                    page2.Graphics.DrawString($"คณะกรรมการ{name} สำนักงานเขตพื้นที่การศึกษามัธยมศึกษานครราชสีมา", ttFont16, brush, new PointF(10, yPosition2));
+                    page2.Graphics.DrawString($"คณะกรรมการ{name} ประกอบด้วย", ttFont16, brush, new PointF(10, yPosition2));
+                    //yPosition2 += 15;
+                    //page2.Graphics.DrawString($"ประกอบด้วย", ttFont16, brush, new PointF(10, yPosition2));
                     yPosition2 += 15;
-                    page2.Graphics.DrawString($"ประกอบด้วย", ttFont16, brush, new PointF(10, yPosition2));
-                    yPosition2 += 15;
-                    var data = await _context.groupreferee.Where(x => x.c_id == s_id[s - 1]).ToListAsync();
+                    var data = await _context.groupreferee.Where(x => x.c_id == s_id[s - 1] && activeSettingIds.Contains(x.SettingID)).ToListAsync();
                     PdfGrid pdfGrid = new PdfGrid();
 
                     PdfPen borderPen;
@@ -1587,7 +1743,7 @@ namespace Silapa.Controllers
 
 
 
-                    var datagroupreferee = await _context.groupreferee.Where(x => x.c_id == s_id[s - 1] && x.type == "2").ToListAsync();
+                    var datagroupreferee = await _context.groupreferee.Where(x => x.c_id == s_id[s - 1] && x.type == "2" && activeSettingIds.Contains(x.SettingID)).ToListAsync();
 
                     int no = 1;
                     foreach (var dr in datagroupreferee)
@@ -1610,7 +1766,7 @@ namespace Silapa.Controllers
                         headerRow.Cells[0].Style.Font = bFont;
                         headerRow.Cells[0].Style.Borders.All = PdfPens.Transparent; // เส้นขอบแต่ละเซลล์โปร่งใส
 
-                        var datareferee = datarefereeAll.Where(x => x.m_id == s_id[s - 1] && x.g_id == dr.id)
+                        var datareferee = datarefereeAll.Where(x => x.m_id == s_id[s - 1] && x.g_id == dr.id && activeSettingIds.Contains(x.SettingID))
                         .OrderBy(x => roleOrder.ContainsKey(x.role) ? roleOrder[x.role] : int.MaxValue)
                         .ToList();
                         // เพิ่มแถวข้อมูลปกติ
@@ -1688,6 +1844,11 @@ namespace Silapa.Controllers
                     {
                         //m_idList.Add(2); // ใช้ Add() แทน Add =
                         m_idList.Add(24); // ใช้ Add() แทน Add =
+                    }
+                    else if (s_id[s - 1] == 32)
+                    {
+                        //m_idList.Add(2); // ใช้ Add() แทน Add =
+                        m_idList.Add(32); // ใช้ Add() แทน Add =
                     }
                     var dataCompetitionlist = await _context.Competitionlist.Where(x => x.status == "1" && x.c_id.HasValue && m_idList.Contains(x.c_id.Value)).ToListAsync();
                     foreach (var dr in dataCompetitionlist)
@@ -1785,9 +1946,9 @@ namespace Silapa.Controllers
 
                 // ข้อความ
                 string text3_1 = "คำสั่งสำนักงานเขตพื้นที่การศึกษามัธยมศึกษานครราชสีมา";
-                string text3_2 = "ที่           / ๒๕๖๗";
+                string text3_2 = "ที่           / ๒๕๖๘";
                 string text3_3 = "เรื่อง แต่งตั้งคณะกรรมการคัดเลือก กรรมการตัดสินการแข่งขันงานศิลปหัตถกรรมนักเรียน";
-                string text3_4 = "ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗";
+                string text3_4 = "ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๓ ปีการศึกษา ๒๕๖๘";
 
                 float xCenter3_1 = (page.GetClientSize().Width - bFont.MeasureString(text3_1).Width) / 2;
                 float xCenter3_2 = (page.GetClientSize().Width - bFont.MeasureString(text3_2).Width) / 2;
@@ -1817,12 +1978,12 @@ namespace Silapa.Controllers
                                   "ทางวัฒนธรรมของไทย รวมทั้งการใช้กิจกรรมเป็นสื่อเพื่อการพัฒนาคุณธรรม จริยธรรม เสริมสร้างวิธีประชาธิปไตย และ<br/>" +
                                   "คุณลักษณะอันพึงประสงค์ตามหลักสูตร และการสร้างภูมิคุ้มกันภัยจากยาเสพติด และแสดงให้เห็นถึงผลสำเร็จของการ <br/>" +
                                   "จัดการศึกษาของครูผู้สอน การเผยแแพร่ผลงานด้านการจัดการศึกษาสู่สาธารณชน จึงกำหนดการจัดการแข่งขันงาน<br/>" +
-                                  "ศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗ ระหว่างวันที่ ๑๒ - ๑๔ ธันวาคม ๒๕๖๗<br/>" +
+                                  "ศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๓ ปีการศึกษา ๒๕๖๘ ระหว่างวันที่ ๑๐ - ๑๒ ธันวาคม ๒๕๖๘<br/>" +
                                   " ณ สนามแข่งขัน โรงเรียนในสังกัดสำนักงานเขตพื้นที่การศึกษามัธยมศึกษานครราชสีมา เพื่อให้การดำเนินงาน<br/>" +
                                   "เป็นไปตามวัตถุประสงค์ และประสิทธิภาพ โดยอาศัยอำนาจตามความในมาตรา ๓๗ แห่งพระราชบัญญัติบริหาร<br/>" +
                                   "ราชการกระทรวงศึกษาธิการ พ.ศ.๒๕๔๖ และมาตรา ๒๔ แห่งพระราชบัญญัติระเบียบราชการครูและบุคลากร<br/>" +
                                   "ทางการศึกษา พ.ศ.๒๕๔๗ และที่แก้ไขเพิ่มเติม จึงแต่งตั้งคณะกรรมการพิจารณาและคัดเลือก กรรมการตัดสินการ<br/>" +
-                                  "แข่งขันงานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗ ดังนี้<br/>"
+                                  "แข่งขันงานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๓ ปีการศึกษา ๒๕๖๘ ดังนี้<br/>"
                                   ;
 
                 #endregion
@@ -1916,7 +2077,7 @@ namespace Silapa.Controllers
                     headerRow7.Cells[0].Style.Font = bFont;
                     headerRow7.Cells[0].Style.Borders.All = PdfPens.Transparent; // เส้นขอบแต่ละเซลล์โปร่งใส
 
-                    var datareferee = datarefereeAll.Where(x => x.m_id == s_id[z - 1] && x.g_id == groupreferee.id)
+                    var datareferee = datarefereeAll.Where(x => x.m_id == s_id[z - 1] && x.g_id == (groupreferee?.id ?? -1))
                      .OrderBy(x => roleOrder.ContainsKey(x.role) ? roleOrder[x.role] : int.MaxValue)
                     .ToList();
                     // เพิ่มแถวข้อมูลปกติ
@@ -1956,7 +2117,7 @@ namespace Silapa.Controllers
                 #region htmlText
 
                 string longtext2 = "มีหน้าที่       ๑) พิจารณาและคัดเลือกคณะกรรมการ ตัดสินการแข่งขันงานศิลปหัตถกรรมนักเรียน ระดับ<br/>" +
-                                  "เขตพื้นที่การศึกษา ครั้งที่ ๗๒ ปีการศึกษา ๒๕๖๗ ตามที่กลุ่มสาระการเรียนรู้ หรือกิจกรรมที่รับผิดชอบจัดการ<br/>" +
+                                  "เขตพื้นที่การศึกษา ครั้งที่ ๗๓ ปีการศึกษา ๒๕๖๘ ตามที่กลุ่มสาระการเรียนรู้ หรือกิจกรรมที่รับผิดชอบจัดการ<br/>" +
                                   "แข่งขัน จากผู้สมัครผ่านโปรแกรมการแข่งขัน หรือ เสนอรายชื่อผู้ที่มีความรู้ ความสามารถ ตามความเหมาะสม<br/>" +
                                   "                ๒) พิจารณาวินิจฉัยชี้ขาดเรื่องอุทธรณ์<br/> " +
                                   "               ๓) พิจารณาวินิจฉัยชี้ขาดเรื่องร้องเรียน<br/>" +
@@ -1965,11 +2126,11 @@ namespace Silapa.Controllers
                                   "บังเกิดผลดีแก่ทางราชการ หากมีปัญหา อุปสรรคในการดำเนินงาน ให้รายงานต่อผู้อำนวยการสำนักงานเขตพื้นที่<br/>" +
                                   "การศึกษามัธยมศึกษานครราชสีมา ทราบ เพื่อพิจารณาดำเนินการต่อ<br/>" +
                                   "               ทั้งนี้ ตั้งแต่บัดนี้เป็นต้นไป<br/>" +
-                                  "                              สั่ง ณ วันที่ ๑ ธันวาคม พ.ศ.๒๕๖๗<br/>" +
+                                  "                              สั่ง ณ วันที่ ๑ ธันวาคม พ.ศ.๒๕๖๘<br/>" +
                                   "                         <br/>" +
                                       "                         <br/>" +
                                        "                         <br/>" +
-                                       "                                                       ดร.นัยนา ตันเจริญ<br/>" +
+                                       "                                                       ว่าที่ร้อยเอก ดร.ทิณกรณ์ ภูโทถ้ำ<br/>" +
                                         "                             ผู้อำนวยการสำนักงานเขตพื้นที่การศึกษามัธยมศึกษานครราชสีมา<br/>" +
                                   ""
                                   ;
@@ -1994,6 +2155,22 @@ namespace Silapa.Controllers
                     return File(stream.ToArray(), "application/pdf", "คำสั่งคณะกรรมการแต่ละศูนย์.pdf");
                 }
             }
+        }
+        // ฟังก์ชันสำหรับแปลงเลขเลขอารบิก -> เลขไทย
+        public string ToThaiDigits(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+            return input
+                .Replace("0", "๐")
+                .Replace("1", "๑")
+                .Replace("2", "๒")
+                .Replace("3", "๓")
+                .Replace("4", "๔")
+                .Replace("5", "๕")
+                .Replace("6", "๖")
+                .Replace("7", "๗")
+                .Replace("8", "๘")
+                .Replace("9", "๙");
         }
         public void DrawTextWithWrapping(PdfPage page, string text, PdfFont font, PdfBrush brush, RectangleF bounds)
         {

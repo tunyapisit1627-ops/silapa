@@ -22,6 +22,7 @@ namespace Silapa.Models
         public string tel { get; set; }
         public int g_id { get; set; }
         public int c_id { get; set; }
+        public int SettingID { get; set; }
         public string? ProfileImageUrl { get; set; }
         public string? status{ get; set; }
         public DateTime? lastupdate { get; set; }

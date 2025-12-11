@@ -1,149 +1,246 @@
-@model List<RegisterViewModel2>
+@model AdminRegistrationViewModel
 @{
-    ViewData["Title"] = "ข้อมูลโรงเรียนที่ทำการลงทะเบียน";
-    int i=1;
-    IList<ApplicationUser> users=ViewBag.users;
+    ViewData["Title"] = "ข้อมูลการลงทะเบียนทั้งหมด";
+    int i = 1;
 }
-<div class="card">
- <div class="card-header">
-        <h2 class="card-title">ข้อมูลโรงเรียนที่ทำการลงทะเบียน</h2>
+
+<div class="row mb-3">
+    <div class="col-md-3 col-sm-6 col-12">
+        <div class="info-box bg-info">
+            <span class="info-box-icon"><i class="fas fa-trophy"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">รายการแข่งขัน</span>
+                <span class="info-box-number">@Model.TotalCompetitions รายการ</span>
+            </div>
+        </div>
     </div>
- <div>
-    <form asp-controller="Admin" asp-action="frmlistregisterAll">
+    <div class="col-md-3 col-sm-6 col-12">
+        <div class="info-box bg-success">
+            <span class="info-box-icon"><i class="fas fa-users"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">ทีมที่สมัคร</span>
+                <span class="info-box-number">@Model.TotalTeams ทีม</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 col-12">
+        <div class="info-box bg-warning">
+            <span class="info-box-icon"><i class="fas fa-child"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">นักเรียน</span>
+                <span class="info-box-number">@Model.TotalStudents คน</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 col-12">
+        <div class="info-box bg-danger">
+            <span class="info-box-icon"><i class="fas fa-chalkboard-teacher"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">ครูผู้ฝึกซ้อม</span>
+                <span class="info-box-number">@Model.TotalTeachers คน</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card collapsed-card">
+    <div class="card-header border-0">
+        <h3 class="card-title">
+            <i class="fas fa-list-ul mr-1"></i> สรุปรายละเอียด (แยกตามหมวดหมู่)
+        </h3>
+        <div class="card-tools">
+            <button type="button" class="btn bg-info btn-sm" data-card-widget="collapse">
+                <i class="fas fa-plus"></i> ดูรายละเอียด
+            </button>
+        </div>
+    </div>
+    
+    <div class="card-body table-responsive p-0" style="max-height: 400px;">
+        <table class="table table-hover text-nowrap">
+            <thead>
+                <tr>
+                    <th>หมวดหมู่</th>
+                    <th class="text-center">จำนวนทีมรวม</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cat in Model.CategoryStats)
+                {
+                    // 1. แถวหลัก (หมวดหมู่) - มี attribute data-widget="expandable-table"
+                    <tr data-widget="expandable-table" aria-expanded="false">
+                        <td>
+                            <i class="expandable-table-caret fas fa-caret-right fa-fw"></i>
+                            @cat.CategoryName
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-primary" style="font-size: 1em;">@cat.TeamCount</span>
+                        </td>
+                        <td></td>
+                    </tr>
+                    
+                    // 2. แถวลูก (ซ่อนอยู่) - มี class expandable-body
+                    <tr class="expandable-body">
+                        <td colspan="3">
+                            <div class="p-0">
+                                <table class="table table-sm">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th style="padding-left: 40px;">ชื่อรายการแข่งขัน</th>
+                                            <th class="text-center" style="width: 100px;">ทีม</th>
+                                            <th class="text-center" style="width: 100px;">นักเรียน</th>
+                                            <th class="text-center" style="width: 100px;">ครู</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var comp in cat.Competitions)
+                                        {
+                                            <tr>
+                                                <td style="padding-left: 40px;">- @comp.CompetitionName</td>
+                                                <td class="text-center">
+                                                    @if(comp.TeamCount > 0) 
+                                                    { 
+                                                        <b>@comp.TeamCount</b> 
+                                                    } 
+                                                    else 
+                                                    { 
+                                                        <span class="text-muted">-</span> 
+                                                    }
+                                                </td>
+                                                <td class="text-center text-muted">@comp.StudentCount</td>
+                                                <td class="text-center text-muted">@comp.TeacherCount</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">@ViewData["Title"]</h2>
+    </div>
+    
+    <div>
+        <form asp-controller="Admin" asp-action="frmlistregisterAll" method="get">
             <div class="card-body">
-                <!-- Main content -->
                 <section class="content">
                     <div class="container-fluid">
-                        <!-- SELECT2 EXAMPLE -->
                         <div class="card card-default">
                             <div class="card-header">
                                 <h3 class="card-title">เงื่อนไขการค้นหา</h3>
-
-                                <div class="card-tools">
-                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-tool" data-card-widget="remove">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
                             </div>
-                            <!-- /.card-header -->
                             <div class="card-body">
                                 <div class="form-group row">
-                                    <label for="inputEmail3" class="col-sm-2 col-form-label">สังกัด</label>
+                                    <label class="col-sm-2 col-form-label">หมวดหมู่</label>
                                     <div class="col-sm-10">
-                                        @Html.DropDownList("c_id", (IEnumerable<SelectListItem>)ViewBag.levelData, "ทั้งหมด", new { @name = "", @class = "form-control select2", @style = "width: 100%;", @selected = (int)ViewBag.currentTypelevel })
+                                        @Html.DropDownList("c_id", (IEnumerable<SelectListItem>)ViewBag.CategoryList, "ทั้งหมด", new { @class = "form-control select2", @style = "width: 100%;" })
                                     </div>
                                 </div>
-                            </div>  
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">สังกัด</label>
+                                    <div class="col-sm-10">
+                                        @Html.DropDownList("a_id", (IEnumerable<SelectListItem>)ViewBag.AffiliationList, "ทั้งหมด", new { @class = "form-control select2", @style = "width: 100%;" })
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <!-- /.container-fluid -->
                 </section>
-                <!-- /.content -->
-                <!-- /.card-body -->
                 <div class="card-footer">
                     <button type="submit" class="btn btn-info">ค้นหา</button>
-                    <button type="submit" class="btn btn-default float-right">Cancel</button>
+                    <a asp-action="frmlistregisterAll" asp-controller="Admin" class="btn btn-default float-right">ล้างค่า</a>
                 </div>
-                <!-- /.card-footer -->
             </div>
         </form>
- </div>
-  <div class="card-body">
-     <table id="example1" class="table table-bordered table-striped">
-        <thead>
+    </div>
+
+    <div class="card-body">
+        <table id="example1" class="table table-bordered table-striped">
+            <thead>
                 <tr>
-                    <th>
-                        #
-                    </th>
-                    <th>
-                        รหัส
-                    </th>
-                    <th>
-                        ชื่อโรงเรียน
-                    </th>
-                    <th>
-                        รายการแข่งขัน
-                    </th>
-                    <th>
-                        นักเรียน
-                    </th>
-                    <th>
-                        ครู
-                    </th>
+                    <th>#</th>
+                    <th>รหัส</th>
+                    <th>ชื่อโรงเรียน</th>
+                    <th>รายการแข่งขัน</th>
+                    <th>นักเรียน</th>
+                    <th>ครู</th>
                     <th>รางวัล</th>
                     <th>อันดับ</th>
                 </tr>
             </thead>
-           <tbody>
-        @if (Model != null && Model.Any())
-        {
-            //int i = 1;
-            foreach (var item in Model)
-            {
-                <tr>
-                    <td>@i</td>
-                    <td>@item.Id</td>
-                    <td>@item.SchoolName</td>
-                    <td>@item.CompetitionName</td>
-                    <td style="vertical-align: top; text-align: left;">
-                        @foreach (var student in item.Students)
-                        {
-                            @($"{student.No} {student.Prefix} {student.FirstName} {student.LastName}")<br />
+            <tbody>
+                @if (Model != null && Model.Registrations.Any())
+                {
+                    foreach (var item in Model.Registrations)
+                    {
+                        <tr>
+                            <td>@(i++)</td> <td>@item.Id</td>
+                            <td>@item.SchoolName</td>
+                            <td>@item.CompetitionName</td>
+                            <td style="vertical-align: top; text-align: left;">
+                                @foreach (var student in item.Students)
+                                {
+                                    @($"{student.No} {student.Prefix} {student.FirstName} {student.LastName}")<br />
+                                }
+                            </td>
+                            <td style="vertical-align: top; text-align: left;">
+                                @foreach (var teacher in item.Teachers)
+                                {
+                                    @($"{teacher.No} {teacher.Prefix} {teacher.FirstName} {teacher.LastName}")<br />
+                                }
+                            </td>
+                            <td align="center">@item.Award</td>
+                            <td align="center">@item.Rank</td>
+                        </tr>
                         }
-                    </td>
-                    <td style="vertical-align: top; text-align: left;">
-                        @foreach (var teacher in item.Teachers)
-                        {
-                            @($"{teacher.No} {teacher.Prefix} {teacher.FirstName} {teacher.LastName}")<br />
-                        }
-                    </td>
-                    <td align="center">@item.Award</td>
-                    <td align="center">@item.Rank</td>
-                </tr>
-                i++;
-            }
-        }
-    </tbody>
-     </table>
-  </div>
-</div>
-<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
-<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
-<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
-<script src="~/plugins/jquery/jquery.min.js"></script>
-<script>$(function () {
-        $('.select2').select2()
-         $("#example1").DataTable({
-    "responsive": true,
-    "lengthChange": false,
-    "autoWidth": false,
-    "ordering": true,
-    "pageLength": 20,
-    "orderMulti": true,
-    "buttons": [
-        {
-            extend: 'excelHtml5',
-            text: 'Export to Excel',
-            customize: function (xlsx) {
-                var sheet = xlsx.xl.worksheets['sheet1.xml'];
-                // หาเซลล์ที่ต้องการปรับแต่ง
-                $('row c[r]', sheet).attr('s', '55'); // กำหนดสไตล์หากต้องการ
-                $('font', sheet).attr('name', 'TH Sarabun');
-            },
-            exportOptions: {
-                columns: ':visible',
-                format: {
-                    body: function (data, row, column, node) {
-                        // เปลี่ยน <br> กลับเป็น \n เพื่อให้ Excel แสดงผลบรรทัดใหม่
-                        return data.replace(/<br\s*\/?>/g, '\n');
-                    }
                 }
-            }
-        },
-        "copy", "csv", "print", "colvis"
-    ]
-}).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-    });</script>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            // 1. เปิด Select2
+            $('.select2').select2();
+
+            // 2. เปิด DataTable
+            $("#example1").DataTable({
+                "responsive": true,
+                "lengthChange": false,
+                "autoWidth": false,
+                "ordering": true,
+                "pageLength": 20,
+                "orderMulti": true,
+                "buttons": [
+                    {
+                        extend: 'excelHtml5',
+                        text: 'Export to Excel',
+                        customize: function (xlsx) {
+                            var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                            $('row c[r]', sheet).attr('s', '55'); 
+                            $('font', sheet).attr('name', 'TH Sarabun');
+                        },
+                        exportOptions: {
+                            columns: ':visible',
+                            format: {
+                                body: function (data, row, column, node) {
+                                    return data.replace(/<br\s*\/?>/g, '\n');
+                                }
+                            }
+                        }
+                    },
+                    "copy", "csv", "print", "colvis"
+                ]
+            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        });
+    </script>
+}

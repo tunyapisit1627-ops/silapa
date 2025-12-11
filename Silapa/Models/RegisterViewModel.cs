@@ -9,7 +9,7 @@ namespace Silapa.Models
        // public string Id { get; set; }
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string ?Email { get; set; }
 
         [Required]
         [Display(Name = "UserName")]

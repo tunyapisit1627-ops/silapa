@@ -1,36 +1,94 @@
-@using X.PagedList
-@using X.PagedList.Mvc.Core
-@model IPagedList<news>
+@model IEnumerable<news>
+
 @{
-    ViewData["Title"] = "งานศิลปหัตภกรรมนักเรียนครั้งที่ 72 ปีการศึกษา 2567 จังหวัดนครราชสีมา";
-   // IList<news> news=ViewBag.news;
-    int n=1;
+    ViewData["Title"] = "ข่าวประชาสัมพันธ์ทั้งหมด";
+    // ใช้ Layout หน้าบ้าน (Frontend) ที่ไม่มีเมนู Admin
+    // เช่น Layout = "~/Views/Shared/_Layout.cshtml"; 
+    
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
 }
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">ข่าวประชาสัมพันธ์ทั้งหมด</h2>
+
+<section class="container">
+    <div class="section-title">
+        <h2>📰 ข่าวสารและกิจกรรมทั้งหมด</h2>
+        <p>หน้าแสดงข่าวประชาสัมพันธ์และกิจกรรมที่เผยแพร่ทั้งหมด</p>
     </div>
-    <div class="card-body">
-        <section class="content">
-            <div class="row">
-            @foreach(var dn in Model)
+
+    <div class="news-grid">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var item in Model)
             {
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <img src="@dn.ImageUrl" class="card-img-top" alt="ข่าว @n">
-                    <div class="card-body">
-                        <h5 class="card-title">@dn.titlename</h5>
-                        <p class="card-text">ลงวันที่ : @dn.lastupdate</p>
-                        <a asp-action="frmnewsshow" asp-controller="Home" asp-route-id="@dn.id" class="btn btn-primary">อ่านเพิ่มเติม</a>
+                <div class="news-card">
+                    
+                    @* 🚨 Badge: ใช้ BadgeText และ BadgeClass *@
+                    @if (!string.IsNullOrEmpty(item.BadgeText))
+                    {
+                        <div class="news-badge @item.BadgeClass">
+                            @item.BadgeText
+                        </div>
+                    }
+
+                    @* 🚨 Image/Background: ใช้ CoverImageUrl หรือ BackgroundGradient *@
+                    <div class="news-image" 
+                         style="background: @(string.IsNullOrEmpty(item.CoverImageUrl) ? item.BackgroundGradient : $"url(/{item.CoverImageUrl}) no-repeat center center / cover;");">
+                    </div>
+                    
+                    <div class="news-content">
+                        <div class="news-meta">
+                            <span class="news-date">📅 @item.lastupdate?.ToString("d MMM yyyy", new System.Globalization.CultureInfo("th-TH"))</span>
+                            <span class="news-category">@item.Category</span>
+                        </div>
+                        
+                        <h3>@item.titlename</h3>
+                        
+                        @* 🚨 Details: ตัดข้อความให้สั้นลง *@
+                        <p>
+                            @{
+                                string cleanDetails = System.Text.RegularExpressions.Regex.Replace(item.details ?? "", "<.*?>", String.Empty);
+                                string summary = cleanDetails.Length > 120 ? cleanDetails.Substring(0, 120) + "..." : cleanDetails;
+                            }
+                            @summary
+                        </p>
+                        
+                        @* ลิงก์ไปยังหน้าแสดงรายละเอียดข่าว *@
+                        <a asp-controller="News" asp-action="Details" asp-route-id="@item.id" class="news-link">อ่านต่อ →</a>
                     </div>
                 </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <p>⚠️ ยังไม่มีข่าวประชาสัมพันธ์ในขณะนี้</p>
             </div>
-            n+=1;
-            }           
-        </div>
-        <div class="pagination justify-content-center">
-            @Html.PagedListPager(Model, page => Url.Action("frmnewsAll", new { page }))
-        </div>
-        </section>
+        }
     </div>
-</div>
+
+    @* 🚨 ส่วน Pagination (เลขหน้า) *@
+    @if (totalPages > 1)
+    {
+        <nav aria-label="Page navigation" style="margin-top: 30px; text-align: center;">
+            <ul class="pagination justify-content-center">
+                
+                @* ปุ่ม Previous *@
+                <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                    <a class="page-link" asp-action="frmnewsAll" asp-route-page="@(currentPage - 1)">Previous</a>
+                </li>
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" asp-action="frmnewsAll" asp-route-page="@i">@i</a>
+                    </li>
+                }
+
+                @* ปุ่ม Next *@
+                <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                    <a class="page-link" asp-action="frmnewsAll" asp-route-page="@(currentPage + 1)">Next</a>
+                </li>
+            </ul>
+        </nav>
+    }
+</section>

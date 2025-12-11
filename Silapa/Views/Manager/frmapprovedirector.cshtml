@@ -1,15 +1,16 @@
 @model IEnumerable<registerdirector>
 @{
     ViewData["Title"] = "ข้อมูลการสมัครกรรมการ";
-    int i=1;
-   // IList<Registerhead> models=ViewBag.data;
+    int i = 1;
+    // IList<Registerhead> models=ViewBag.data;
 }
 <div class="card">
- <div class="card-header">
+    <div class="card-header">
         <h2 class="card-title">ข้อมูลการสมัครกรรมการ</h2>
     </div>
- <div>
-    <form asp-controller="Manager" asp-action="frmapprovedirector">
+    <div>
+        <form asp-controller="Manager" asp-action="frmapprovedirector">
+            @Html.AntiForgeryToken()
             <div class="card-body">
                 <!-- Main content -->
                 <section class="content">
@@ -33,16 +34,16 @@
                                 <div class="form-group row">
                                     <label for="inputEmail3" class="col-sm-2 col-form-label">หมวดหมู่</label>
                                     <div class="col-sm-10">
-                                       @Html.DropDownList("c_id", ViewBag.categoryData as SelectList,
-                                                 "เลือกหมวดหมู่/สาระ", new
-                                                 {
-                                                     @class = "form-control select2",
-                                                     id = "c_id",
-                                                     @name="c_id"
-                                                 })
+                                        @Html.DropDownList("c_id", ViewBag.categoryData as SelectList,
+                                        "เลือกหมวดหมู่/สาระ", new
+                                        {
+                                            @class = "form-control select2",
+                                            id = "c_id",
+                                            @name = "c_id"
+                                        })
                                     </div>
                                 </div>
-                            </div>  
+                            </div>
                         </div>
                     </div>
                     <!-- /.container-fluid -->
@@ -56,10 +57,10 @@
                 <!-- /.card-footer -->
             </div>
         </form>
- </div>
-  <div class="card-body">
-     <table id="example1" class="table table-bordered table-striped">
-        <thead>
+    </div>
+    <div class="card-body">
+        <table id="example1" class="table table-bordered table-striped">
+            <thead>
                 <tr>
                     <th>
                         #
@@ -81,21 +82,23 @@
                         รายละเอียด
                     </th>
                     <th>
-                       สถานะ
+                        สถานะ
                     </th>
                     <th></th>
                 </tr>
             </thead>
-             <tbody>
+            <tbody>
                 @foreach (var item in Model)
                 {
-                     
+
                     <tr data-widget="expandable-table" aria-expanded="false">
                         <td align="center">
                             @i
                         </td>
                         <td align="center">
-                            <img width="128" height="128" src="@(!string.IsNullOrEmpty(item.ProfileImageUrl) ? item.ProfileImageUrl : "default-image.png")" alt="User Image" />
+                            <img width="128" height="128"
+                                src="@(!string.IsNullOrEmpty(item.ProfileImageUrl) ? item.ProfileImageUrl : "default-image.png")"
+                                alt="User Image" />
                         </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.name)
@@ -103,38 +106,49 @@
                         <td>
                             @Html.DisplayFor(modelItem => item.Competitionlist.Name)
                         </td>
-                         <td>
+                        <td>
                             @Html.DisplayFor(modelItem => item.position)
                         </td>
-                         <td>
+                        <td>
                             @Html.DisplayFor(modelItem => item.tel)
                         </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.experience)
                         </td>
-                        
-                        <td align="center" id="status-@item.id"> 
-                             รอการอนุมัติ
+
+                        <td align="center" id="status-@item.id">
+                            @if(item.status == "1")
+        {
+            <span class="badge bg-warning">รอการอนุมัติ</span>
+        }
+        else if(item.status == "2")
+        {
+            <span class="badge bg-success">อนุมัติแล้ว</span>
+        }
+        else
+        {
+            <span class="badge bg-secondary">@item.status</span>
+        }
                         </td>
                         <td align="center">
-                          <button class="btn btn-success" onclick="approveUser(@item.id)">อนุมัติ</button>
+                            @if(item.status == "1") 
+        {
+            <button class="btn btn-success" onclick="approveUser(@item.id)">อนุมัติ</button>
+        }
                         </td>
                     </tr>
-                    i+=1;
-                    
+                    i += 1;
+
                 }
             </tbody>
-     </table>
-  </div>
+        </table>
+    </div>
 </div>
-<link type="text/css" href="~/css/css/ui-lightness/jquery-ui-1.8.10.custom.css" rel="stylesheet" />
-<script type="text/javascript" src="~/js/jquery-1.4.4.min.js"></script>
-<script type="text/javascript" src="~/js/jquery-ui-1.8.10.offset.datepicker.min.js"></script>
 <script src="~/plugins/jquery/jquery.min.js"></script>
 <script>$(function () {
         $('.select2').select2()
         $("#example1").DataTable({
-            "responsive": true, "lengthChange": false, "autoWidth": false, "ordering": true, "pageLength": 20, "orderMulti":true,
+            "responsive": true, "lengthChange": false, "autoWidth": false, "ordering": true, "pageLength": 20, "orderMulti": true,
             "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
         }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         $('#example2').DataTable({
@@ -147,23 +161,38 @@
             "responsive": true,
         });
     });</script>
-    <script>
+<script>
     function approveUser(userId) {
+        var token = $('input[name="__RequestVerificationToken"]').val();
         $.ajax({
             url: '@Url.Action("Approvedirector", "Manager")',
             type: 'POST',
-            data: { id: userId },
-            success: function(response) {
+            data: {
+                __RequestVerificationToken: token,
+                id: userId
+            },
+            success: function (response) {
                 if (response.success) {
-                    // เปลี่ยนสถานะเป็น "อนุมัติแล้ว"
-                    $('#status-' + userId).text('อนุมัติแล้ว');
-                    location.reload(); // รีเฟรชหน้าหลังอัปเดตสถานะ
+                    var statusCell = $('#status-' + userId);
+                    statusCell.html('<span class="badge bg-success">อนุมัติแล้ว</span>');
+                    
+                    // (ซ่อนปุ่ม "อนุมัติ" ที่เราเพิ่งกดไป)
+                    statusCell.next('td').find('button.btn-success').remove();
+                    Swal.fire(
+                        'อนุมัติสำเร็จ!',
+                        'กรรมการถูกเพิ่มเข้าระบบแล้ว',
+                        'success'
+                    );
                 } else {
-                    alert('เกิดข้อผิดพลาด: ' + response.message);
+                    Swal.fire(
+                        'อนุมัติไม่สำเร็จ',
+                        response.message, // (แสดง Error ที่ส่งมาจาก Controller)
+                        'error'
+                    );
                 }
             },
-            error: function() {
-                alert('ไม่สามารถอนุมัติได้');
+            error: function () {
+                Swal.fire('การเชื่อมต่อล้มเหลว', 'ไม่สามารถอนุมัติได้', 'error');
             }
         });
     }

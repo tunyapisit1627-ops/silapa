@@ -1,0 +1,187 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "แดชบอร์ดผู้ดูแลระบบ";
+    // (ดึง setup system มาใช้กับปุ่มทางลัด)
+    var activeSystem = ViewBag.ActiveSystem as setupsystem;
+    var activeSystemId = activeSystem?.id ?? 0;
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">@ViewData["Title"]</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>@Model.TotalRegistrations</h3>
+                        <p>ทีมที่ลงทะเบียน (ทั้งหมด)</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <a asp-action="frmlistregisterAll" asp-controller="Admin" class="small-box-footer">ดูเพิ่มเติม <i
+                            class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>@Model.TotalSchools</h3>
+                        <p>โรงเรียนในระบบ</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-school"></i>
+                    </div>
+                    <a asp-action="SchoolRegistrationReport" asp-controller="Admin" class="small-box-footer">ดูรายงาน
+                        (เจาะลึก) <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>@Model.TotalUsers</h3>
+                        <p>ผู้ใช้งานทั้งหมด</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <a asp-action="ListRegister" asp-controller="Account" class="small-box-footer">ดูเพิ่มเติม <i
+                            class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>@Model.DailyVisits</h3>
+                        <p>ผู้เข้าชมวันนี้</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <a asp-action="Index" asp-controller="Home" class="small-box-footer">ไปหน้าแรก <i
+                            class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-primary">
+                    <div class="inner">
+                        <h3>@Model.TotalStudents</h3>
+                        <p>จำนวนนักเรียน (ผู้เข้าแข่งขัน)</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-child"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">(ดูรายละเอียด) <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-secondary">
+                    <div class="inner">
+                        <h3>@Model.TotalTeachers</h3>
+                        <p>จำนวนครู (ผู้ฝึกซ้อม)</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">(ดูรายละเอียด) <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>@Model.TotalJudges</h3>
+                        <p>จำนวนกรรมการ</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-gavel"></i>
+                    </div>
+                    <a asp-action="frmlistreferee" asp-controller="Manager" class="small-box-footer">จัดการกรรมการ <i
+                            class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-light">
+                    <div class="inner">
+                        <h3>@Model.MonthlyVisits</h3>
+                        <p>ยอดเข้าชม (เดือนนี้)</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <a href="#" class="small-box-footer"> </a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="card card-outline card-success">
+                    <div class="card-header">
+                        <h3 class="card-title">สรุปยอดลงทะเบียน (แยกตามหมวดหมู่)</h3>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.CategoryStats == null || !Model.CategoryStats.Any())
+                        {
+                            <p class="text-muted">ยังไม่มีข้อมูลการลงทะเบียน</p>
+                        }
+                        else
+                        {
+                            foreach (var item in Model.CategoryStats)
+                            {
+                                // คำนวณ % (ป้องกันการหารด้วย 0)
+                                double percentage = (Model.TotalRegistrations > 0)
+                                ? (item.TeamCount * 100.0) / Model.TotalRegistrations
+                                : 0;
+
+                                <div class="progress-group">
+                                    @item.CategoryName
+                                    <span class="float-right"><b>@item.TeamCount</b> / @Model.TotalRegistrations</span>
+                                    <div class="progress progress-sm">
+                                        <div class="progress-bar bg-success" style="width: @percentage.ToString("F0")%"></div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="card card-outline card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">ทางลัด (Quick Actions)</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>เมนูจัดการระบบที่ใช้งานบ่อย:</p>
+
+                        <a class="btn btn-app bg-info" asp-controller="Admin" asp-action="frmsetupsystem"
+                            asp-route-id="@activeSystemId">
+                            <i class="fas fa-cogs"></i> ตั้งค่าระบบ
+                        </a>
+                        <a class="btn btn-app bg-success" asp-controller="Admin" asp-action="frmList">
+                            <i class="fas fa-trophy"></i> จัดการแข่งขัน
+                        </a>
+                        <a class="btn btn-app bg-danger" asp-controller="News" asp-action="frmnewslist">
+                            <i class="fas fa-bullhorn"></i> จัดการข่าว
+                        </a>
+                        <a class="btn btn-app bg-secondary" asp-controller="Admin" asp-action="frmfileList">
+                            <i class="fas fa-file-alt"></i> จัดการไฟล์
+                        </a>
+                        <a class="btn btn-app bg-warning" asp-controller="Admin" asp-action="CategoryList">
+                            <i class="fas fa-tags"></i> จัดการหมวดหมู่
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

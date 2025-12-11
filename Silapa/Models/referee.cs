@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
+using System.Text.Json.Serialization;
 namespace Silapa.Models
 {
     public class referee
@@ -32,6 +32,7 @@ namespace Silapa.Models
          [ForeignKey("g_id")]
          public virtual groupreferee? Groupreferee { get;set;}
          [ForeignKey("SettingID")]
+         [JsonIgnore]
         public virtual setupsystem? Setupsystem { get; set; }
     }
 }
